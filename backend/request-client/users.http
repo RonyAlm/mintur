@@ -1,0 +1,38 @@
+@baseUrl = http://localhost:3000/api
+
+### GET - getAllUsers
+GET {{baseUrl}}/users
+
+
+### POST Register
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "W Almiron",
+  "email": "w@rony.com",
+  "password": "32332323"
+}
+
+### POST Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "w@rony.com",
+  "password": "32332323"
+}
+
+### GET Profile
+GET {{baseUrl}}/auth/profile
+
+### DELETE 
+DELETE {{baseUrl}}/users/1
+
+### UPDATE 
+PATCH {{baseUrl}}/users/1
+Content-Type: application/json
+
+{
+  "name": "Walter"
+}
