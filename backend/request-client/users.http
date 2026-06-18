@@ -23,6 +23,17 @@ Content-Type: application/json
   "password": "32332323"
 }
 
+### POST Register
+POST {{baseUrl}}/users/create
+Content-Type: application/json
+
+{
+  "name": "Walter",
+  "email": "hola@mail.com",
+  "password": "32332323",
+  "role": "user"
+}
+
 ### GET Profile
 GET {{baseUrl}}/auth/profile
 
