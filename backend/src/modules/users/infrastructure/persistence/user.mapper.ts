@@ -1,8 +1,8 @@
 import { User as UserTable } from 'src/generated/prisma/client';
-import { Role, Users } from '../../domain/entities/';
+import { Role, Users, UserSecured } from '../../domain/entities/';
 
 export class UserMapper {
-  static toDomain(raw: UserTable): Users {
+  static toDomainPrivate(raw: UserTable): Users {
     return new Users(
       raw.id,
       raw.name,
@@ -13,8 +13,18 @@ export class UserMapper {
       raw.updatedAt,
     );
   }
+  static toDomain(raw: UserTable): UserSecured {
+    return {
+      id: raw.id,
+      name: raw.name,
+      email: raw.email,
+      role: raw.role as Role,
+      createdAt: raw.createdAt,
+      updatedAt: raw.updatedAt,
+    };
+  }
 
-  static toDomainList(raw: UserTable[]): Users[] {
+  static toDomainList(raw: UserTable[]): UserSecured[] {
     return raw.map((user) => this.toDomain(user));
   }
 }

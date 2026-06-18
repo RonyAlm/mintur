@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from '../../../modules/prisma/prisma.module';
-import { FindUserByEmailUseCase } from '../applications';
+import { CreateUserUseCase, FindUserByEmailUseCase } from '../applications';
 import { PrismaUsersRepository } from './persistence';
 import { UsersRepository } from '../domain';
+import { UsersController } from './controllers';
 
 @Module({
   imports: [PrismaModule],
@@ -13,6 +14,12 @@ import { UsersRepository } from '../domain';
       provide: UsersRepository,
       useClass: PrismaUsersRepository,
     },
+    CreateUserUseCase,
   ],
+  controllers: [UsersController],
 })
 export class UsersModule {}
+
+//  controllers: [AuthController],
+//   providers: [LoginUseCase, JwtModule],
+//   exports: [JwtModule, LoginUseCase],

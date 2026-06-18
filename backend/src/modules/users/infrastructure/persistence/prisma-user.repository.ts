@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { Users, UsersWithoutPassword } from '../../domain/entities';
+import { Users, UserSecured } from '../../domain/entities';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { UsersRepository } from '../../domain';
 import { UserMapper } from './user.mapper';
+import { CreateUserDto } from '../../applications/dtos';
 
 @Injectable()
 export class PrismaUsersRepository implements UsersRepository {
   constructor(private readonly prismaService: PrismaService) {}
-  async findAll(): Promise<UsersWithoutPassword[]> {
+  async findAll(): Promise<UserSecured[]> {
     const users = await this.prismaService.user.findMany();
     if (!users) return [];
     return UserMapper.toDomainList(users);
@@ -15,13 +16,17 @@ export class PrismaUsersRepository implements UsersRepository {
   async findByEmail(email: string): Promise<Users | null> {
     const user = await this.prismaService.user.findUnique({ where: { email } });
     if (!user) return null;
-    return UserMapper.toDomain(user);
+    return UserMapper.toDomainPrivate(user);
   }
-  findById(id: string): Promise<Users | null> {
-    throw new Error('Method not implemented.' + id);
+  async findById(id: string): Promise<Users | null> {
+    const user = await this.prismaService.user.findUnique({ where: { id } });
+    if (!user) return null;
+    return UserMapper.toDomainPrivate(user);
   }
-  save(user: Users): Promise<Users> {
-    throw new Error('Method not implemented.', { cause: user });
+  async save(user: CreateUserDto): Promise<UserSecured> {
+    const userCreated = await this.prismaService.user.create({ data: user });
+    const result = UserMapper.toDomain(userCreated);
+    return result;
   }
   delete(id: string): Promise<void> {
     throw new Error('Method not implemented.' + id);

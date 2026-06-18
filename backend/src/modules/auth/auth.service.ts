@@ -5,9 +5,9 @@ import {
 } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from '../users/users.service';
+// import { UsersService } from '../users/users.service';
 import { RegisterDto, LoginDto } from './applications/dto';
-
+/*
 @Injectable()
 export class AuthService {
   constructor(
@@ -52,3 +52,5 @@ export class AuthService {
     return user;
   }
 }
+
+*/

@@ -11,13 +11,17 @@ export class Users {
     public readonly email: string,
     public readonly password: string,
     public readonly role: Role,
-    public readonly createdAt: Date,
-    public readonly updatedAt: Date,
+    public readonly createdAt?: Date,
+    public readonly updatedAt?: Date,
   ) {}
 
-  // isAdmin(): boolean {
-  //   return this.role === Role.ADMIN;
-  // }
+  isAdmin(): boolean {
+    return this.role === Role.ADMIN || this.role === Role.SUPERADMIN;
+  }
+
+  isSuperAdmin(): boolean {
+    return this.role === Role.SUPERADMIN;
+  }
 }
 
-export type UsersWithoutPassword = Omit<Users, 'password'>;
+export type UserSecured = Omit<Users, 'password' | 'isAdmin' | 'isSuperAdmin'>;
