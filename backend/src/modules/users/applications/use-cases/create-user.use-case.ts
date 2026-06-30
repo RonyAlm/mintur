@@ -11,11 +11,16 @@ import { CreateUserDto } from '../dtos';
 export class CreateUserUseCase {
   constructor(private readonly usersRepository: UsersRepository) {}
 
-  async execute(user: CreateUserDto, executor: Users): Promise<UserSecured> {
-    const executorExists = await this.usersRepository.findById(executor.id);
+  async execute(
+    user: CreateUserDto,
+    executor: { id: string; email: string; role: Role },
+  ): Promise<UserSecured> {
+    const executorExists = await this.usersRepository.findById(
+      executor.id || '',
+    );
     if (!executorExists) throw new UnauthorizedException('Executor not found');
 
-    if (!executor.isAdmin())
+    if (executor.role !== Role.ADMIN && executor.role !== Role.SUPERADMIN)
       throw new UnauthorizedException('User must be admin');
 
     const userExists = await this.usersRepository.findByEmail(user.email);
@@ -26,7 +31,7 @@ export class CreateUserUseCase {
         message: 'User already exists',
       });
 
-    if (user.role === Role.SUPERADMIN && !executor.isSuperAdmin())
+    if (user.role === 'admin' && executor.role !== Role.SUPERADMIN)
       throw new UnauthorizedException('User must be super admin');
 
     const hashedPassword = await bcrypt.hash(user.password, 10);
