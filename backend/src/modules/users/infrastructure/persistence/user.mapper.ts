@@ -1,4 +1,4 @@
-import { User as UserTable } from 'src/generated/prisma/client';
+import { User as UserTable } from '../../../../core/lib/generated/prisma/client';
 import { Role, Users, UserSecured } from '../../domain/entities/';
 
 export class UserMapper {
