@@ -1,7 +1,9 @@
 import { Body, Controller, Get, Post, Request } from '@nestjs/common';
 import { CreateUserDto } from '../../applications/dtos';
-import { Role, Users } from '../../domain';
+import { Role } from '../../domain';
 import { CreateUserUseCase } from '../../applications';
+import { Activeuser, type ExecutorUser } from '../../../../core';
+import { Auth } from '../../../../core/decorators';
 
 @Controller('users')
 export class UsersController {
@@ -19,14 +21,11 @@ export class UsersController {
   // }
 
   @Post('create')
-  async createUser(@Body() dto: CreateUserDto, @Request() req) {
-    const executor = new Users(
-      'd6534be2-8cf4-4ec4-b7b5-1cc976947151',
-      'carlos@rony.com',
-      'hash',
-      'W Almiron',
-      Role.ADMIN,
-    );
+  @Auth(Role.ADMIN)
+  async createUser(
+    @Body() dto: CreateUserDto,
+    @Activeuser() executor: ExecutorUser,
+  ) {
     return this.createUserUseCase.execute(dto, executor);
   }
 
