@@ -11,23 +11,31 @@ export const api = axios.create({
 
 // Interceptors
 
-api.interceptors.request.use(
-    (config) => {
-        console.log("Desde el interceptor ", config);
-        return config;
+// api.interceptors.request.use(
+//     (config) => {
+//         console.log("Desde el interceptor ", config);
 
-    },
-    (error) => {
-        return Promise.reject(error);
-    }
-);
+//         const user = localStorage.getItem("user");
+//         console.log("Desde el interceptor user ", user);
+//         if (user) {
+//             const { accessToken } = JSON.parse(user);
+//             console.log("Desde el interceptor Token ", accessToken);
+//             config.headers.Authorization = `Bearer ${accessToken}`;
+//         }
+//         return config;
 
-api.interceptors.response.use(
-    (response) => {
-        console.log("Desde el interceptor response ", response);
-        return response;
-    },
-    (error) => {
-        return Promise.reject(error);
-    }
-);
+//     },
+//     (error) => {
+//         return Promise.reject(error);
+//     }
+// );
+
+// api.interceptors.response.use(
+//     (response) => {
+//         console.log("Desde el interceptor response ", response);
+//         return response;
+//     },
+//     (error) => {
+//         return Promise.reject(error);
+//     }
+// );
