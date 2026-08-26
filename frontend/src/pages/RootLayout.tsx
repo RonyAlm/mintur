@@ -1,9 +1,7 @@
 import { Outlet } from "react-router"
-// import Header from "../components/Header"
-// import {  SidebarTrigger } from "../components/ui/sidebar"
-import DashboardLayout from "./dashboard/DashboardLayout"
-// import Header from "../components/Header"
-// import type { User } from "@domain/entities"
+import { SidebarTrigger, SidebarProvider, SidebarInset } from "../components/ui/sidebar"
+import { AppSidebar } from "../components/AppSidebar"
+import { DropdownMenuUser } from "../components/DropdownMenuUser"
 
 interface User {
     id: string
@@ -13,19 +11,32 @@ interface User {
 }
 
 interface Props {
-    user?:  User
+    user?: User
 }
 
-const RootLayout = ({ user }: Props ) => {
+const RootLayout = ({ user }: Props) => {
     return (
-        <DashboardLayout>
-             
-             {/* <Header user={user!} /> */}
-            <main>
-                <Outlet />
-            </main>
-            { /*/<footer>Footer</footer> */}
-        </DashboardLayout>
+        <SidebarProvider>
+            <AppSidebar />
+
+            <SidebarInset>
+                <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+                    <SidebarTrigger />
+
+                    <h1 className="font-semibold">
+                        {user?.email}
+                    </h1>
+
+                    <div className="flex flex-1" />
+                    
+                    <DropdownMenuUser />
+                </header>
+
+                <main className="flex flex-1 flex-col gap-4 p-4">
+                    <Outlet />
+                </main>
+            </SidebarInset>
+        </SidebarProvider>
     )
 }
 

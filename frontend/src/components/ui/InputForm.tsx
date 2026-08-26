@@ -25,7 +25,7 @@ const InputForm = <T extends FieldValues>({
 }: Props<T>) => {
   return (
     <div className="flex flex-col gap-2">
-      <Label className="">
+      <Label className=" text-green-700">
         {label}
       </Label>
 
@@ -37,7 +37,9 @@ const InputForm = <T extends FieldValues>({
             <Input
               id={name}
               {...field}
-              className=""
+              className="text-green-950/80 border-gray-300 focus-within:border-green-700
+               hover:border-green-700 
+              `"
               placeholder={placeholder}
               type={type}
             />

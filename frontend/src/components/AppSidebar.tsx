@@ -56,6 +56,13 @@ const systemItems = [
 export function AppSidebar() {
   const { logout, user } = useAuth();
 
+  // const user = {
+  //   id: "1",
+  //   name: "John Doe",
+  //   email: "a@b.com",
+  //   role: "admin",
+  // };
+
   return (
     <Sidebar collapsible="icon">
 

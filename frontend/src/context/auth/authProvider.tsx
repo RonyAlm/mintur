@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { AuthContext, type User } from "./authContext"
 import loginService from "../../services/auth.service"
 type Props = {
@@ -8,31 +8,39 @@ const AuthProvider = ({children} : Props) => {
     const [ user, setUser ] = useState<User | null>(
         JSON.parse(localStorage.getItem('user') || 'null')
     )
+    const [ loading, setLoading ] = useState(false)
+    const [ error, setError ] = useState('')
 
     const login = async (credentials: { email: string, password: string }) => {
         const { email, password } = credentials
-
+        
+        setLoading(true)
         const response = await loginService.login({ email, password })
-
+        setLoading(false)
         if (response.email) {
             setUser(response)
             localStorage.setItem('user', JSON.stringify(response))            
+            localStorage.setItem('token', response.accessToken)
             return response
+        } 
+
+        if (response.error === 'Unauthorized') {
+            setError("Email o contraseña incorrectos") 
+            setTimeout(() => setError(''), 5000)
         }
 
+        setUser(null)
+        localStorage.removeItem('user')
+       
+        
         return response
     }
 
     const logout = () => {
         setUser(null)
         localStorage.removeItem('user')
+        localStorage.removeItem('token')
     }
-
-    useEffect(() => {
-        if (user) {
-            localStorage.setItem('user', JSON.stringify(user))
-        }
-    }, [])
 
     // useEffect(() => {
     //     const userStored = localStorage.getItem('user')
@@ -45,7 +53,7 @@ const AuthProvider = ({children} : Props) => {
 
     return (
         <AuthContext.Provider 
-            value={ { user, login, logout }}>
+            value={ { user, login, logout, loading, error }}>
             {children}
         </AuthContext.Provider>
     )
