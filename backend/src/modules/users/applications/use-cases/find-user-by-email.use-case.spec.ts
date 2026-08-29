@@ -48,10 +48,11 @@ describe.only('FindUserByEmailUseCase', () => {
     };
     const mockUserFound = new Users(
       user.id,
-      user.name,
       email,
       user.password,
       Role.USER,
+      true,
+      user.name,
       new Date(),
       new Date(),
     );
