@@ -1,18 +1,21 @@
-export enum Role {
-  USER = 'user',
-  ADMIN = 'admin',
-  SUPERADMIN = 'superadmin',
-}
+export const Role = {
+  USER: 'USER',
+  ADMIN: 'ADMIN',
+  SUPERADMIN: 'SUPERADMIN',
+} as const;
+
+export type Role = (typeof Role)[keyof typeof Role];
 
 export class Users {
   constructor(
     public readonly id: string,
-    public readonly name: string,
     public readonly email: string,
-    public readonly password: string,
+    public readonly passwordHash: string,
     public readonly role: Role,
-    public readonly createdAt?: Date,
-    public readonly updatedAt?: Date,
+    public readonly mustChangePassword: boolean,
+    public readonly name: string,
+    public readonly createdAt: Date,
+    public readonly updatedAt: Date,
   ) {}
 
   isAdmin(): boolean {
@@ -24,4 +27,13 @@ export class Users {
   }
 }
 
-export type UserSecured = Omit<Users, 'password' | 'isAdmin' | 'isSuperAdmin'>;
+export type UserSecured = Omit<
+  Users,
+  'passwordHash' | 'isAdmin' | 'isSuperAdmin'
+>;
+
+export type ExecutorUser = {
+  sub: string;
+  email: string;
+  role: Role;
+};

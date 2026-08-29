@@ -3,12 +3,11 @@ import { Users, UserSecured } from '../../domain/entities';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { UsersRepository } from '../../domain';
 import { UserMapper } from './user.mapper';
-import { CreateUserDto } from '../../applications/dtos';
 
 @Injectable()
 export class PrismaUsersRepository implements UsersRepository {
   constructor(private readonly prismaService: PrismaService) {}
-  async findAll(): Promise<UserSecured[]> {
+  async findAll(): Promise<UserSecured[] | []> {
     const users = await this.prismaService.user.findMany();
     if (!users) return [];
     return UserMapper.toDomainList(users);
@@ -23,15 +22,16 @@ export class PrismaUsersRepository implements UsersRepository {
     if (!user) return null;
     return UserMapper.toDomainPrivate(user);
   }
-  async save(user: CreateUserDto): Promise<UserSecured> {
+  async save(user: Users): Promise<UserSecured> {
     const userCreated = await this.prismaService.user.create({ data: user });
     const result = UserMapper.toDomain(userCreated);
     return result;
   }
+
   delete(id: string): Promise<void> {
     throw new Error('Method not implemented.' + id);
   }
   update(id: string, user: Partial<Users>): Promise<Users | null> {
-    throw new Error('Method not implemented.');
+    throw new Error('Method not implemented.' + id);
   }
 }

@@ -4,8 +4,19 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Role, Users, UserSecured, UsersRepository } from '../../domain';
+import {
+  ExecutorUser,
+  Role,
+  Users,
+  UserSecured,
+  UsersRepository,
+} from '../../domain';
 import { CreateUserDto } from '../dtos';
+import * as crypto from 'crypto';
+
+export interface ResponseData extends UserSecured {
+  temporaryPassword: string;
+}
 
 @Injectable()
 export class CreateUserUseCase {
@@ -13,11 +24,9 @@ export class CreateUserUseCase {
 
   async execute(
     user: CreateUserDto,
-    executor: { id: string; email: string; role: Role },
-  ): Promise<UserSecured> {
-    const executorExists = await this.usersRepository.findById(
-      executor.id || '',
-    );
+    executor: ExecutorUser,
+  ): Promise<ResponseData> {
+    const executorExists = await this.usersRepository.findById(executor.sub);
     if (!executorExists) throw new UnauthorizedException('Executor not found');
 
     if (executor.role !== Role.ADMIN && executor.role !== Role.SUPERADMIN)
@@ -31,16 +40,18 @@ export class CreateUserUseCase {
         message: 'User already exists',
       });
 
-    if (user.role === 'admin' && executor.role !== Role.SUPERADMIN)
+    if (user.role === 'ADMIN' && executor.role !== Role.SUPERADMIN)
       throw new UnauthorizedException('User must be super admin');
 
-    const hashedPassword = await bcrypt.hash(user.password, 10);
+    const temporaryPassword = crypto.randomBytes(6).toString('hex');
+    const hashedPassword = await bcrypt.hash(temporaryPassword, 10);
     const userCreated = new Users(
       crypto.randomUUID(),
-      user.name,
       user.email,
       hashedPassword,
       Role.USER,
+      true,
+      user.name || '',
       new Date(),
       new Date(),
     );
@@ -48,6 +59,15 @@ export class CreateUserUseCase {
     const result = await this.usersRepository.save(userCreated);
     if (!result) throw new Error('Error creating user');
 
-    return result;
+    return {
+      id: result.id,
+      name: result.name,
+      email: result.email,
+      role: result.role,
+      mustChangePassword: result.mustChangePassword,
+      createdAt: result.createdAt,
+      updatedAt: result.updatedAt,
+      temporaryPassword,
+    };
   }
 }

@@ -12,12 +12,13 @@ import { Request } from 'express';
 // import { Activeuser } from '../../core/decorators/active-user.decotor';
 import { LoginDto, LoginUseCase } from '../../applications';
 // import { Auth } from '../../../core/decorators';
-import { Role } from '../../../../modules/users/domain';
+// import { Role } from '../../../../modules/users/domain';
 import { Activeuser } from '../../../../core';
-import { Auth } from '../../../../core/decorators';
+// import { Auth } from '../../../../core/decorators';
 
 export interface RequestWithUser extends Request {
   user: {
+    sub: string;
     email: string;
     role?: string;
   };
@@ -39,7 +40,7 @@ export class AuthController {
   }
 
   @Get('profile')
-  @Auth(Role.ADMIN)
+  // @Auth(Role.ADMIN)
   profile(@Activeuser() user: { email: string }) {
     console.log(user);
     return user;

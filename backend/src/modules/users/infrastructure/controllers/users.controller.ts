@@ -26,6 +26,11 @@ export class UsersController {
     @Body() dto: CreateUserDto,
     @Activeuser() executor: ExecutorUser,
   ) {
+    // const executorTest = {
+    //   sub: 'id-1',
+    //   email: 'empleado@turismo.gob.ar',
+    //   role: Role.SUPERADMIN,
+    // };
     return this.createUserUseCase.execute(dto, executor);
   }
 

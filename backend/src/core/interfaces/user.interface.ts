@@ -1,7 +1,7 @@
 import { Role } from 'src/modules/users/domain';
 
 export interface ExecutorUser {
-  id: string;
+  sub: string;
   email: string;
   role: Role;
 }

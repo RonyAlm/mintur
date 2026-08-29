@@ -16,13 +16,23 @@ export class LoginUseCase {
 
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
-    const isPasswordValid = await bcrypt.compare(dto.password, user.password);
+    const isPasswordValid = await bcrypt.compare(
+      dto.password,
+      user.passwordHash,
+    );
+
     if (!isPasswordValid)
       throw new UnauthorizedException('Invalid credentials');
-    const payload = { id: user.id, email: user.email, role: user.role };
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      mustChangePassword: user.mustChangePassword,
+      role: user.role,
+    };
     return {
       accessToken: await this.jwtService.signAsync(payload),
       email: user.email,
+      mustChangePassword: user.mustChangePassword,
     };
   }
 }
