@@ -5,7 +5,7 @@
 
 generator client {
   provider        = "prisma-client"
-  output          = "../src/generated/prisma"
+  output          = "../src/core/lib/generated/prisma"
   moduleFormat = "cjs"
 }
 
@@ -15,12 +15,13 @@ datasource db {
 
 model User {
   id        String   @id @default(uuid())
-  name      String?
+  name      String  @default("")
   email     String   @unique
-  password  String
+  passwordHash  String
   role      Role   @default(USER)
+  mustChangePassword Boolean @default(true)
   createdAt DateTime @default(now())
-  updatedAt DateTime? @updatedAt 
+  updatedAt DateTime @updatedAt 
 }
 
 enum Role {
