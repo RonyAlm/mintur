@@ -4,12 +4,15 @@ import { Role, Users, UserSecured } from '../../domain/entities/';
 interface UserTable extends User {
   id: string;
   email: string;
-  name: string;
   passwordHash: string;
-  createdAt: Date;
-  updatedAt: Date;
   role: Role;
   mustChangePassword: boolean;
+  username: string;
+  firstName: string;
+  lastName: string;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export class UserMapper {
@@ -20,7 +23,10 @@ export class UserMapper {
       passwordHash: raw.passwordHash,
       role: raw.role,
       mustChangePassword: raw.mustChangePassword,
-      name: raw.name || '',
+      username: raw.username,
+      firstName: raw.firstName,
+      lastName: raw.lastName,
+      isActive: raw.isActive,
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,
     } as Users;
@@ -29,7 +35,10 @@ export class UserMapper {
   static toDomain(raw: UserTable): UserSecured {
     return {
       id: raw.id,
-      name: raw.name || '',
+      username: raw.username,
+      firstName: raw.firstName,
+      lastName: raw.lastName,
+      isActive: raw.isActive,
       email: raw.email,
       role: raw.role,
       mustChangePassword: raw.mustChangePassword,
@@ -41,10 +50,13 @@ export class UserMapper {
   static toDomainList(raw: UserTable[]): UserSecured[] {
     return raw.map((user) => ({
       id: user.id,
-      name: user.name || '',
+      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
       role: user.role,
       mustChangePassword: user.mustChangePassword,
+      isActive: user.isActive,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     }));

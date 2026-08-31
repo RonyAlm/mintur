@@ -15,11 +15,14 @@ datasource db {
 
 model User {
   id        String   @id @default(uuid())
-  name      String  @default("")
+  username      String  @unique
+  firstName  String 
+  lastName  String
   email     String   @unique
   passwordHash  String
   role      Role   @default(USER)
   mustChangePassword Boolean @default(true)
+  isActive Boolean @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt 
 }
