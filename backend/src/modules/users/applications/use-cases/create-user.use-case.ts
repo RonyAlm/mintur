@@ -48,10 +48,13 @@ export class CreateUserUseCase {
     const userCreated = new Users(
       crypto.randomUUID(),
       user.email,
+      user.username || '',
+      user.firstName || '',
+      user.lastName || '',
       hashedPassword,
       Role.USER,
       true,
-      user.name || '',
+      true,
       new Date(),
       new Date(),
     );
@@ -61,10 +64,13 @@ export class CreateUserUseCase {
 
     return {
       id: result.id,
-      name: result.name,
+      username: result.username,
       email: result.email,
       role: result.role,
       mustChangePassword: result.mustChangePassword,
+      firstName: result.firstName,
+      lastName: result.lastName,
+      isActive: result.isActive,
       createdAt: result.createdAt,
       updatedAt: result.updatedAt,
       temporaryPassword,
