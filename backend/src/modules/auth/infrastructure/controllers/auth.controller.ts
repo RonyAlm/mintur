@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Patch,
   Post,
 } from '@nestjs/common';
 import { Request } from 'express';
@@ -14,6 +15,12 @@ import { LoginDto, LoginUseCase } from '../../applications';
 // import { Auth } from '../../../core/decorators';
 // import { Role } from '../../../../modules/users/domain';
 import { Activeuser } from '../../../../core';
+import {
+  ChangePasswordDto,
+  ChangePasswordUseCase,
+} from 'src/modules/users/applications';
+import { Auth } from 'src/core/decorators';
+import { ProfileUseCase } from '../../applications/use-cases';
 // import { Auth } from '../../../../core/decorators';
 
 export interface RequestWithUser extends Request {
@@ -26,7 +33,11 @@ export interface RequestWithUser extends Request {
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly loginUseCase: LoginUseCase) {}
+  constructor(
+    private readonly loginUseCase: LoginUseCase,
+    private readonly changePasswordUseCase: ChangePasswordUseCase,
+    private readonly profileUseCase: ProfileUseCase,
+  ) {}
 
   // @Post('register')
   // register(@Body() registerDto: RegisterDto) {
@@ -40,9 +51,24 @@ export class AuthController {
   }
 
   @Get('profile')
-  // @Auth(Role.ADMIN)
+  @Auth('USER')
   profile(@Activeuser() user: { email: string }) {
     console.log(user);
-    return user;
+    return this.profileUseCase.execute(user.email);
+  }
+
+  @Patch('change-password')
+  @Auth('USER')
+  changePassword(
+    @Body() dto: ChangePasswordDto,
+    @Activeuser()
+    user: {
+      sub: string;
+      email: string;
+      role?: string;
+    },
+  ) {
+    const userId = user.sub;
+    return this.changePasswordUseCase.execute(userId, dto);
   }
 }

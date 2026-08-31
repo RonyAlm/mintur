@@ -4,7 +4,7 @@ import { Module } from '@nestjs/common';
 import { jwtConstants } from '../constants';
 import { UsersModule } from '../../../modules/users/infrastructure/users.module';
 import { AuthController } from './controllers/auth.controller';
-import { LoginUseCase } from '../applications';
+import { LoginUseCase, ProfileUseCase } from '../applications';
 
 @Module({
   imports: [
@@ -16,7 +16,7 @@ import { LoginUseCase } from '../applications';
     }),
   ],
   controllers: [AuthController],
-  providers: [LoginUseCase, JwtModule],
+  providers: [LoginUseCase, ProfileUseCase, JwtModule],
   exports: [JwtModule, LoginUseCase],
 })
 export class AuthModule {}

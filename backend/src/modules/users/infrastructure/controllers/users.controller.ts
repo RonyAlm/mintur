@@ -1,13 +1,30 @@
-import { Body, Controller, Get, Post, Request } from '@nestjs/common';
-import { CreateUserDto } from '../../applications/dtos';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Request,
+} from '@nestjs/common';
 import { Role } from '../../domain';
-import { CreateUserUseCase } from '../../applications';
+import {
+  CreateUserUseCase,
+  CreateUserDto,
+  ResetUserPasswordUseCase,
+  UpdateUserUseCase,
+  UpdateUserDto,
+} from '../../applications';
 import { Activeuser, type ExecutorUser } from '../../../../core';
 import { Auth } from '../../../../core/decorators';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly createUserUseCase: CreateUserUseCase) {}
+  constructor(
+    private readonly createUserUseCase: CreateUserUseCase,
+    private readonly resetUserPasswordUseCase: ResetUserPasswordUseCase,
+    private readonly updateUserUseCase: UpdateUserUseCase,
+  ) {}
 
   @Get()
   getAllUsers() {
@@ -32,6 +49,21 @@ export class UsersController {
     //   role: Role.SUPERADMIN,
     // };
     return this.createUserUseCase.execute(dto, executor);
+  }
+
+  @Patch(':id/reset-password')
+  @Auth(Role.ADMIN)
+  resetUserPassword(
+    @Param('id') userId: string,
+    @Activeuser() executor: ExecutorUser,
+  ) {
+    return this.resetUserPasswordUseCase.execute(userId, executor);
+  }
+
+  @Patch(':id')
+  @Auth(Role.USER)
+  updateUser(@Param('id') id: string, @Body() updatedFields: UpdateUserDto) {
+    return this.updateUserUseCase.execute(id, updatedFields);
   }
 
   // @Delete(':id')
