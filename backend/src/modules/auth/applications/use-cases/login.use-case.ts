@@ -14,7 +14,8 @@ export class LoginUseCase {
   async execute(dto: LoginDto) {
     const user = await this.findUserByEmail.execute(dto.email);
 
-    if (!user) throw new UnauthorizedException('Invalid credentials');
+    if (!user || !user.isActive)
+      throw new UnauthorizedException('Invalid credentials');
 
     const isPasswordValid = await bcrypt.compare(
       dto.password,

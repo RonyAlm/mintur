@@ -53,7 +53,6 @@ export class AuthController {
   @Get('profile')
   @Auth('USER')
   profile(@Activeuser() user: { email: string }) {
-    console.log(user);
     return this.profileUseCase.execute(user.email);
   }
 

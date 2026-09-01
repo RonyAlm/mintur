@@ -14,6 +14,8 @@ import {
   ResetUserPasswordUseCase,
   UpdateUserUseCase,
   UpdateUserDto,
+  ActivateUserUseCase,
+  DeactivateUserUseCase,
 } from '../../applications';
 import { Activeuser, type ExecutorUser } from '../../../../core';
 import { Auth } from '../../../../core/decorators';
@@ -24,6 +26,8 @@ export class UsersController {
     private readonly createUserUseCase: CreateUserUseCase,
     private readonly resetUserPasswordUseCase: ResetUserPasswordUseCase,
     private readonly updateUserUseCase: UpdateUserUseCase,
+    private readonly activateUserUseCase: ActivateUserUseCase,
+    private readonly deactivateUserUseCase: DeactivateUserUseCase,
   ) {}
 
   @Get()
@@ -43,11 +47,6 @@ export class UsersController {
     @Body() dto: CreateUserDto,
     @Activeuser() executor: ExecutorUser,
   ) {
-    // const executorTest = {
-    //   sub: 'id-1',
-    //   email: 'empleado@turismo.gob.ar',
-    //   role: Role.SUPERADMIN,
-    // };
     return this.createUserUseCase.execute(dto, executor);
   }
 
@@ -64,6 +63,18 @@ export class UsersController {
   @Auth(Role.USER)
   updateUser(@Param('id') id: string, @Body() updatedFields: UpdateUserDto) {
     return this.updateUserUseCase.execute(id, updatedFields);
+  }
+
+  @Patch(':id/activate')
+  @Auth(Role.ADMIN)
+  activateUser(@Param('id') userId: string) {
+    return this.activateUserUseCase.execute(userId);
+  }
+
+  @Patch(':id/deactivate')
+  @Auth(Role.ADMIN)
+  deactivateUser(@Param('id') userId: string) {
+    return this.deactivateUserUseCase.execute(userId);
   }
 
   // @Delete(':id')

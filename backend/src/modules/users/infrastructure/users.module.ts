@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from '../../../modules/prisma/prisma.module';
 import {
+  ActivateUserUseCase,
   ChangePasswordUseCase,
   CreateUserUseCase,
+  DeactivateUserUseCase,
   FindUserByEmailUseCase,
   ResetUserPasswordUseCase,
   UpdateUserUseCase,
@@ -24,6 +26,8 @@ import { UsersController } from './controllers';
     ResetUserPasswordUseCase,
     ChangePasswordUseCase,
     UpdateUserUseCase,
+    DeactivateUserUseCase,
+    ActivateUserUseCase,
   ],
   controllers: [UsersController],
 })
