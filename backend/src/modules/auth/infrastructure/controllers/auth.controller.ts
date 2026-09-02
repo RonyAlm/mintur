@@ -11,17 +11,17 @@ import { Request } from 'express';
 // import { Auth } from './decorators';
 // import { Role } from '../users/domain/entities';
 // import { Activeuser } from '../../core/decorators/active-user.decotor';
-import { LoginDto, LoginUseCase } from '../../applications';
-// import { Auth } from '../../../core/decorators';
-// import { Role } from '../../../../modules/users/domain';
+import {
+  LoginDto,
+  LoginUseCase,
+  GetMyProfileUseCase,
+} from '../../applications';
 import { Activeuser } from '../../../../core';
 import {
   ChangePasswordDto,
   ChangePasswordUseCase,
-} from 'src/modules/users/applications';
-import { Auth } from 'src/core/decorators';
-import { ProfileUseCase } from '../../applications/use-cases';
-// import { Auth } from '../../../../core/decorators';
+} from '../../../../modules/users/applications';
+import { Auth } from '../../../../core/decorators';
 
 export interface RequestWithUser extends Request {
   user: {
@@ -36,7 +36,7 @@ export class AuthController {
   constructor(
     private readonly loginUseCase: LoginUseCase,
     private readonly changePasswordUseCase: ChangePasswordUseCase,
-    private readonly profileUseCase: ProfileUseCase,
+    private readonly getMyProfileUseCase: GetMyProfileUseCase,
   ) {}
 
   // @Post('register')
@@ -53,7 +53,7 @@ export class AuthController {
   @Get('profile')
   @Auth('USER')
   profile(@Activeuser() user: { email: string }) {
-    return this.profileUseCase.execute(user.email);
+    return this.getMyProfileUseCase.execute(user.email);
   }
 
   @Patch('change-password')

@@ -16,6 +16,8 @@ import {
   UpdateUserDto,
   ActivateUserUseCase,
   DeactivateUserUseCase,
+  GetUserByIdUseCase,
+  ListUsersUseCase,
 } from '../../applications';
 import { Activeuser, type ExecutorUser } from '../../../../core';
 import { Auth } from '../../../../core/decorators';
@@ -28,18 +30,21 @@ export class UsersController {
     private readonly updateUserUseCase: UpdateUserUseCase,
     private readonly activateUserUseCase: ActivateUserUseCase,
     private readonly deactivateUserUseCase: DeactivateUserUseCase,
+    private readonly getUserByIdUseCase: GetUserByIdUseCase,
+    private readonly listUsersUseCase: ListUsersUseCase,
   ) {}
 
-  @Get()
+  @Get('')
+  @Auth(Role.ADMIN)
   getAllUsers() {
-    // return this.prismaUserRepository.findAll();
-    return [];
+    return this.listUsersUseCase.execute();
   }
 
-  // @Get(':id')
-  // getUserById(@Param('id') id: string): User {
-  //   return this.usersService.getUserById(id);
-  // }
+  @Auth(Role.ADMIN)
+  @Get(':id')
+  async getUserById(@Param('id') id: string) {
+    return await this.getUserByIdUseCase.execute(id);
+  }
 
   @Post('create')
   @Auth(Role.ADMIN)

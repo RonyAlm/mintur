@@ -6,6 +6,8 @@ import {
   CreateUserUseCase,
   DeactivateUserUseCase,
   FindUserByEmailUseCase,
+  GetUserByIdUseCase,
+  ListUsersUseCase,
   ResetUserPasswordUseCase,
   UpdateUserUseCase,
 } from '../applications';
@@ -28,6 +30,8 @@ import { UsersController } from './controllers';
     UpdateUserUseCase,
     DeactivateUserUseCase,
     ActivateUserUseCase,
+    GetUserByIdUseCase,
+    ListUsersUseCase,
   ],
   controllers: [UsersController],
 })
