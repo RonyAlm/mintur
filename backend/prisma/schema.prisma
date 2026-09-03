@@ -20,15 +20,30 @@ model User {
   lastName  String
   email     String   @unique
   passwordHash  String
-  role      Role   @default(USER)
+
+  roleId String
+  role Role @relation(fields: [roleId], references: [id])
+
   mustChangePassword Boolean @default(true)
   isActive Boolean @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt 
 }
 
-enum Role {
-  USER 
-  ADMIN
-  SUPERADMIN
+// enum Role {
+//   USER 
+//   ADMIN
+//   SUPERADMIN
+// }
+
+model Role {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users       User[]
+
+  @@map("roles")
 }
