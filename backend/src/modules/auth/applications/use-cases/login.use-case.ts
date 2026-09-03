@@ -28,7 +28,7 @@ export class LoginUseCase {
       sub: user.id,
       email: user.email,
       mustChangePassword: user.mustChangePassword,
-      role: user.role,
+      role: user.roleId,
     };
     return {
       accessToken: await this.jwtService.signAsync(payload),

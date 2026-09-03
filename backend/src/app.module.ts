@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './modules/prisma/prisma.module';
 import { UsersModule } from './modules/users/infrastructure/users.module';
 import { AuthModule } from './modules/auth/infrastructure/auth.module';
+import { RolesModule } from './modules/roles/infrastructure/roles.module';
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { AuthModule } from './modules/auth/infrastructure/auth.module';
 
     // 3. Módulos de Negocio (Dominios / Contextos)
     UsersModule, // Maneja el dominio de usuarios y repositorios
-    AuthModule, // Maneja los controladores de login y uso de JWT
+    AuthModule,
+    RolesModule, // Maneja los controladores de login y uso de JWT
   ],
   controllers: [],
   providers: [],
