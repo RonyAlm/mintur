@@ -64,9 +64,10 @@ export class AuthController {
     user: {
       sub: string;
       email: string;
-      role?: string;
+      roleId?: string;
     },
   ) {
+    // console.log(user);
     const userId = user.sub;
     return this.changePasswordUseCase.execute(userId, dto);
   }

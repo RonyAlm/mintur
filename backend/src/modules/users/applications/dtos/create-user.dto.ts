@@ -5,18 +5,16 @@ import {
   IsString,
   MinLength,
 } from 'class-validator';
-import { Role } from '../../domain';
 
 export class CreateUserDto {
   @IsEmail()
   @IsNotEmpty()
   email!: string;
 
-  @IsOptional()
   @IsString()
   @IsNotEmpty()
   @MinLength(3)
-  username?: string;
+  username!: string;
 
   @IsOptional()
   @IsString()
@@ -30,5 +28,6 @@ export class CreateUserDto {
 
   @IsString()
   @IsOptional()
-  role!: Role;
+  @IsNotEmpty()
+  roleId!: string;
 }

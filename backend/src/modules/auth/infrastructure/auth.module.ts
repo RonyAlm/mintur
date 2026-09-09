@@ -5,10 +5,12 @@ import { jwtConstants } from '../constants';
 import { UsersModule } from '../../../modules/users/infrastructure/users.module';
 import { AuthController } from './controllers/auth.controller';
 import { LoginUseCase, GetMyProfileUseCase } from '../applications';
+import { RolesModule } from 'src/modules/roles/infrastructure/roles.module';
 
 @Module({
   imports: [
     UsersModule,
+    RolesModule,
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret,

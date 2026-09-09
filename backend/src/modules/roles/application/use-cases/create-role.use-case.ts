@@ -13,8 +13,9 @@ export class CreateRoleUseCase {
 
     const inputRole = {
       id: crypto.randomUUID(),
-      name: dto.name.trim(),
-      description: dto.description?.trim().toLocaleUpperCase(),
+      name: dto.name.trim().toLocaleUpperCase(),
+      description: dto.description?.trim(),
+      isSystemRole: false,
       createdAt: new Date(),
       updatedAt: new Date(),
     } as Role;

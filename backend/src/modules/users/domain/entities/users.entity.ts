@@ -14,20 +14,21 @@ export class Users {
     public readonly firstName: string,
     public readonly lastName: string,
     public readonly passwordHash: string,
-    public readonly role: Role,
+    // public readonly role: Role,
+    public readonly roleId: string,
     public readonly mustChangePassword: boolean,
     public readonly isActive: boolean,
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
   ) {}
 
-  isAdmin(): boolean {
-    return this.role === Role.ADMIN || this.role === Role.SUPERADMIN;
-  }
+  // isAdmin(): boolean {
+  //   return this.role === Role.ADMIN || this.role === Role.SUPERADMIN;
+  // }
 
-  isSuperAdmin(): boolean {
-    return this.role === Role.SUPERADMIN;
-  }
+  // isSuperAdmin(): boolean {
+  //   return this.role === Role.SUPERADMIN;
+  // }
 }
 
 export type UserSecured = Omit<
@@ -38,5 +39,5 @@ export type UserSecured = Omit<
 export type ExecutorUser = {
   sub: string;
   email: string;
-  role: Role;
+  // role: Role;
 };

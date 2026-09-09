@@ -35,7 +35,7 @@ export class UpdateUserUseCase {
       firstName: userUpdated.firstName,
       lastName: userUpdated.lastName,
       email: userUpdated.email,
-      role: userUpdated.role,
+      roleId: userUpdated.roleId,
     };
   }
 }

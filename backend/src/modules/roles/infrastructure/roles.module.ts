@@ -5,13 +5,14 @@ import {
   CreateRoleUseCase,
   GetRoleByIdUseCase,
   ListRolesUseCase,
+  UpdateRoleUseCase,
 } from '../application';
 import { RolesController } from './controllers';
 import { PrismaRoleRepository } from './persistence';
 
 @Module({
   imports: [PrismaModule],
-  exports: [],
+  exports: [GetRoleByIdUseCase, ListRolesUseCase, UpdateRoleUseCase],
   providers: [
     {
       provide: RoleRepository,
@@ -20,6 +21,7 @@ import { PrismaRoleRepository } from './persistence';
     CreateRoleUseCase,
     GetRoleByIdUseCase,
     ListRolesUseCase,
+    UpdateRoleUseCase,
   ],
   controllers: [RolesController],
 })

@@ -1,9 +1,11 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import {
   CreateRoleDto,
   CreateRoleUseCase,
   GetRoleByIdUseCase,
   ListRolesUseCase,
+  UpdateRoleDto,
+  UpdateRoleUseCase,
 } from '../../application';
 
 @Controller('roles')
@@ -12,6 +14,7 @@ export class RolesController {
     private readonly createRoleUseCase: CreateRoleUseCase,
     private readonly getRoleByIdUseCase: GetRoleByIdUseCase,
     private readonly listRolesUseCase: ListRolesUseCase,
+    private readonly updateRoleUseCase: UpdateRoleUseCase,
   ) {}
 
   @Get('')
@@ -28,5 +31,10 @@ export class RolesController {
   @Post('')
   createRole(@Body() dto: CreateRoleDto) {
     return this.createRoleUseCase.execute(dto);
+  }
+
+  @Patch(':id')
+  updateRole(@Param('id') id: string, @Body() dto: UpdateRoleDto) {
+    return this.updateRoleUseCase.execute(id, dto);
   }
 }

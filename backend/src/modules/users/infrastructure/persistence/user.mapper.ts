@@ -1,11 +1,11 @@
 import { User } from '../../../../core/lib/generated/prisma/client';
-import { Role, Users, UserSecured } from '../../domain/entities/';
+import { Users, UserSecured } from '../../domain/entities/';
 
 interface UserTable extends User {
   id: string;
   email: string;
   passwordHash: string;
-  role: Role;
+  roleId: string;
   mustChangePassword: boolean;
   username: string;
   firstName: string;
@@ -21,7 +21,7 @@ export class UserMapper {
       id: raw.id,
       email: raw.email,
       passwordHash: raw.passwordHash,
-      role: raw.role,
+      roleId: raw.roleId,
       mustChangePassword: raw.mustChangePassword,
       username: raw.username,
       firstName: raw.firstName,
@@ -29,7 +29,7 @@ export class UserMapper {
       isActive: raw.isActive,
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,
-    } as Users;
+    };
   }
 
   static toDomain(raw: UserTable): UserSecured {
@@ -40,7 +40,7 @@ export class UserMapper {
       lastName: raw.lastName,
       isActive: raw.isActive,
       email: raw.email,
-      role: raw.role,
+      roleId: raw.roleId,
       mustChangePassword: raw.mustChangePassword,
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,
@@ -54,7 +54,7 @@ export class UserMapper {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
-      role: user.role,
+      roleId: user.roleId,
       mustChangePassword: user.mustChangePassword,
       isActive: user.isActive,
       createdAt: user.createdAt,

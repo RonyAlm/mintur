@@ -4,14 +4,14 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ExecutorUser, Role, UsersRepository } from '../../domain';
+import { ExecutorUser, UsersRepository } from '../../domain';
 import * as crypto from 'crypto';
 
 export interface ResponseResetPassword {
   id: string;
   username: string | null;
   email: string;
-  role: Role;
+  roleId: string;
   mustChangePassword: boolean;
   temporaryPassword: string;
 }
@@ -20,15 +20,12 @@ export interface ResponseResetPassword {
 export class ResetUserPasswordUseCase {
   constructor(private readonly usersRepository: UsersRepository) {}
 
-  async execute(
-    userId: string,
-    executor: ExecutorUser,
-  ): Promise<ResponseResetPassword> {
-    const executorExists = await this.usersRepository.findById(executor.sub);
-    if (!executorExists) throw new UnauthorizedException('Executor not found');
+  async execute(userId: string): Promise<ResponseResetPassword> {
+    // const executorExists = await this.usersRepository.findById(executor.sub);
+    // if (!executorExists) throw new UnauthorizedException('Executor not found');
 
-    if (executor.role !== Role.ADMIN && executor.role !== Role.SUPERADMIN)
-      throw new UnauthorizedException('User must be admin');
+    // if (executor.role !== Role.ADMIN && executor.role !== Role.SUPERADMIN)
+    //   throw new UnauthorizedException('User must be admin');
 
     const userExists = await this.usersRepository.findById(userId);
     if (!userExists) throw new BadRequestException('User not found');
@@ -46,7 +43,7 @@ export class ResetUserPasswordUseCase {
       id: result.id,
       username: result.username,
       email: result.email,
-      role: result.role,
+      roleId: result.roleId,
       mustChangePassword: result.mustChangePassword,
       temporaryPassword,
     };

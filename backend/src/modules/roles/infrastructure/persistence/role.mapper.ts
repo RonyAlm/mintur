@@ -4,6 +4,7 @@ interface RoleTable extends Role {
   id: string;
   name: string;
   description: string | null;
+  isSystemRole: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -14,6 +15,7 @@ export class RoleMapper {
       id: role.id,
       name: role.name,
       description: role.description,
+      isSystemRole: role.isSystemRole,
       createdAt: role.createdAt,
       updatedAt: role.updatedAt,
     };

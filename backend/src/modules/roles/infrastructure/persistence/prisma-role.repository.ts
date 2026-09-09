@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../../../../modules/prisma/prisma.service';
 import { Role, RoleRepository } from '../../domain';
-import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { RoleMapper } from './role.mapper';
 
 @Injectable()
@@ -24,5 +24,9 @@ export class PrismaRoleRepository implements RoleRepository {
 
   async save(role: Role): Promise<Role> {
     return this.prismaService.role.create({ data: role });
+  }
+
+  async update(id: string, role: Partial<Role>): Promise<Role | null> {
+    return this.prismaService.role.update({ where: { id }, data: role });
   }
 }

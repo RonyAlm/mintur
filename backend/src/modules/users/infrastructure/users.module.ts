@@ -13,17 +13,20 @@ import {
 } from '../applications';
 import { PrismaUsersRepository } from './persistence';
 import { UsersRepository } from '../domain';
+// import { roleRepository } from '../../../modules/roles/domain';
 import { UsersController } from './controllers';
+import { RolesModule } from '../../../modules/roles/infrastructure/roles.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, RolesModule],
   exports: [FindUserByEmailUseCase, ChangePasswordUseCase],
   providers: [
-    FindUserByEmailUseCase,
     {
       provide: UsersRepository,
+      // roleRepository,
       useClass: PrismaUsersRepository,
     },
+    FindUserByEmailUseCase,
     CreateUserUseCase,
     ResetUserPasswordUseCase,
     ChangePasswordUseCase,
@@ -36,7 +39,3 @@ import { UsersController } from './controllers';
   controllers: [UsersController],
 })
 export class UsersModule {}
-
-//  controllers: [AuthController],
-//   providers: [LoginUseCase, JwtModule],
-//   exports: [JwtModule, LoginUseCase],
