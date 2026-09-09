@@ -19,7 +19,6 @@ import {
   GetUserByIdUseCase,
   ListUsersUseCase,
 } from '../../applications';
-import { Activeuser, type ExecutorUser } from '../../../../core';
 import { Auth } from '../../../../core/decorators';
 
 @Controller('users')
@@ -47,21 +46,15 @@ export class UsersController {
   }
 
   @Post('create')
-  @Auth(Role.ADMIN)
-  async createUser(
-    @Body() dto: CreateUserDto,
-    @Activeuser() executor: ExecutorUser,
-  ) {
-    return this.createUserUseCase.execute(dto, executor);
+  // @Auth(Role.ADMIN)
+  async createUser(@Body() dto: CreateUserDto) {
+    return this.createUserUseCase.execute(dto);
   }
 
   @Patch(':id/reset-password')
   @Auth(Role.ADMIN)
-  resetUserPassword(
-    @Param('id') userId: string,
-    @Activeuser() executor: ExecutorUser,
-  ) {
-    return this.resetUserPasswordUseCase.execute(userId, executor);
+  resetUserPassword(@Param('id') userId: string) {
+    return this.resetUserPasswordUseCase.execute(userId);
   }
 
   @Patch(':id')
@@ -81,7 +74,6 @@ export class UsersController {
   deactivateUser(@Param('id') userId: string) {
     return this.deactivateUserUseCase.execute(userId);
   }
-
   // @Delete(':id')
   // deleteUser(@Param('id') id: string) {
   //   return this.usersService.deleteUser(id);
