@@ -5,4 +5,5 @@ export abstract class RoleRepository {
   abstract findById(id: string): Promise<Role | null>;
   abstract findAll(): Promise<Role[] | []>;
   abstract save(role: Role): Promise<Role>;
+  abstract update(id: string, role: Partial<Role>): Promise<Role | null>;
 }
