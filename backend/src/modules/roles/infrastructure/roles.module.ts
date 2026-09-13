@@ -26,25 +26,3 @@ import { PrismaRoleRepository } from './persistence';
   controllers: [RolesController],
 })
 export class RolesModule {}
-
-/* @Module({
-  imports: [PrismaModule],
-  exports: [FindUserByEmailUseCase, ChangePasswordUseCase],
-  providers: [
-    FindUserByEmailUseCase,
-    {
-      provide: UsersRepository,
-      useClass: PrismaUsersRepository,
-    },
-    CreateUserUseCase,
-    ResetUserPasswordUseCase,
-    ChangePasswordUseCase,
-    UpdateUserUseCase,
-    DeactivateUserUseCase,
-    ActivateUserUseCase,
-    GetUserByIdUseCase,
-    ListUsersUseCase,
-  ],
-  controllers: [UsersController],
-})
-export class UsersModule {} */
