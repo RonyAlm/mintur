@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import {
   CreateRoleDto,
   CreateRoleUseCase,
@@ -6,6 +14,10 @@ import {
   ListRolesUseCase,
   UpdateRoleDto,
   UpdateRoleUseCase,
+  AssignPermissionToRoleUseCase,
+  RemovePermissionFromRoleUseCase,
+  AssignPermissionToRoleDto,
+  RemovePermissionFromRoleDto,
 } from '../../application';
 
 @Controller('roles')
@@ -15,6 +27,8 @@ export class RolesController {
     private readonly getRoleByIdUseCase: GetRoleByIdUseCase,
     private readonly listRolesUseCase: ListRolesUseCase,
     private readonly updateRoleUseCase: UpdateRoleUseCase,
+    private readonly assignPermissionToRoleUseCase: AssignPermissionToRoleUseCase,
+    private readonly removePermissionFromRoleUseCase: RemovePermissionFromRoleUseCase,
   ) {}
 
   @Get('')
@@ -36,5 +50,22 @@ export class RolesController {
   @Patch(':id')
   updateRole(@Param('id') id: string, @Body() dto: UpdateRoleDto) {
     return this.updateRoleUseCase.execute(id, dto);
+  }
+
+  @Post(':roleId/permissions')
+  assignPermissionToRole(
+    @Param('roleId') roleId: string,
+    @Body() dto: AssignPermissionToRoleDto,
+  ) {
+    return this.assignPermissionToRoleUseCase.execute({ ...dto, roleId });
+  }
+
+  @Delete(':roleId/permissions/:permissionId')
+  removePermissionFromRole(
+    @Param('roleId') roleId: string,
+    @Param('permissionId') permissionId: string,
+  ) {
+    const dto: RemovePermissionFromRoleDto = { roleId, permissionId };
+    return this.removePermissionFromRoleUseCase.execute(dto);
   }
 }

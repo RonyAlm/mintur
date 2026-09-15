@@ -19,8 +19,9 @@ import { PermissionsModule } from './modules/permissions/infrastructure/permissi
     // 3. Módulos de Negocio (Dominios / Contextos)
     UsersModule, // Maneja el dominio de usuarios y repositorios
     AuthModule,
+    PermissionsModule,
     RolesModule,
-    PermissionsModule, // Maneja los controladores de login y uso de JWT
+    // Maneja los controladores de login y uso de JWT
   ],
   controllers: [],
   providers: [],

@@ -30,6 +30,11 @@ export class PermissionsController {
     return this.createPermissionUseCase.execute(dto);
   }
 
+  // @Post('/assign')
+  // assignPermissionToRole(@Body() dto: AssignPermissionToRoleDto) {
+  //   return this.assignPermissionToRoleUseCase.execute(dto);
+  // }
+
   //   @Patch(':id')
   //   updateRole(@Param('id') id: string, @Body() dto: UpdateRoleDto) {
   //     return this.updateRoleUseCase.execute(id, dto);

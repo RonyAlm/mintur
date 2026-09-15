@@ -1,7 +1,10 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from '../../../modules/prisma/prisma.module';
-import { PermissionRepository } from '../domain';
-import { PrismaPermissionRepository } from './persistence';
+import { PermissionRepository, RolePermissionRepository } from '../domain';
+import {
+  PrismaPermissionRepository,
+  PrismaRolePermissionRepository,
+} from './persistence';
 import { PermissionsController } from './controllers';
 import {
   CreatePermissionUseCase,
@@ -11,11 +14,19 @@ import {
 
 @Module({
   imports: [PrismaModule],
-  //   exports: [GetRoleByIdUseCase, ListRolesUseCase, UpdateRoleUseCase],
+  exports: [
+    ListPermissionsUseCase,
+    GetPermissionByIdUseCase,
+    CreatePermissionUseCase,
+  ],
   providers: [
     {
       provide: PermissionRepository,
       useClass: PrismaPermissionRepository,
+    },
+    {
+      provide: RolePermissionRepository,
+      useClass: PrismaRolePermissionRepository,
     },
     CreatePermissionUseCase,
     GetPermissionByIdUseCase,
