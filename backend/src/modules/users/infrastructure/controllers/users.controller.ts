@@ -6,6 +6,7 @@ import {
   Patch,
   Post,
   Request,
+  UseGuards,
 } from '@nestjs/common';
 import { Role } from '../../domain';
 import {
@@ -20,6 +21,7 @@ import {
   ListUsersUseCase,
 } from '../../applications';
 import { Auth } from '../../../../core/decorators';
+import { JwtAuthGuard } from '../../../../modules/auth/infrastructure/guards';
 
 @Controller('users')
 export class UsersController {
@@ -33,8 +35,9 @@ export class UsersController {
     private readonly listUsersUseCase: ListUsersUseCase,
   ) {}
 
+  @UseGuards(JwtAuthGuard)
   @Get('')
-  @Auth(Role.ADMIN)
+  //@Auth(Role.ADMIN)
   getAllUsers() {
     return this.listUsersUseCase.execute();
   }

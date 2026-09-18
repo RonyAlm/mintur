@@ -5,10 +5,13 @@ import { jwtConstants } from '../constants';
 import { UsersModule } from '../../../modules/users/infrastructure/users.module';
 import { AuthController } from './controllers/auth.controller';
 import { LoginUseCase, GetMyProfileUseCase } from '../applications';
-import { RolesModule } from 'src/modules/roles/infrastructure/roles.module';
+import { RolesModule } from '../../../modules/roles/infrastructure/roles.module';
+import { PassportModule } from '@nestjs/passport';
+import { JwtStrategy } from './strategies';
 
 @Module({
   imports: [
+    PassportModule,
     UsersModule,
     RolesModule,
     JwtModule.register({
@@ -18,7 +21,7 @@ import { RolesModule } from 'src/modules/roles/infrastructure/roles.module';
     }),
   ],
   controllers: [AuthController],
-  providers: [LoginUseCase, GetMyProfileUseCase, JwtModule],
+  providers: [LoginUseCase, GetMyProfileUseCase, JwtModule, JwtStrategy],
   exports: [JwtModule, LoginUseCase],
 })
 export class AuthModule {}

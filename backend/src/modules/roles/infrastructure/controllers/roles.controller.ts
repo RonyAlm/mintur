@@ -6,6 +6,8 @@ import {
   Param,
   Patch,
   Post,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import {
   CreateRoleDto,
@@ -19,8 +21,10 @@ import {
   AssignPermissionToRoleDto,
   RemovePermissionFromRoleDto,
 } from '../../application';
+import { JwtAuthGuard } from '../../../../modules/auth/infrastructure/guards';
 
 @Controller('roles')
+@UseGuards(JwtAuthGuard)
 export class RolesController {
   constructor(
     private readonly createRoleUseCase: CreateRoleUseCase,

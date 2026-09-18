@@ -6,22 +6,21 @@ import {
   HttpStatus,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { Request } from 'express';
-// import { Auth } from './decorators';
-// import { Role } from '../users/domain/entities';
-// import { Activeuser } from '../../core/decorators/active-user.decotor';
 import {
   LoginDto,
   LoginUseCase,
   GetMyProfileUseCase,
 } from '../../applications';
-import { Activeuser } from '../../../../core';
 import {
   ChangePasswordDto,
   ChangePasswordUseCase,
 } from '../../../../modules/users/applications';
-import { Auth } from '../../../../core/decorators';
+import { JwtAuthGuard } from '../guards';
+import { CurrentUser } from '../decorators';
+import type { AuthenticatedUser } from '../../applications/types';
 
 export interface RequestWithUser extends Request {
   user: {
@@ -51,24 +50,18 @@ export class AuthController {
   }
 
   @Get('profile')
-  @Auth('USER')
-  profile(@Activeuser() user: { email: string }) {
+  // @Auth('USER')
+  @UseGuards(JwtAuthGuard)
+  profile(@CurrentUser() user: AuthenticatedUser) {
     return this.getMyProfileUseCase.execute(user.email);
   }
 
   @Patch('change-password')
-  @Auth('USER')
+  // @Auth('USER')
   changePassword(
     @Body() dto: ChangePasswordDto,
-    @Activeuser()
-    user: {
-      sub: string;
-      email: string;
-      roleId?: string;
-    },
+    @CurrentUser() user: AuthenticatedUser,
   ) {
-    // console.log(user);
-    const userId = user.sub;
-    return this.changePasswordUseCase.execute(userId, dto);
+    return this.changePasswordUseCase.execute(user.sub, dto);
   }
 }
