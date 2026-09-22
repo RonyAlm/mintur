@@ -16,9 +16,10 @@ import { UsersRepository } from '../domain';
 // import { roleRepository } from '../../../modules/roles/domain';
 import { UsersController } from './controllers';
 import { RolesModule } from '../../../modules/roles/infrastructure/roles.module';
+import { PermissionsModule } from 'src/modules/permissions/infrastructure/permissions.module';
 
 @Module({
-  imports: [PrismaModule, RolesModule],
+  imports: [PrismaModule, RolesModule, PermissionsModule],
   exports: [FindUserByEmailUseCase, ChangePasswordUseCase],
   providers: [
     {

@@ -1,19 +1,21 @@
 import 'dotenv/config';
 import { JwtModule } from '@nestjs/jwt';
 import { Module } from '@nestjs/common';
-import { jwtConstants } from '../constants';
-import { UsersModule } from '../../../modules/users/infrastructure/users.module';
-import { AuthController } from './controllers/auth.controller';
-import { LoginUseCase, GetMyProfileUseCase } from '../applications';
-import { RolesModule } from '../../../modules/roles/infrastructure/roles.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './strategies';
+import { LoginUseCase, GetMyProfileUseCase } from '../applications';
+import { jwtConstants } from '../constants';
+import { AuthController } from './controllers/auth.controller';
+import { UsersModule } from '../../../modules/users/infrastructure/users.module';
+import { RolesModule } from '../../../modules/roles/infrastructure/roles.module';
+import { PermissionsModule } from '../../../modules/permissions/infrastructure/permissions.module';
 
 @Module({
   imports: [
     PassportModule,
     UsersModule,
     RolesModule,
+    PermissionsModule,
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret,

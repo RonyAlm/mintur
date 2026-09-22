@@ -6,8 +6,6 @@ import {
   Param,
   Patch,
   Post,
-  Request,
-  UseGuards,
 } from '@nestjs/common';
 import {
   CreateRoleDto,
@@ -21,10 +19,9 @@ import {
   AssignPermissionToRoleDto,
   RemovePermissionFromRoleDto,
 } from '../../application';
-import { JwtAuthGuard } from '../../../../modules/auth/infrastructure/guards';
+import { Auth } from '../../../../core/decorators';
 
 @Controller('roles')
-@UseGuards(JwtAuthGuard)
 export class RolesController {
   constructor(
     private readonly createRoleUseCase: CreateRoleUseCase,
@@ -36,27 +33,31 @@ export class RolesController {
   ) {}
 
   @Get('')
-  //   @Auth(Role.ADMIN)
+  @Auth('roles:read')
   getAllRoles() {
     return this.listRolesUseCase.execute();
   }
 
   @Get(':id')
+  @Auth('roles:read')
   getRoleById(@Param('id') id: string) {
     return this.getRoleByIdUseCase.execute(id);
   }
 
   @Post('')
+  @Auth('roles:create')
   createRole(@Body() dto: CreateRoleDto) {
     return this.createRoleUseCase.execute(dto);
   }
 
   @Patch(':id')
+  @Auth('roles:update')
   updateRole(@Param('id') id: string, @Body() dto: UpdateRoleDto) {
     return this.updateRoleUseCase.execute(id, dto);
   }
 
   @Post(':roleId/permissions')
+  @Auth('roles:manage_permissions')
   assignPermissionToRole(
     @Param('roleId') roleId: string,
     @Body() dto: AssignPermissionToRoleDto,
@@ -65,6 +66,7 @@ export class RolesController {
   }
 
   @Delete(':roleId/permissions/:permissionId')
+  @Auth('roles:manage_permissions')
   removePermissionFromRole(
     @Param('roleId') roleId: string,
     @Param('permissionId') permissionId: string,

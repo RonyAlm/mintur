@@ -5,6 +5,7 @@ import {
   GetPermissionByIdUseCase,
   ListPermissionsUseCase,
 } from '../../applications/use-cases';
+import { Auth } from '../../../../core/decorators';
 
 @Controller('permissions')
 export class PermissionsController {
@@ -15,28 +16,20 @@ export class PermissionsController {
   ) {}
 
   @Get('')
-  //   @Auth(Role.ADMIN)
+  @Auth('permissions:read')
   getAllPermissions() {
     return this.listPermissionsUseCase.execute();
   }
 
   @Get(':id')
+  @Auth('permissions:read')
   getPermissionById(@Param('id') id: string) {
     return this.getPermissionByIdUseCase.execute(id);
   }
 
   @Post('')
+  @Auth('permissions:create')
   createPermission(@Body() dto: CreatePermissionDto) {
     return this.createPermissionUseCase.execute(dto);
   }
-
-  // @Post('/assign')
-  // assignPermissionToRole(@Body() dto: AssignPermissionToRoleDto) {
-  //   return this.assignPermissionToRoleUseCase.execute(dto);
-  // }
-
-  //   @Patch(':id')
-  //   updateRole(@Param('id') id: string, @Body() dto: UpdateRoleDto) {
-  //     return this.updateRoleUseCase.execute(id, dto);
-  //   }
 }

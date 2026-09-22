@@ -1,14 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Request,
-  UseGuards,
-} from '@nestjs/common';
-import { Role } from '../../domain';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import {
   CreateUserUseCase,
   CreateUserDto,
@@ -21,9 +11,9 @@ import {
   ListUsersUseCase,
 } from '../../applications';
 import { Auth } from '../../../../core/decorators';
-import { JwtAuthGuard } from '../../../../modules/auth/infrastructure/guards';
 
 @Controller('users')
+// @UseGuards(JwtAuthGuard, PermissionGuard)
 export class UsersController {
   constructor(
     private readonly createUserUseCase: CreateUserUseCase,
@@ -35,55 +25,45 @@ export class UsersController {
     private readonly listUsersUseCase: ListUsersUseCase,
   ) {}
 
-  @UseGuards(JwtAuthGuard)
   @Get('')
-  //@Auth(Role.ADMIN)
+  @Auth('users:read')
   getAllUsers() {
     return this.listUsersUseCase.execute();
   }
 
-  @Auth(Role.ADMIN)
   @Get(':id')
+  @Auth('users:read')
   async getUserById(@Param('id') id: string) {
     return await this.getUserByIdUseCase.execute(id);
   }
 
   @Post('create')
-  // @Auth(Role.ADMIN)
+  @Auth('users:create')
   async createUser(@Body() dto: CreateUserDto) {
     return this.createUserUseCase.execute(dto);
   }
 
   @Patch(':id/reset-password')
-  @Auth(Role.ADMIN)
+  @Auth('users:reset_password')
   resetUserPassword(@Param('id') userId: string) {
     return this.resetUserPasswordUseCase.execute(userId);
   }
 
   @Patch(':id')
-  @Auth(Role.USER)
+  @Auth('users:update')
   updateUser(@Param('id') id: string, @Body() updatedFields: UpdateUserDto) {
     return this.updateUserUseCase.execute(id, updatedFields);
   }
 
   @Patch(':id/activate')
-  @Auth(Role.ADMIN)
+  @Auth('users:activate')
   activateUser(@Param('id') userId: string) {
     return this.activateUserUseCase.execute(userId);
   }
 
   @Patch(':id/deactivate')
-  @Auth(Role.ADMIN)
+  @Auth('users:deactivate')
   deactivateUser(@Param('id') userId: string) {
     return this.deactivateUserUseCase.execute(userId);
   }
-  // @Delete(':id')
-  // deleteUser(@Param('id') id: string) {
-  //   return this.usersService.deleteUser(id);
-  // }
-
-  // @Patch(':id')
-  // updateUser(@Param('id') id: string, @Body() updatedFields: UpdateUserDto) {
-  //   return this.usersService.updateUser(id, updatedFields);
-  // }
 }

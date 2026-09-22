@@ -13,4 +13,8 @@ export class RolePermissionMapper {
       permissionId: raw.permissionId,
     };
   }
+
+  static toDomainList(raws: RolePermissionTable[]): RolePermissionEntity[] {
+    return raws.map((raw) => this.toDomain(raw));
+  }
 }

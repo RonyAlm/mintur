@@ -15,6 +15,7 @@ import {
 @Module({
   imports: [PrismaModule],
   exports: [
+    RolePermissionRepository,
     ListPermissionsUseCase,
     GetPermissionByIdUseCase,
     CreatePermissionUseCase,

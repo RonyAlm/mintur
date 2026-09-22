@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../../modules/prisma/prisma.service';
-import { RolePermission, RolePermissionRepository } from '../../domain';
+import {
+  Permission,
+  RolePermission,
+  RolePermissionRepository,
+} from '../../domain';
 import { RolePermissionMapper } from './role-permission.mappers';
+import { PermissionMapper } from './permission.mappers';
 
 @Injectable()
 export class PrismaRolePermissionRepository implements RolePermissionRepository {
@@ -29,5 +34,13 @@ export class PrismaRolePermissionRepository implements RolePermissionRepository 
       where: { roleId_permissionId: { roleId, permissionId } },
     });
     return !!rolePermission;
+  }
+
+  async findPermissionsByRoleId(roleId: string): Promise<Permission[]> {
+    const permissions = await this.prismaService.rolePermission.findMany({
+      where: { roleId },
+      include: { permission: true },
+    });
+    return PermissionMapper.toDomainList(permissions.map((p) => p.permission));
   }
 }

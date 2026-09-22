@@ -38,11 +38,6 @@ export class AuthController {
     private readonly getMyProfileUseCase: GetMyProfileUseCase,
   ) {}
 
-  // @Post('register')
-  // register(@Body() registerDto: RegisterDto) {
-  //   return this.authService.register(registerDto);
-  // }
-
   @HttpCode(HttpStatus.OK)
   @Post('login')
   async login(@Body() dto: LoginDto) {
@@ -50,18 +45,17 @@ export class AuthController {
   }
 
   @Get('profile')
-  // @Auth('USER')
   @UseGuards(JwtAuthGuard)
   profile(@CurrentUser() user: AuthenticatedUser) {
     return this.getMyProfileUseCase.execute(user.email);
   }
 
   @Patch('change-password')
-  // @Auth('USER')
+  @UseGuards(JwtAuthGuard)
   changePassword(
     @Body() dto: ChangePasswordDto,
     @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.changePasswordUseCase.execute(user.sub, dto);
+    return this.changePasswordUseCase.execute(user.id, dto);
   }
 }
