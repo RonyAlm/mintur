@@ -9,7 +9,23 @@
 * 🟢 You can import this file directly.
 */
 
+export const OrganizationType = {
+  MINISTRY: 'MINISTRY',
+  HOTEL: 'HOTEL',
+  AGENCY: 'AGENCY',
+  TOURISM_PROVIDER: 'TOURISM_PROVIDER',
+  GASTRONOMY: 'GASTRONOMY',
+  TRANSPORTATION: 'TRANSPORTATION',
+  OTHER: 'OTHER'
+} as const
+
+export type OrganizationType = (typeof OrganizationType)[keyof typeof OrganizationType]
 
 
-// This file is empty because there are no enums in the schema.
-export {}
+export const OrganizationMemberRole = {
+  OWNER: 'OWNER',
+  ADMIN: 'ADMIN',
+  OPERATOR: 'OPERATOR'
+} as const
+
+export type OrganizationMemberRole = (typeof OrganizationMemberRole)[keyof typeof OrganizationMemberRole]
