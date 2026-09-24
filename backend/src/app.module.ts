@@ -5,6 +5,7 @@ import { UsersModule } from './modules/users/infrastructure/users.module';
 import { AuthModule } from './modules/auth/infrastructure/auth.module';
 import { RolesModule } from './modules/roles/infrastructure/roles.module';
 import { PermissionsModule } from './modules/permissions/infrastructure/permissions.module';
+import { OrganizationModule } from './modules/organizations/infrastructure/organization.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { PermissionsModule } from './modules/permissions/infrastructure/permissi
     AuthModule,
     PermissionsModule,
     RolesModule,
+    OrganizationModule,
     // Maneja los controladores de login y uso de JWT
   ],
   controllers: [],

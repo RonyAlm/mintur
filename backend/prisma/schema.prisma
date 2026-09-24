@@ -90,7 +90,7 @@ enum OrganizationType {
 
 model Organization {
   id          String           @id @default(uuid())
-  name        String
+  name        String           
   type        OrganizationType
   description String?
   isActive    Boolean          @default(true)
