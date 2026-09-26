@@ -20,7 +20,7 @@ import { PermissionsModule } from 'src/modules/permissions/infrastructure/permis
 
 @Module({
   imports: [PrismaModule, RolesModule, PermissionsModule],
-  exports: [FindUserByEmailUseCase, ChangePasswordUseCase],
+  exports: [FindUserByEmailUseCase, ChangePasswordUseCase, GetUserByIdUseCase],
   providers: [
     {
       provide: UsersRepository,

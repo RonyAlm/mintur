@@ -1,13 +1,31 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import {
   ActivateOrganizationUseCase,
+  CreateOrganizationMembershipUseCase,
   CreateOrganizationUseCase,
   DeactivateOrganizationUseCase,
   GetOrganizationByIdUseCase,
+  GetOrganizationMembershipsUseCase,
+  GetUserOrganizationsUseCase,
   ListOrganizationsUseCase,
+  RemoveOrganizationMembershipUseCase,
+  UpdateOrganizationMembershipUseCase,
   UpdateOrganizationUseCase,
 } from '../../applications';
-import { CreateOrganizationDto, UpdateOrganizationDto } from './dtos';
+import {
+  CreateOrganizationDto,
+  CreateOrganizationMembershipDto,
+  UpdateOrganizationDto,
+  UpdateOrganizationMembershipDto,
+} from './dtos';
 
 @Controller('organizations')
 export class OrganizationController {
@@ -18,6 +36,11 @@ export class OrganizationController {
     private readonly updateOrganizationUseCase: UpdateOrganizationUseCase,
     private readonly activateOrganizationUseCase: ActivateOrganizationUseCase,
     private readonly deactivateOrganizationUseCase: DeactivateOrganizationUseCase,
+    private readonly createOrganizationMembershipUseCase: CreateOrganizationMembershipUseCase,
+    private readonly getOrganizationMembershipsUseCase: GetOrganizationMembershipsUseCase,
+    private readonly getUserOrganizationsUseCase: GetUserOrganizationsUseCase,
+    private readonly updateOrganizationMembershipUseCase: UpdateOrganizationMembershipUseCase,
+    private readonly removeOrganizationMembershipUseCase: RemoveOrganizationMembershipUseCase,
   ) {}
 
   @Get()
@@ -53,5 +76,53 @@ export class OrganizationController {
   @Patch(':id/deactivate')
   async deactivateOrganization(@Param('id') id: string) {
     return this.deactivateOrganizationUseCase.execute(id);
+  }
+
+  @Post(':organizationId/members')
+  async createOrganizationMembership(
+    @Param('organizationId') organizationId: string,
+    @Body() dto: CreateOrganizationMembershipDto,
+  ) {
+    return this.createOrganizationMembershipUseCase.execute({
+      ...dto,
+      organizationId,
+    });
+  }
+
+  @Get(':organizationId/members')
+  async getOrganizationMemberships(
+    @Param('organizationId') organizationId: string,
+  ) {
+    return this.getOrganizationMembershipsUseCase.execute(organizationId);
+  }
+
+  //TODO: despues cambiar al modulo de users
+  @Get('/users/:userId/organizations')
+  async getUserOrganizations(@Param('userId') userId: string) {
+    return this.getUserOrganizationsUseCase.execute(userId);
+  }
+
+  @Patch(':organizationId/members/:userId')
+  async updateOrganizationMembership(
+    @Param('organizationId') organizationId: string,
+    @Param('userId') userId: string,
+    @Body() dto: UpdateOrganizationMembershipDto,
+  ) {
+    return this.updateOrganizationMembershipUseCase.execute({
+      userId,
+      organizationId,
+      ...dto,
+    });
+  }
+
+  @Delete(':organizationId/members/:userId')
+  async deleteOrganizationMembership(
+    @Param('organizationId') organizationId: string,
+    @Param('userId') userId: string,
+  ) {
+    return this.removeOrganizationMembershipUseCase.execute(
+      userId,
+      organizationId,
+    );
   }
 }
