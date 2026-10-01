@@ -1,20 +1,24 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Role, RoleRepository } from '../../domain';
-import { CreateRoleDto } from '../dtos';
+
+export interface CreateRoleInput {
+  name: string;
+  description?: string;
+}
 
 @Injectable()
 export class CreateRoleUseCase {
   constructor(private readonly roleRepository: RoleRepository) {}
 
-  async execute(dto: CreateRoleDto): Promise<Role> {
-    const existsRole = await this.roleRepository.findByName(dto.name);
+  async execute(input: CreateRoleInput): Promise<Role> {
+    const existsRole = await this.roleRepository.findByName(input.name);
     if (existsRole)
       throw new NotFoundException('Ya existe un rol con ese nombre');
 
     const inputRole = {
       id: crypto.randomUUID(),
-      name: dto.name.trim().toLocaleUpperCase(),
-      description: dto.description?.trim(),
+      name: input.name.trim().toLocaleUpperCase(),
+      description: input.description?.trim(),
       isSystemRole: false,
       createdAt: new Date(),
       updatedAt: new Date(),

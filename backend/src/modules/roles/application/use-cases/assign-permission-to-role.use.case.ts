@@ -2,7 +2,11 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { GetPermissionByIdUseCase } from '../../../../modules/permissions/applications';
 import { RolePermissionRepository } from '../../../../modules/permissions/domain';
 import { GetRoleByIdUseCase } from './get-role-by-id.use-case';
-import { AssignPermissionToRoleDto } from '../dtos';
+
+export interface AssignPermissionToRoleInput {
+  roleId: string;
+  permissionId: string;
+}
 
 @Injectable()
 export class AssignPermissionToRoleUseCase {
@@ -12,11 +16,11 @@ export class AssignPermissionToRoleUseCase {
     private readonly getRoleByIdUseCase: GetRoleByIdUseCase,
   ) {}
 
-  async execute(dto: AssignPermissionToRoleDto) {
-    const role = await this.getRoleByIdUseCase.execute(dto.roleId.trim());
+  async execute(input: AssignPermissionToRoleInput) {
+    const role = await this.getRoleByIdUseCase.execute(input.roleId.trim());
 
     const permission = await this.getPermissionByIdUseCase.execute(
-      dto.permissionId.trim(),
+      input.permissionId.trim(),
     );
 
     const exists = await this.rolePermissionRepository.exists(

@@ -1,8 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { RemovePermissionFromRoleDto } from '../dtos';
 import { RolePermissionRepository } from '../../../../modules/permissions/domain';
 import { GetPermissionByIdUseCase } from '../../../../modules/permissions/applications';
 import { GetRoleByIdUseCase } from './get-role-by-id.use-case';
+
+export interface RemovePermissionFromRoleInput {
+  roleId: string;
+  permissionId: string;
+}
 
 @Injectable()
 export class RemovePermissionFromRoleUseCase {
@@ -12,10 +16,10 @@ export class RemovePermissionFromRoleUseCase {
     private readonly getPermissionByIdUseCase: GetPermissionByIdUseCase,
   ) {}
 
-  async execute(dto: RemovePermissionFromRoleDto) {
-    const role = await this.getRoleByIdUseCase.execute(dto.roleId.trim());
+  async execute(input: RemovePermissionFromRoleInput) {
+    const role = await this.getRoleByIdUseCase.execute(input.roleId.trim());
     const permission = await this.getPermissionByIdUseCase.execute(
-      dto.permissionId.trim(),
+      input.permissionId.trim(),
     );
 
     const exists = await this.rolePermissionRepository.exists(

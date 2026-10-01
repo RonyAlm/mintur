@@ -5,21 +5,27 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { RoleRepository } from '../../domain';
-import { UpdateRoleDto } from '../dtos';
+
+export interface UpdateRoleInput {
+  name?: string;
+  description?: string;
+}
 
 @Injectable()
 export class UpdateRoleUseCase {
   constructor(private readonly roleRepository: RoleRepository) {}
 
-  async execute(id: string, dto: UpdateRoleDto) {
+  async execute(id: string, input: UpdateRoleInput) {
     const role = await this.roleRepository.findById(id.trim());
     if (!role) throw new NotFoundException('No existe el rol');
 
     if (role.isSystemRole)
       throw new ForbiddenException('No se puede actualizar un rol del sistema');
 
-    if (dto.name && role.name !== dto.name.trim()) {
-      const roleExists = await this.roleRepository.findByName(dto.name.trim());
+    if (input.name && role.name !== input.name.trim()) {
+      const roleExists = await this.roleRepository.findByName(
+        input.name.trim(),
+      );
       if (roleExists)
         throw new ConflictException({
           message: 'Ya existe un rol con ese nombre',
@@ -29,8 +35,8 @@ export class UpdateRoleUseCase {
 
     const inputRole = {
       id: role.id,
-      name: dto.name && dto.name.trim().toLocaleUpperCase(),
-      description: dto.description?.trim(),
+      name: input.name && input.name.trim().toLocaleUpperCase(),
+      description: input.description?.trim(),
       isSystemRole: role.isSystemRole,
       createdAt: role.createdAt,
       updatedAt: new Date(),

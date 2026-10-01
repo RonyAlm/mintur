@@ -8,18 +8,20 @@ import {
   Post,
 } from '@nestjs/common';
 import {
-  CreateRoleDto,
   CreateRoleUseCase,
   GetRoleByIdUseCase,
   ListRolesUseCase,
-  UpdateRoleDto,
   UpdateRoleUseCase,
   AssignPermissionToRoleUseCase,
   RemovePermissionFromRoleUseCase,
-  AssignPermissionToRoleDto,
-  RemovePermissionFromRoleDto,
 } from '../../application';
 import { Auth } from '../../../../core/decorators';
+import {
+  AssignPermissionToRoleDto,
+  CreateRoleDto,
+  UpdateRoleDto,
+  RemovePermissionFromRoleDto,
+} from './dtos';
 
 @Controller('roles')
 export class RolesController {
@@ -62,7 +64,10 @@ export class RolesController {
     @Param('roleId') roleId: string,
     @Body() dto: AssignPermissionToRoleDto,
   ) {
-    return this.assignPermissionToRoleUseCase.execute({ ...dto, roleId });
+    return this.assignPermissionToRoleUseCase.execute({
+      roleId,
+      permissionId: dto.permissionId,
+    });
   }
 
   @Delete(':roleId/permissions/:permissionId')
