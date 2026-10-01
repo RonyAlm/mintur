@@ -9,7 +9,6 @@ import {
   PrismaOrganizationRepository,
 } from './persistence';
 import { OrganizationController } from './controllers';
-import { UsersModule } from '../../users/infrastructure/users.module';
 
 import {
   ActivateOrganizationUseCase,
@@ -23,10 +22,15 @@ import {
   GetUserOrganizationsUseCase,
   UpdateOrganizationMembershipUseCase,
   RemoveOrganizationMembershipUseCase,
+  OrganizationAccessService,
+  GetMyOrganizationsUseCase,
 } from '../applications';
+import { UsersModule } from '../../users/infrastructure/users.module';
+import { PermissionsModule } from '../../../modules/permissions/infrastructure/permissions.module';
+import { RolesModule } from '../../../modules/roles/infrastructure/roles.module';
 
 @Module({
-  imports: [PrismaModule, UsersModule],
+  imports: [PrismaModule, UsersModule, PermissionsModule, RolesModule],
   exports: [
     OrganizationRepository,
     CreateOrganizationUseCase,
@@ -55,6 +59,8 @@ import {
     GetUserOrganizationsUseCase,
     UpdateOrganizationMembershipUseCase,
     RemoveOrganizationMembershipUseCase,
+    OrganizationAccessService,
+    GetMyOrganizationsUseCase,
   ],
   controllers: [OrganizationController],
 })

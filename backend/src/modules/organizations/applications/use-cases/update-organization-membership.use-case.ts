@@ -3,8 +3,10 @@ import {
   OrganizationMemberRole,
   OrganizationMembershipRepository,
 } from '../../domain';
+import { OrganizationAccessService } from '../services';
 
 export interface UpdateOrganizationMembershipInput {
+  currentUser: { id: string; roleId: string };
   userId: string;
   organizationId: string;
   role: OrganizationMemberRole;
@@ -14,9 +16,15 @@ export interface UpdateOrganizationMembershipInput {
 export class UpdateOrganizationMembershipUseCase {
   constructor(
     private readonly organizationMembershipRepository: OrganizationMembershipRepository,
+    private readonly organizationAccessService: OrganizationAccessService,
   ) {}
 
   async execute(input: UpdateOrganizationMembershipInput) {
+    await this.organizationAccessService.requireOrganizationAdmin(
+      input.currentUser.roleId,
+      input.currentUser.id,
+      input.organizationId,
+    );
     const membership =
       await this.organizationMembershipRepository.findByUserAndOrganization(
         input.userId,

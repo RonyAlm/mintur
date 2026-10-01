@@ -1,7 +1,14 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { OrganizationRepository, OrganizationType } from '../../domain';
+import { OrganizationAccessService } from '../services';
 
 type CreateOrganizationInput = {
+  currentUserRoleId: string;
+
   name: string;
   type: OrganizationType;
   description?: string;
@@ -11,9 +18,20 @@ type CreateOrganizationInput = {
 export class CreateOrganizationUseCase {
   constructor(
     private readonly organizationRepository: OrganizationRepository,
+    private readonly organizationAccessService: OrganizationAccessService,
   ) {}
 
   async execute(input: CreateOrganizationInput) {
+    const isSystemAdmin = await this.organizationAccessService.isSystemAdmin(
+      input.currentUserRoleId,
+    );
+
+    if (!isSystemAdmin) {
+      throw new ForbiddenException(
+        'No tienes permisos para crear una organización',
+      );
+    }
+
     const existingOrganization = await this.organizationRepository.findByName(
       input.name,
     );

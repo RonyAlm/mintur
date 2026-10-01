@@ -2,6 +2,7 @@ export * from './activate-organzation';
 export * from './create-organization-membership.use-case';
 export * from './create-organization.use-case';
 export * from './deactivate-organzation';
+export * from './get-my-organizations.use-case';
 export * from './get-organization-by-id.use-case';
 export * from './get-organization-memberships.use-case';
 export * from './get-user-organizations.use-case';

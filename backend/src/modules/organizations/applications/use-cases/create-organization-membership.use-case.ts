@@ -6,11 +6,13 @@ import {
 import {
   OrganizationMemberRole,
   OrganizationMembershipRepository,
+  OrganizationRepository,
 } from '../../domain';
+import { OrganizationAccessService } from '../services';
 import { GetUserByIdUseCase } from '../../../../modules/users/applications';
-import { GetOrganizationByIdUseCase } from './get-organization-by-id.use-case';
 
 export interface CreateOrganizationMembershipInput {
+  currentUser: { id: string; roleId: string };
   userId: string;
   organizationId: string;
   role: OrganizationMemberRole;
@@ -20,12 +22,19 @@ export interface CreateOrganizationMembershipInput {
 export class CreateOrganizationMembershipUseCase {
   constructor(
     private readonly organizationMembershipRepository: OrganizationMembershipRepository,
-    private readonly getOrganizationByIdUseCase: GetOrganizationByIdUseCase,
+    private readonly organizationRepository: OrganizationRepository,
     private readonly getUserByIdUseCase: GetUserByIdUseCase,
+    private readonly organizationAccessService: OrganizationAccessService,
   ) {}
 
   async execute(input: CreateOrganizationMembershipInput) {
-    const organization = await this.getOrganizationByIdUseCase.execute(
+    await this.organizationAccessService.requireOrganizationAdmin(
+      input.currentUser.roleId,
+      input.currentUser.id,
+      input.organizationId,
+    );
+
+    const organization = await this.organizationRepository.findById(
       input.organizationId,
     );
     const user = await this.getUserByIdUseCase.execute(input.userId);

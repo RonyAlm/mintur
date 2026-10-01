@@ -1,13 +1,28 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { OrganizationMembershipRepository } from '../../domain';
+import { OrganizationAccessService } from '../services';
 
 @Injectable()
 export class RemoveOrganizationMembershipUseCase {
   constructor(
     private readonly organizationMembershipRepository: OrganizationMembershipRepository,
+    private readonly organizationAccessService: OrganizationAccessService,
   ) {}
 
-  async execute(userId: string, organizationId: string) {
+  async execute(
+    currentUser: {
+      id: string;
+      roleId: string;
+    },
+    userId: string,
+    organizationId: string,
+  ) {
+    await this.organizationAccessService.requireOrganizationAdmin(
+      currentUser.roleId,
+      currentUser.id,
+      organizationId,
+    );
+
     const membership =
       await this.organizationMembershipRepository.findByUserAndOrganization(
         userId,

@@ -4,8 +4,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { OrganizationRepository, OrganizationType } from '../../domain';
+import { OrganizationAccessService } from '../services';
 
 export type UpdateOrganizationInput = {
+  currentUser: { id: string; roleId: string };
+
   name?: string;
   type?: OrganizationType;
   description?: string;
@@ -15,6 +18,7 @@ export type UpdateOrganizationInput = {
 export class UpdateOrganizationUseCase {
   constructor(
     private readonly organizationRepository: OrganizationRepository,
+    private readonly organizationAccessService: OrganizationAccessService,
   ) {}
 
   async execute(id: string, input: UpdateOrganizationInput) {
@@ -25,6 +29,12 @@ export class UpdateOrganizationUseCase {
     if (!existingOrganization) {
       throw new NotFoundException('Organización no encontrada');
     }
+
+    await this.organizationAccessService.requireOrganizationAdmin(
+      input.currentUser.roleId,
+      input.currentUser.id,
+      id,
+    );
 
     if (input.name && existingOrganization.name !== input.name.trim()) {
       const organizationExists = await this.organizationRepository.findByName(
