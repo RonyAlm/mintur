@@ -43,7 +43,7 @@ export class CreateUserUseCase {
     // if (user.role === 'ADMIN' && executor.role !== Role.SUPERADMIN)
     //   throw new UnauthorizedException('User must be super admin');
 
-    const roleDefault = dto.roleId || 'cfb7af81-b4fc-4c57-9c35-34f9e13910eb'; // Role USER
+    const roleDefault = dto.roleId || '63f3a6b7-b939-4c96-a983-9c17be4ba7at'; // Role USER
 
     const role = await this.getRoleByIdUseCase.execute(roleDefault);
     if (!role) throw new NotFoundException('El rol indicado no existe');
