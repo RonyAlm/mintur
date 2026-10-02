@@ -36,6 +36,13 @@ import { RolesModule } from '../../../modules/roles/infrastructure/roles.module'
     CreateOrganizationUseCase,
     ListOrganizationsUseCase,
     GetOrganizationByIdUseCase,
+    UpdateOrganizationUseCase,
+
+    ActivateOrganizationUseCase,
+    DeactivateOrganizationUseCase,
+
+    CreateOrganizationMembershipUseCase,
+    OrganizationAccessService,
   ],
   providers: [
     {

@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { OrganizationType } from 'src/modules/organizations/domain';
+import { OrganizationType } from '../../../../../modules/organizations/domain';
 
 export class UpdateOrganizationDto {
   @IsOptional()
