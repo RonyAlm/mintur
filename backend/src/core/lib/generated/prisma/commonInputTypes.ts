@@ -157,6 +157,23 @@ export type EnumOrganizationMemberRoleWithAggregatesFilter<$PrismaModel = never>
   _max?: Prisma.NestedEnumOrganizationMemberRoleFilter<$PrismaModel>
 }
 
+export type EnumAccommodationTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.AccommodationType | Prisma.EnumAccommodationTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.AccommodationType[] | Prisma.ListEnumAccommodationTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AccommodationType[] | Prisma.ListEnumAccommodationTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAccommodationTypeFilter<$PrismaModel> | $Enums.AccommodationType
+}
+
+export type EnumAccommodationTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AccommodationType | Prisma.EnumAccommodationTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.AccommodationType[] | Prisma.ListEnumAccommodationTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AccommodationType[] | Prisma.ListEnumAccommodationTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAccommodationTypeWithAggregatesFilter<$PrismaModel> | $Enums.AccommodationType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAccommodationTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAccommodationTypeFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -311,6 +328,23 @@ export type NestedEnumOrganizationMemberRoleWithAggregatesFilter<$PrismaModel = 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumOrganizationMemberRoleFilter<$PrismaModel>
   _max?: Prisma.NestedEnumOrganizationMemberRoleFilter<$PrismaModel>
+}
+
+export type NestedEnumAccommodationTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.AccommodationType | Prisma.EnumAccommodationTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.AccommodationType[] | Prisma.ListEnumAccommodationTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AccommodationType[] | Prisma.ListEnumAccommodationTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAccommodationTypeFilter<$PrismaModel> | $Enums.AccommodationType
+}
+
+export type NestedEnumAccommodationTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AccommodationType | Prisma.EnumAccommodationTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.AccommodationType[] | Prisma.ListEnumAccommodationTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AccommodationType[] | Prisma.ListEnumAccommodationTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAccommodationTypeWithAggregatesFilter<$PrismaModel> | $Enums.AccommodationType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAccommodationTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAccommodationTypeFilter<$PrismaModel>
 }
 
 

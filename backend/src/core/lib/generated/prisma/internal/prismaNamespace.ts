@@ -389,7 +389,8 @@ export const ModelName = {
   Permission: 'Permission',
   RolePermission: 'RolePermission',
   Organization: 'Organization',
-  OrganizationMembership: 'OrganizationMembership'
+  OrganizationMembership: 'OrganizationMembership',
+  Accommodation: 'Accommodation'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -405,7 +406,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "role" | "permission" | "rolePermission" | "organization" | "organizationMembership"
+    modelProps: "user" | "role" | "permission" | "rolePermission" | "organization" | "organizationMembership" | "accommodation"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -853,6 +854,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Accommodation: {
+      payload: Prisma.$AccommodationPayload<ExtArgs>
+      fields: Prisma.AccommodationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AccommodationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AccommodationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationPayload>
+        }
+        findFirst: {
+          args: Prisma.AccommodationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AccommodationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationPayload>
+        }
+        findMany: {
+          args: Prisma.AccommodationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationPayload>[]
+        }
+        create: {
+          args: Prisma.AccommodationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationPayload>
+        }
+        createMany: {
+          args: Prisma.AccommodationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AccommodationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationPayload>[]
+        }
+        delete: {
+          args: Prisma.AccommodationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationPayload>
+        }
+        update: {
+          args: Prisma.AccommodationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationPayload>
+        }
+        deleteMany: {
+          args: Prisma.AccommodationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AccommodationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AccommodationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationPayload>[]
+        }
+        upsert: {
+          args: Prisma.AccommodationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationPayload>
+        }
+        aggregate: {
+          args: Prisma.AccommodationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAccommodation>
+        }
+        groupBy: {
+          args: Prisma.AccommodationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccommodationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AccommodationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccommodationCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -964,6 +1039,26 @@ export const OrganizationMembershipScalarFieldEnum = {
 export type OrganizationMembershipScalarFieldEnum = (typeof OrganizationMembershipScalarFieldEnum)[keyof typeof OrganizationMembershipScalarFieldEnum]
 
 
+export const AccommodationScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  type: 'type',
+  image: 'image',
+  address: 'address',
+  addressMap: 'addressMap',
+  phoneOne: 'phoneOne',
+  phoneTwo: 'phoneTwo',
+  email: 'email',
+  website: 'website',
+  instagram: 'instagram',
+  facebook: 'facebook',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AccommodationScalarFieldEnum = (typeof AccommodationScalarFieldEnum)[keyof typeof AccommodationScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1054,6 +1149,20 @@ export type EnumOrganizationMemberRoleFieldRefInput<$PrismaModel> = FieldRefInpu
  * Reference to a field of type 'OrganizationMemberRole[]'
  */
 export type ListEnumOrganizationMemberRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrganizationMemberRole[]'>
+    
+
+
+/**
+ * Reference to a field of type 'AccommodationType'
+ */
+export type EnumAccommodationTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AccommodationType'>
+    
+
+
+/**
+ * Reference to a field of type 'AccommodationType[]'
+ */
+export type ListEnumAccommodationTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AccommodationType[]'>
     
 
 
@@ -1186,6 +1295,7 @@ export type GlobalOmitConfig = {
   rolePermission?: Prisma.RolePermissionOmit
   organization?: Prisma.OrganizationOmit
   organizationMembership?: Prisma.OrganizationMembershipOmit
+  accommodation?: Prisma.AccommodationOmit
 }
 
 /* Types for Logging */

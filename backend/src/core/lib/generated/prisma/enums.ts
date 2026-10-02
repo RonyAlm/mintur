@@ -11,7 +11,7 @@
 
 export const OrganizationType = {
   MINISTRY: 'MINISTRY',
-  HOTEL: 'HOTEL',
+  ACCOMMODATION: 'ACCOMMODATION',
   AGENCY: 'AGENCY',
   TOURISM_PROVIDER: 'TOURISM_PROVIDER',
   GASTRONOMY: 'GASTRONOMY',
@@ -29,3 +29,13 @@ export const OrganizationMemberRole = {
 } as const
 
 export type OrganizationMemberRole = (typeof OrganizationMemberRole)[keyof typeof OrganizationMemberRole]
+
+
+export const AccommodationType = {
+  HOTEL: 'HOTEL',
+  HOSTEL: 'HOSTEL',
+  APART_HOTEL: 'APART_HOTEL',
+  OTRO: 'OTRO'
+} as const
+
+export type AccommodationType = (typeof AccommodationType)[keyof typeof AccommodationType]

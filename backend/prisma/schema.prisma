@@ -80,7 +80,7 @@ model RolePermission {
 
 enum OrganizationType {
   MINISTRY
-  HOTEL
+  ACCOMMODATION
   AGENCY
   TOURISM_PROVIDER
   GASTRONOMY
@@ -99,6 +99,7 @@ model Organization {
   updatedAt DateTime @updatedAt
 
   memberships OrganizationMembership[]
+  accommodation Accommodation?
 
   @@map("organizations")
 }
@@ -122,4 +123,34 @@ model OrganizationMembership {
 
   @@id([userId, organizationId])
   @@map("organization_memberships")
+}
+
+enum AccommodationType {
+  HOTEL
+  HOSTEL
+  APART_HOTEL
+  OTRO
+}
+
+model Accommodation {
+  id             String            @id @default(uuid())
+  organizationId String            @unique
+  type           AccommodationType
+
+  image          String?
+  address        String?
+  addressMap     String?
+  phoneOne       String?
+  phoneTwo       String?
+  email          String?
+  website        String?
+  instagram      String?
+  facebook       String?
+
+  organization Organization @relation( fields: [organizationId], references: [id], onDelete: Cascade )
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("accommodations")
 }

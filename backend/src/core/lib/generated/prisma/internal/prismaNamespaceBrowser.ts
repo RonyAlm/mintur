@@ -56,7 +56,8 @@ export const ModelName = {
   Permission: 'Permission',
   RolePermission: 'RolePermission',
   Organization: 'Organization',
-  OrganizationMembership: 'OrganizationMembership'
+  OrganizationMembership: 'OrganizationMembership',
+  Accommodation: 'Accommodation'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -145,6 +146,26 @@ export const OrganizationMembershipScalarFieldEnum = {
 } as const
 
 export type OrganizationMembershipScalarFieldEnum = (typeof OrganizationMembershipScalarFieldEnum)[keyof typeof OrganizationMembershipScalarFieldEnum]
+
+
+export const AccommodationScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  type: 'type',
+  image: 'image',
+  address: 'address',
+  addressMap: 'addressMap',
+  phoneOne: 'phoneOne',
+  phoneTwo: 'phoneTwo',
+  email: 'email',
+  website: 'website',
+  instagram: 'instagram',
+  facebook: 'facebook',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AccommodationScalarFieldEnum = (typeof AccommodationScalarFieldEnum)[keyof typeof AccommodationScalarFieldEnum]
 
 
 export const SortOrder = {

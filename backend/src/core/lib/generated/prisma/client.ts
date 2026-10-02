@@ -69,3 +69,8 @@ export type Organization = Prisma.OrganizationModel
  * 
  */
 export type OrganizationMembership = Prisma.OrganizationMembershipModel
+/**
+ * Model Accommodation
+ * 
+ */
+export type Accommodation = Prisma.AccommodationModel
