@@ -137,6 +137,8 @@ model Accommodation {
   organizationId String            @unique
   type           AccommodationType
 
+  isActive    Boolean          @default(true)
+
   image          String?
   address        String?
   addressMap     String?

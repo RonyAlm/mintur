@@ -152,6 +152,7 @@ export const AccommodationScalarFieldEnum = {
   id: 'id',
   organizationId: 'organizationId',
   type: 'type',
+  isActive: 'isActive',
   image: 'image',
   address: 'address',
   addressMap: 'addressMap',
