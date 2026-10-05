@@ -21,6 +21,7 @@ export interface Accommodation {
   id: string;
   organizationId: string;
   type: AccommodationType;
+  isActive: boolean;
   image?: string;
   address?: string;
   addressMap?: string;

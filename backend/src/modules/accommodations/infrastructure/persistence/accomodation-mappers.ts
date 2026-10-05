@@ -11,6 +11,7 @@ export interface AccommodationTable extends Accommodation {
   id: string;
   organizationId: string;
   type: AccommodationType;
+  isActive: boolean;
   image: string | null;
   address: string | null;
   addressMap: string | null;
@@ -30,6 +31,7 @@ export class AccommodationMapper {
       id: raw.id,
       organizationId: raw.organizationId,
       type: raw.type as AccommodationTypeEntity,
+      isActive: raw.isActive,
       image: raw.image,
       address: raw.address,
       addressMap: raw.addressMap,

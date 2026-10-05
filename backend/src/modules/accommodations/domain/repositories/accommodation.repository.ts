@@ -7,9 +7,12 @@ export abstract class AccommodationRepository {
   abstract findByOrganizationId(
     organizationId: string,
   ): Promise<Accommodation | null>;
+  abstract findByOrganizationIds(
+    organizationIds: string[],
+  ): Promise<Accommodation[]>;
   abstract update(
     id: string,
-    accommodation: Accommodation,
+    accommodation: Partial<Accommodation>,
   ): Promise<Accommodation>;
   abstract delete(id: string): Promise<void>;
 }

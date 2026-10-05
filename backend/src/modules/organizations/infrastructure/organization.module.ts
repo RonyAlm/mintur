@@ -33,6 +33,7 @@ import { RolesModule } from '../../../modules/roles/infrastructure/roles.module'
   imports: [PrismaModule, UsersModule, PermissionsModule, RolesModule],
   exports: [
     OrganizationRepository,
+    OrganizationMembershipRepository,
     CreateOrganizationUseCase,
     ListOrganizationsUseCase,
     GetOrganizationByIdUseCase,

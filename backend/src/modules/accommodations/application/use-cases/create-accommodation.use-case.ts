@@ -74,6 +74,7 @@ export class CreateAccommodationUseCase {
     const inputAccommodation: Accommodation = {
       id: crypto.randomUUID(),
       organizationId: input.organizationId,
+      isActive: true,
       type: input.type,
       image: input.image,
       address: input.address,

@@ -34,6 +34,16 @@ export class PrismaAccommodationRepository implements AccommodationRepository {
     return AccommodationMapper.toDomain(accommodation);
   }
 
+  async findByOrganizationIds(
+    organizationIds: string[],
+  ): Promise<Accommodation[]> {
+    if (organizationIds.length === 0) return [];
+    const accommodations = await this.prismaService.accommodation.findMany({
+      where: { organizationId: { in: organizationIds } },
+    });
+    return AccommodationMapper.toDomainList(accommodations);
+  }
+
   async findById(id: string): Promise<Accommodation | null> {
     const accommodation = await this.prismaService.accommodation.findUnique({
       where: { id },

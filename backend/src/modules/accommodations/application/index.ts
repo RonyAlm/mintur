@@ -1,1 +1,1 @@
-export * from './use-cases/create-accommodation.use-case';
+export * from './use-cases';
