@@ -1,1 +1,1 @@
-export * from './use-cases/create-accommodation-daily-statistic.use-case';
+export * from './use-cases';

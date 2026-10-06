@@ -1,12 +1,17 @@
 import { Module } from '@nestjs/common';
 import { AccommodationModule } from '../../../modules/accommodations/infrastructure/accommodation.module';
 import { PermissionsModule } from '../../../modules/permissions/infrastructure/permissions.module';
+import { OrganizationModule } from '../../../modules/organizations/infrastructure/organization.module';
 import { UsersModule } from '../../../modules/users/infrastructure';
 import { PrismaAccommodationStatisticRepository } from './persistence';
 import { AccommodationStatisticRepository } from '../domain';
 import { AccommodationStatisticsController } from './controllers';
-import { CreateAccommodationDailyStatisticUseCase } from '../application';
-import { OrganizationModule } from 'src/modules/organizations/infrastructure/organization.module';
+import {
+  CreateAccommodationDailyStatisticUseCase,
+  GetAccommodationDailyStatisticUseCase,
+  GetAccommodationStatisticsByAccommodationUseCase,
+  UpdateAccommodationDailyStatisticUseCase,
+} from '../application';
 
 @Module({
   imports: [
@@ -23,10 +28,15 @@ import { OrganizationModule } from 'src/modules/organizations/infrastructure/org
       useClass: PrismaAccommodationStatisticRepository,
     },
     CreateAccommodationDailyStatisticUseCase,
+    GetAccommodationDailyStatisticUseCase,
+    GetAccommodationStatisticsByAccommodationUseCase,
+    UpdateAccommodationDailyStatisticUseCase,
   ],
   exports: [
     AccommodationStatisticRepository,
     CreateAccommodationDailyStatisticUseCase,
+    GetAccommodationDailyStatisticUseCase,
+    GetAccommodationStatisticsByAccommodationUseCase,
   ],
 })
 export class AccommodationStatisticsModule {}
