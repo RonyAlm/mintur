@@ -7,6 +7,7 @@ import { RolesModule } from './modules/roles/infrastructure/roles.module';
 import { PermissionsModule } from './modules/permissions/infrastructure/permissions.module';
 import { OrganizationModule } from './modules/organizations/infrastructure/organization.module';
 import { AccommodationModule } from './modules/accommodations/infrastructure/accommodation.module';
+import { AccommodationStatisticsModule } from './modules/accommodation-statistics/infrastructure/accommodation-statistics.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { AccommodationModule } from './modules/accommodations/infrastructure/acc
     RolesModule,
     OrganizationModule,
     AccommodationModule,
+    AccommodationStatisticsModule,
     // Maneja los controladores de login y uso de JWT
   ],
   controllers: [],
