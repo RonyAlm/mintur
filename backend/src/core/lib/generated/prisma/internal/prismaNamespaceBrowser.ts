@@ -57,7 +57,11 @@ export const ModelName = {
   RolePermission: 'RolePermission',
   Organization: 'Organization',
   OrganizationMembership: 'OrganizationMembership',
-  Accommodation: 'Accommodation'
+  Accommodation: 'Accommodation',
+  AccommodationDailyStatistic: 'AccommodationDailyStatistic',
+  AccommodationStatisticAgeRange: 'AccommodationStatisticAgeRange',
+  AccommodationStatisticTravelPurpose: 'AccommodationStatisticTravelPurpose',
+  AccommodationStatisticOrigin: 'AccommodationStatisticOrigin'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -167,6 +171,46 @@ export const AccommodationScalarFieldEnum = {
 } as const
 
 export type AccommodationScalarFieldEnum = (typeof AccommodationScalarFieldEnum)[keyof typeof AccommodationScalarFieldEnum]
+
+
+export const AccommodationDailyStatisticScalarFieldEnum = {
+  id: 'id',
+  accommodationId: 'accommodationId',
+  date: 'date',
+  totalGuests: 'totalGuests',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AccommodationDailyStatisticScalarFieldEnum = (typeof AccommodationDailyStatisticScalarFieldEnum)[keyof typeof AccommodationDailyStatisticScalarFieldEnum]
+
+
+export const AccommodationStatisticAgeRangeScalarFieldEnum = {
+  statisticId: 'statisticId',
+  ageRange: 'ageRange',
+  quantity: 'quantity'
+} as const
+
+export type AccommodationStatisticAgeRangeScalarFieldEnum = (typeof AccommodationStatisticAgeRangeScalarFieldEnum)[keyof typeof AccommodationStatisticAgeRangeScalarFieldEnum]
+
+
+export const AccommodationStatisticTravelPurposeScalarFieldEnum = {
+  statisticId: 'statisticId',
+  purpose: 'purpose',
+  quantity: 'quantity'
+} as const
+
+export type AccommodationStatisticTravelPurposeScalarFieldEnum = (typeof AccommodationStatisticTravelPurposeScalarFieldEnum)[keyof typeof AccommodationStatisticTravelPurposeScalarFieldEnum]
+
+
+export const AccommodationStatisticOriginScalarFieldEnum = {
+  statisticId: 'statisticId',
+  type: 'type',
+  name: 'name',
+  quantity: 'quantity'
+} as const
+
+export type AccommodationStatisticOriginScalarFieldEnum = (typeof AccommodationStatisticOriginScalarFieldEnum)[keyof typeof AccommodationStatisticOriginScalarFieldEnum]
 
 
 export const SortOrder = {

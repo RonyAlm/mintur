@@ -390,7 +390,11 @@ export const ModelName = {
   RolePermission: 'RolePermission',
   Organization: 'Organization',
   OrganizationMembership: 'OrganizationMembership',
-  Accommodation: 'Accommodation'
+  Accommodation: 'Accommodation',
+  AccommodationDailyStatistic: 'AccommodationDailyStatistic',
+  AccommodationStatisticAgeRange: 'AccommodationStatisticAgeRange',
+  AccommodationStatisticTravelPurpose: 'AccommodationStatisticTravelPurpose',
+  AccommodationStatisticOrigin: 'AccommodationStatisticOrigin'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -406,7 +410,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "role" | "permission" | "rolePermission" | "organization" | "organizationMembership" | "accommodation"
+    modelProps: "user" | "role" | "permission" | "rolePermission" | "organization" | "organizationMembership" | "accommodation" | "accommodationDailyStatistic" | "accommodationStatisticAgeRange" | "accommodationStatisticTravelPurpose" | "accommodationStatisticOrigin"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -928,6 +932,302 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AccommodationDailyStatistic: {
+      payload: Prisma.$AccommodationDailyStatisticPayload<ExtArgs>
+      fields: Prisma.AccommodationDailyStatisticFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AccommodationDailyStatisticFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationDailyStatisticPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AccommodationDailyStatisticFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationDailyStatisticPayload>
+        }
+        findFirst: {
+          args: Prisma.AccommodationDailyStatisticFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationDailyStatisticPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AccommodationDailyStatisticFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationDailyStatisticPayload>
+        }
+        findMany: {
+          args: Prisma.AccommodationDailyStatisticFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationDailyStatisticPayload>[]
+        }
+        create: {
+          args: Prisma.AccommodationDailyStatisticCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationDailyStatisticPayload>
+        }
+        createMany: {
+          args: Prisma.AccommodationDailyStatisticCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AccommodationDailyStatisticCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationDailyStatisticPayload>[]
+        }
+        delete: {
+          args: Prisma.AccommodationDailyStatisticDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationDailyStatisticPayload>
+        }
+        update: {
+          args: Prisma.AccommodationDailyStatisticUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationDailyStatisticPayload>
+        }
+        deleteMany: {
+          args: Prisma.AccommodationDailyStatisticDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AccommodationDailyStatisticUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AccommodationDailyStatisticUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationDailyStatisticPayload>[]
+        }
+        upsert: {
+          args: Prisma.AccommodationDailyStatisticUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationDailyStatisticPayload>
+        }
+        aggregate: {
+          args: Prisma.AccommodationDailyStatisticAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAccommodationDailyStatistic>
+        }
+        groupBy: {
+          args: Prisma.AccommodationDailyStatisticGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccommodationDailyStatisticGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AccommodationDailyStatisticCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccommodationDailyStatisticCountAggregateOutputType> | number
+        }
+      }
+    }
+    AccommodationStatisticAgeRange: {
+      payload: Prisma.$AccommodationStatisticAgeRangePayload<ExtArgs>
+      fields: Prisma.AccommodationStatisticAgeRangeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AccommodationStatisticAgeRangeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticAgeRangePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AccommodationStatisticAgeRangeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticAgeRangePayload>
+        }
+        findFirst: {
+          args: Prisma.AccommodationStatisticAgeRangeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticAgeRangePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AccommodationStatisticAgeRangeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticAgeRangePayload>
+        }
+        findMany: {
+          args: Prisma.AccommodationStatisticAgeRangeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticAgeRangePayload>[]
+        }
+        create: {
+          args: Prisma.AccommodationStatisticAgeRangeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticAgeRangePayload>
+        }
+        createMany: {
+          args: Prisma.AccommodationStatisticAgeRangeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AccommodationStatisticAgeRangeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticAgeRangePayload>[]
+        }
+        delete: {
+          args: Prisma.AccommodationStatisticAgeRangeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticAgeRangePayload>
+        }
+        update: {
+          args: Prisma.AccommodationStatisticAgeRangeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticAgeRangePayload>
+        }
+        deleteMany: {
+          args: Prisma.AccommodationStatisticAgeRangeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AccommodationStatisticAgeRangeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AccommodationStatisticAgeRangeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticAgeRangePayload>[]
+        }
+        upsert: {
+          args: Prisma.AccommodationStatisticAgeRangeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticAgeRangePayload>
+        }
+        aggregate: {
+          args: Prisma.AccommodationStatisticAgeRangeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAccommodationStatisticAgeRange>
+        }
+        groupBy: {
+          args: Prisma.AccommodationStatisticAgeRangeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccommodationStatisticAgeRangeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AccommodationStatisticAgeRangeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccommodationStatisticAgeRangeCountAggregateOutputType> | number
+        }
+      }
+    }
+    AccommodationStatisticTravelPurpose: {
+      payload: Prisma.$AccommodationStatisticTravelPurposePayload<ExtArgs>
+      fields: Prisma.AccommodationStatisticTravelPurposeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AccommodationStatisticTravelPurposeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticTravelPurposePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AccommodationStatisticTravelPurposeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticTravelPurposePayload>
+        }
+        findFirst: {
+          args: Prisma.AccommodationStatisticTravelPurposeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticTravelPurposePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AccommodationStatisticTravelPurposeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticTravelPurposePayload>
+        }
+        findMany: {
+          args: Prisma.AccommodationStatisticTravelPurposeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticTravelPurposePayload>[]
+        }
+        create: {
+          args: Prisma.AccommodationStatisticTravelPurposeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticTravelPurposePayload>
+        }
+        createMany: {
+          args: Prisma.AccommodationStatisticTravelPurposeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AccommodationStatisticTravelPurposeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticTravelPurposePayload>[]
+        }
+        delete: {
+          args: Prisma.AccommodationStatisticTravelPurposeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticTravelPurposePayload>
+        }
+        update: {
+          args: Prisma.AccommodationStatisticTravelPurposeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticTravelPurposePayload>
+        }
+        deleteMany: {
+          args: Prisma.AccommodationStatisticTravelPurposeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AccommodationStatisticTravelPurposeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AccommodationStatisticTravelPurposeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticTravelPurposePayload>[]
+        }
+        upsert: {
+          args: Prisma.AccommodationStatisticTravelPurposeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticTravelPurposePayload>
+        }
+        aggregate: {
+          args: Prisma.AccommodationStatisticTravelPurposeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAccommodationStatisticTravelPurpose>
+        }
+        groupBy: {
+          args: Prisma.AccommodationStatisticTravelPurposeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccommodationStatisticTravelPurposeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AccommodationStatisticTravelPurposeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccommodationStatisticTravelPurposeCountAggregateOutputType> | number
+        }
+      }
+    }
+    AccommodationStatisticOrigin: {
+      payload: Prisma.$AccommodationStatisticOriginPayload<ExtArgs>
+      fields: Prisma.AccommodationStatisticOriginFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AccommodationStatisticOriginFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticOriginPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AccommodationStatisticOriginFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticOriginPayload>
+        }
+        findFirst: {
+          args: Prisma.AccommodationStatisticOriginFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticOriginPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AccommodationStatisticOriginFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticOriginPayload>
+        }
+        findMany: {
+          args: Prisma.AccommodationStatisticOriginFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticOriginPayload>[]
+        }
+        create: {
+          args: Prisma.AccommodationStatisticOriginCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticOriginPayload>
+        }
+        createMany: {
+          args: Prisma.AccommodationStatisticOriginCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AccommodationStatisticOriginCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticOriginPayload>[]
+        }
+        delete: {
+          args: Prisma.AccommodationStatisticOriginDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticOriginPayload>
+        }
+        update: {
+          args: Prisma.AccommodationStatisticOriginUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticOriginPayload>
+        }
+        deleteMany: {
+          args: Prisma.AccommodationStatisticOriginDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AccommodationStatisticOriginUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AccommodationStatisticOriginUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticOriginPayload>[]
+        }
+        upsert: {
+          args: Prisma.AccommodationStatisticOriginUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccommodationStatisticOriginPayload>
+        }
+        aggregate: {
+          args: Prisma.AccommodationStatisticOriginAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAccommodationStatisticOrigin>
+        }
+        groupBy: {
+          args: Prisma.AccommodationStatisticOriginGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccommodationStatisticOriginGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AccommodationStatisticOriginCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccommodationStatisticOriginCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1060,6 +1360,46 @@ export const AccommodationScalarFieldEnum = {
 export type AccommodationScalarFieldEnum = (typeof AccommodationScalarFieldEnum)[keyof typeof AccommodationScalarFieldEnum]
 
 
+export const AccommodationDailyStatisticScalarFieldEnum = {
+  id: 'id',
+  accommodationId: 'accommodationId',
+  date: 'date',
+  totalGuests: 'totalGuests',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AccommodationDailyStatisticScalarFieldEnum = (typeof AccommodationDailyStatisticScalarFieldEnum)[keyof typeof AccommodationDailyStatisticScalarFieldEnum]
+
+
+export const AccommodationStatisticAgeRangeScalarFieldEnum = {
+  statisticId: 'statisticId',
+  ageRange: 'ageRange',
+  quantity: 'quantity'
+} as const
+
+export type AccommodationStatisticAgeRangeScalarFieldEnum = (typeof AccommodationStatisticAgeRangeScalarFieldEnum)[keyof typeof AccommodationStatisticAgeRangeScalarFieldEnum]
+
+
+export const AccommodationStatisticTravelPurposeScalarFieldEnum = {
+  statisticId: 'statisticId',
+  purpose: 'purpose',
+  quantity: 'quantity'
+} as const
+
+export type AccommodationStatisticTravelPurposeScalarFieldEnum = (typeof AccommodationStatisticTravelPurposeScalarFieldEnum)[keyof typeof AccommodationStatisticTravelPurposeScalarFieldEnum]
+
+
+export const AccommodationStatisticOriginScalarFieldEnum = {
+  statisticId: 'statisticId',
+  type: 'type',
+  name: 'name',
+  quantity: 'quantity'
+} as const
+
+export type AccommodationStatisticOriginScalarFieldEnum = (typeof AccommodationStatisticOriginScalarFieldEnum)[keyof typeof AccommodationStatisticOriginScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1180,6 +1520,62 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
 
+
+/**
+ * Reference to a field of type 'AccommodationAgeRange'
+ */
+export type EnumAccommodationAgeRangeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AccommodationAgeRange'>
+    
+
+
+/**
+ * Reference to a field of type 'AccommodationAgeRange[]'
+ */
+export type ListEnumAccommodationAgeRangeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AccommodationAgeRange[]'>
+    
+
+
+/**
+ * Reference to a field of type 'AccommodationTravelPurpose'
+ */
+export type EnumAccommodationTravelPurposeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AccommodationTravelPurpose'>
+    
+
+
+/**
+ * Reference to a field of type 'AccommodationTravelPurpose[]'
+ */
+export type ListEnumAccommodationTravelPurposeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AccommodationTravelPurpose[]'>
+    
+
+
+/**
+ * Reference to a field of type 'AccommodationOriginType'
+ */
+export type EnumAccommodationOriginTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AccommodationOriginType'>
+    
+
+
+/**
+ * Reference to a field of type 'AccommodationOriginType[]'
+ */
+export type ListEnumAccommodationOriginTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AccommodationOriginType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Float'
+ */
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+/**
+ * Reference to a field of type 'Float[]'
+ */
+export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -1297,6 +1693,10 @@ export type GlobalOmitConfig = {
   organization?: Prisma.OrganizationOmit
   organizationMembership?: Prisma.OrganizationMembershipOmit
   accommodation?: Prisma.AccommodationOmit
+  accommodationDailyStatistic?: Prisma.AccommodationDailyStatisticOmit
+  accommodationStatisticAgeRange?: Prisma.AccommodationStatisticAgeRangeOmit
+  accommodationStatisticTravelPurpose?: Prisma.AccommodationStatisticTravelPurposeOmit
+  accommodationStatisticOrigin?: Prisma.AccommodationStatisticOriginOmit
 }
 
 /* Types for Logging */

@@ -52,3 +52,23 @@ export type OrganizationMembership = Prisma.OrganizationMembershipModel
  * 
  */
 export type Accommodation = Prisma.AccommodationModel
+/**
+ * Model AccommodationDailyStatistic
+ * 
+ */
+export type AccommodationDailyStatistic = Prisma.AccommodationDailyStatisticModel
+/**
+ * Model AccommodationStatisticAgeRange
+ * 
+ */
+export type AccommodationStatisticAgeRange = Prisma.AccommodationStatisticAgeRangeModel
+/**
+ * Model AccommodationStatisticTravelPurpose
+ * 
+ */
+export type AccommodationStatisticTravelPurpose = Prisma.AccommodationStatisticTravelPurposeModel
+/**
+ * Model AccommodationStatisticOrigin
+ * 
+ */
+export type AccommodationStatisticOrigin = Prisma.AccommodationStatisticOriginModel

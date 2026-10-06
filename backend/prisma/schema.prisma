@@ -150,9 +150,98 @@ model Accommodation {
   facebook       String?
 
   organization Organization @relation( fields: [organizationId], references: [id], onDelete: Cascade )
+  dailyStatistics AccommodationDailyStatistic[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("accommodations")
 }
+
+// Estadistica de Alojamientos
+
+// Rango de Edades de los huespedes
+enum AccommodationAgeRange {
+  AGE_0_12
+  AGE_13_17
+  AGE_18_30
+  AGE_31_45
+  AGE_46_60
+  AGE_61_PLUS
+}
+
+// Motivo de viajes
+enum AccommodationTravelPurpose {
+  TOURISM
+  WORK
+  BUSINESS
+  VISIT_FAMILY
+  STUDIES
+  HEALTH
+  EVENTS
+  OTHER
+}
+
+// Lugar de Procedencia
+enum AccommodationOriginType {
+  PROVINCE
+  COUNTRY
+}
+
+// Estadisitca diarias de alojamientos
+model AccommodationDailyStatistic {
+  id              String   @id @default(uuid())
+  accommodationId String
+
+  date        DateTime @db.Date
+  totalGuests Int //Total huespedes
+
+  accommodation Accommodation @relation( fields: [accommodationId], references: [id], onDelete: Cascade )
+
+  ageRanges      AccommodationStatisticAgeRange[]
+  travelPurposes AccommodationStatisticTravelPurpose[]
+  origins        AccommodationStatisticOrigin[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([accommodationId, date])
+  @@index([accommodationId, date])
+  @@map("accommodation_daily_statistics")
+}
+
+
+model AccommodationStatisticAgeRange {
+  statisticId String
+  ageRange    AccommodationAgeRange
+  quantity    Int
+
+  statistic AccommodationDailyStatistic @relation( fields: [statisticId], references: [id], onDelete: Cascade )
+
+  @@id([statisticId, ageRange])
+  @@map("accommodation_statistic_age_ranges")
+}
+
+model AccommodationStatisticTravelPurpose {
+  statisticId String
+  purpose     AccommodationTravelPurpose
+  quantity    Int
+
+  statistic AccommodationDailyStatistic @relation( fields: [statisticId], references: [id],onDelete: Cascade)
+
+  @@id([statisticId, purpose])
+  @@map("accommodation_statistic_travel_purposes")
+}
+
+model AccommodationStatisticOrigin {
+  statisticId String
+  type        AccommodationOriginType
+  name        String
+  quantity    Int
+
+  statistic AccommodationDailyStatistic @relation( fields: [statisticId], references: [id], onDelete: Cascade  )
+
+  @@id([statisticId, type, name])
+  @@map("accommodation_statistic_origins")
+}
+
