@@ -9,6 +9,7 @@ import { PermissionsController } from './controllers';
 import {
   CreatePermissionUseCase,
   GetPermissionByIdUseCase,
+  GetPermissionsByRoleIdUseCase,
   ListPermissionsUseCase,
 } from '../applications';
 
@@ -19,6 +20,7 @@ import {
     ListPermissionsUseCase,
     GetPermissionByIdUseCase,
     CreatePermissionUseCase,
+    GetPermissionsByRoleIdUseCase,
   ],
   providers: [
     {
@@ -32,6 +34,7 @@ import {
     CreatePermissionUseCase,
     GetPermissionByIdUseCase,
     ListPermissionsUseCase,
+    GetPermissionsByRoleIdUseCase,
   ],
   controllers: [PermissionsController],
 })
