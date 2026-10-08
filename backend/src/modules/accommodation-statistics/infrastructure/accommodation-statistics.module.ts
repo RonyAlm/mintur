@@ -10,12 +10,12 @@ import {
   CreateAccommodationDailyStatisticUseCase,
   GetAccommodationDailyStatisticUseCase,
   GetAccommodationStatisticsByAccommodationUseCase,
+  GetAccommodationStatisticsSummaryUseCase,
   UpdateAccommodationDailyStatisticUseCase,
 } from '../application';
 
 @Module({
   imports: [
-    AccommodationStatisticsModule,
     AccommodationModule,
     OrganizationModule,
     UsersModule,
@@ -31,12 +31,15 @@ import {
     GetAccommodationDailyStatisticUseCase,
     GetAccommodationStatisticsByAccommodationUseCase,
     UpdateAccommodationDailyStatisticUseCase,
+    GetAccommodationStatisticsSummaryUseCase,
   ],
   exports: [
     AccommodationStatisticRepository,
     CreateAccommodationDailyStatisticUseCase,
     GetAccommodationDailyStatisticUseCase,
     GetAccommodationStatisticsByAccommodationUseCase,
+    UpdateAccommodationDailyStatisticUseCase,
+    GetAccommodationStatisticsSummaryUseCase,
   ],
 })
 export class AccommodationStatisticsModule {}

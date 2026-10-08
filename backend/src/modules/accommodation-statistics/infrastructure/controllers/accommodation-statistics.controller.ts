@@ -11,11 +11,12 @@ import {
   CreateAccommodationDailyStatisticUseCase,
   GetAccommodationDailyStatisticUseCase,
   GetAccommodationStatisticsByAccommodationUseCase,
+  GetAccommodationStatisticsSummaryUseCase,
   UpdateAccommodationDailyStatisticUseCase,
 } from '../../application';
-import { Auth } from 'src/core/decorators';
-import { type AuthenticatedUser } from 'src/modules/auth/applications/types';
-import { CurrentUser } from 'src/modules/auth/infrastructure/decorators';
+import { Auth } from '../../../../core/decorators';
+import { type AuthenticatedUser } from '../../../../modules/auth/applications/types';
+import { CurrentUser } from '../../../../modules/auth/infrastructure/decorators';
 import {
   CreateAccommodationDailyStatisticDto,
   GetAccommodationStatisticsQueryDto,
@@ -34,6 +35,7 @@ export class AccommodationStatisticsController {
     private readonly getAccommodationDailyStatisticUseCase: GetAccommodationDailyStatisticUseCase,
     private readonly getAccommodationStatisticsByAccommodationUseCase: GetAccommodationStatisticsByAccommodationUseCase,
     private readonly updateAccommodationDailyStatisticUseCase: UpdateAccommodationDailyStatisticUseCase,
+    private readonly getAccommodationStatisticsSummaryUseCase: GetAccommodationStatisticsSummaryUseCase,
   ) {}
 
   @Get('/accommodation/:accommodationId')
@@ -49,6 +51,22 @@ export class AccommodationStatisticsController {
 
       from: query.from ? new Date(query.from) : undefined,
       to: query.to ? new Date(query.to) : undefined,
+    });
+  }
+
+  @Get('/accommodation/:accommodationId/summary')
+  @Auth('accommodation-statistics:read')
+  async getAccommodationStatisticsSummary(
+    @Param('accommodationId') accommodationId: string,
+    @CurrentUser() currentUser: AuthenticatedUser,
+    @Query() query: { from: string; to: string },
+  ) {
+    return this.getAccommodationStatisticsSummaryUseCase.execute({
+      currentUser,
+      accommodationId,
+
+      from: new Date(query.from),
+      to: new Date(query.to),
     });
   }
 
