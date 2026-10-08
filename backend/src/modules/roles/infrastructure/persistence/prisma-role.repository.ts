@@ -7,7 +7,7 @@ import { RoleMapper } from './role.mapper';
 export class PrismaRoleRepository implements RoleRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async findAll(): Promise<Role[] | []> {
+  async findAll(): Promise<Role[]> {
     const roles = await this.prismaService.role.findMany({
       orderBy: { createdAt: 'asc' },
     });

@@ -6,9 +6,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Users, UserSecured, UsersRepository } from '../../domain';
-// import { RoleRepository } from '../../../../modules/roles/domain';
 import { CreateUserDto } from '../dtos';
-import { GetRoleByIdUseCase } from '../../../../modules/roles/application';
+import {
+  GetRoleByIdUseCase,
+  ListRolesUseCase,
+} from '../../../../modules/roles/application';
 
 export interface ResponseData extends UserSecured {
   temporaryPassword: string;
@@ -18,16 +20,11 @@ export interface ResponseData extends UserSecured {
 export class CreateUserUseCase {
   constructor(
     private readonly usersRepository: UsersRepository,
+    private readonly listRolesUseCase: ListRolesUseCase,
     private readonly getRoleByIdUseCase: GetRoleByIdUseCase,
   ) {}
 
   async execute(dto: CreateUserDto): Promise<ResponseData> {
-    // const executorExists = await this.usersRepository.findById(executor.sub);
-    // if (!executorExists) throw new UnauthorizedException('Executor not found');
-
-    // if (executor.role !== Role.ADMIN && executor.role !== Role.SUPERADMIN)
-    //   throw new UnauthorizedException('User must be admin');
-
     const userExists = await this.usersRepository.findByEmail(dto.email.trim());
     if (userExists)
       throw new ConflictException('Ya existe un usuario con ese email');
@@ -40,13 +37,17 @@ export class CreateUserUseCase {
         'Ya existe un usuario con ese nombre de usuario',
       );
 
-    // if (user.role === 'ADMIN' && executor.role !== Role.SUPERADMIN)
-    //   throw new UnauthorizedException('User must be super admin');
+    if (dto.roleId) {
+      const roleExists = await this.getRoleByIdUseCase.execute(
+        dto.roleId.trim(),
+      );
+      if (!roleExists) throw new NotFoundException('Rol no encontrado');
+    }
 
-    const roleDefault = dto.roleId || '63f3a6b7-b939-4c96-a983-9c17be4ba7at'; // Role USER
-
-    const role = await this.getRoleByIdUseCase.execute(roleDefault);
-    if (!role) throw new NotFoundException('El rol indicado no existe');
+    const roles = await this.listRolesUseCase.execute();
+    const roleDefault =
+      roles.length > 0 && roles.find((role) => role.name === 'USER');
+    if (!roleDefault) throw new NotFoundException('Rol no encontrado');
 
     const temporaryPassword = crypto.randomBytes(6).toString('hex');
     const hashedPassword = await bcrypt.hash(temporaryPassword, 10);
@@ -57,7 +58,7 @@ export class CreateUserUseCase {
       dto.firstName || '',
       dto.lastName || '',
       hashedPassword,
-      role.id,
+      dto.roleId || roleDefault.id,
       true,
       true,
       new Date(),

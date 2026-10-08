@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { UsersRepository } from '../../domain';
 import { UpdateUserDto } from '../dtos';
 
@@ -10,24 +14,29 @@ export class UpdateUserUseCase {
     userId = userId.trim();
 
     const user = await this.usersRepository.findById(userId);
-    if (!user) throw new Error('User not found');
+    if (!user) throw new NotFoundException('No se encontró el usuario');
 
     if (dto.email && dto.email !== user.email) {
       const userExists = await this.usersRepository.findByEmail(dto.email);
-      if (userExists) throw new Error('User already exists');
+      if (userExists)
+        throw new ConflictException('El email ya está en uso por otro usuario');
     }
 
     if (dto.username && dto.username !== user.username) {
       const userExists = await this.usersRepository.findByUsername(
         dto.username,
       );
-      if (userExists) throw new Error('User already exists');
+      if (userExists)
+        throw new ConflictException(
+          'El nombre de usuario ya está en uso por otro usuario',
+        );
     }
 
     Object.assign(user, dto);
 
     const userUpdated = await this.usersRepository.update(userId, user);
-    if (!userUpdated) throw new Error('Error updating user');
+    if (!userUpdated)
+      throw new ConflictException('No se pudo actualizar el usuario');
 
     return {
       id: userUpdated.id,
