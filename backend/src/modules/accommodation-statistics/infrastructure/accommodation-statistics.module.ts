@@ -11,6 +11,7 @@ import {
   GetAccommodationDailyStatisticUseCase,
   GetAccommodationStatisticsByAccommodationUseCase,
   GetAccommodationStatisticsSummaryUseCase,
+  GetAllAccommodationsStatisticsSummaryUseCase,
   UpdateAccommodationDailyStatisticUseCase,
 } from '../application';
 
@@ -32,6 +33,7 @@ import {
     GetAccommodationStatisticsByAccommodationUseCase,
     UpdateAccommodationDailyStatisticUseCase,
     GetAccommodationStatisticsSummaryUseCase,
+    GetAllAccommodationsStatisticsSummaryUseCase,
   ],
   exports: [
     AccommodationStatisticRepository,

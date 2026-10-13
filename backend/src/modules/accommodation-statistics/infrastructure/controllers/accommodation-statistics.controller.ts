@@ -12,6 +12,7 @@ import {
   GetAccommodationDailyStatisticUseCase,
   GetAccommodationStatisticsByAccommodationUseCase,
   GetAccommodationStatisticsSummaryUseCase,
+  GetAllAccommodationsStatisticsSummaryUseCase,
   UpdateAccommodationDailyStatisticUseCase,
 } from '../../application';
 import { Auth } from '../../../../core/decorators';
@@ -36,6 +37,7 @@ export class AccommodationStatisticsController {
     private readonly getAccommodationStatisticsByAccommodationUseCase: GetAccommodationStatisticsByAccommodationUseCase,
     private readonly updateAccommodationDailyStatisticUseCase: UpdateAccommodationDailyStatisticUseCase,
     private readonly getAccommodationStatisticsSummaryUseCase: GetAccommodationStatisticsSummaryUseCase,
+    private readonly getAllAccommodationsStatisticsSummaryUseCase: GetAllAccommodationsStatisticsSummaryUseCase,
   ) {}
 
   @Get('/accommodation/:accommodationId')
@@ -65,6 +67,19 @@ export class AccommodationStatisticsController {
       currentUser,
       accommodationId,
 
+      from: new Date(query.from),
+      to: new Date(query.to),
+    });
+  }
+
+  @Get('/summary')
+  @Auth('accommodation-statistics:read')
+  async getAllAccommodationsStatisticsSummary(
+    @Query() query: { from: string; to: string },
+    @CurrentUser() currentUser: AuthenticatedUser,
+  ) {
+    return this.getAllAccommodationsStatisticsSummaryUseCase.execute({
+      currentUser,
       from: new Date(query.from),
       to: new Date(query.to),
     });
