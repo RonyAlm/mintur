@@ -6,9 +6,11 @@ import {
   HttpStatus,
   Patch,
   Post,
+  Request,
+  Res,
   UseGuards,
 } from '@nestjs/common';
-import { Request } from 'express';
+
 import {
   LoginDto,
   LoginUseCase,
@@ -21,6 +23,7 @@ import {
 import { JwtAuthGuard } from '../guards';
 import { CurrentUser } from '../decorators';
 import type { AuthenticatedUser } from '../../applications/types';
+import type { Response } from 'express';
 
 export interface RequestWithUser extends Request {
   user: {
@@ -40,8 +43,34 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async login(@Body() dto: LoginDto) {
-    return this.loginUseCase.execute(dto);
+  async login(
+    @Body() dto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { accessToken, ...result } = await this.loginUseCase.execute(dto);
+
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 10000 * 60 * 60 * 24, // 1 day
+    });
+
+    return result;
+  }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  logout(@Res({ passthrough: true }) response: Response) {
+    response.clearCookie('accessToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    });
+
+    return { message: 'Session closed successfully' };
   }
 
   @Get('profile')
