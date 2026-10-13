@@ -1,6 +1,6 @@
-
-import { Button } from "./ui/button"
-import { Avatar, AvatarBadge, AvatarFallback, AvatarImage } from "./ui/avatar"
+import { Link } from "react-router"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,81 +9,88 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu"
-import { BadgeQuestionMark, CircleUserIcon, LogOutIcon, SettingsIcon } from "lucide-react"
-import { useAuth } from "../hooks/useAuth"
-
-interface User {
-  name?: string
-  email: string
-}
-
-interface Props {
-  user: User
-}
+} from "@/components/ui/dropdown-menu"
+import {
+  CircleUserIcon,
+  LogOutIcon,
+  SettingsIcon,
+  BadgeQuestionMarkIcon,
+} from "lucide-react"
+import { useAuth } from "@/hooks/useAuth"
+import { hasModuleAccess } from "@/lib/modules"
+import { getDisplayName, getRoleName, getUserInitials } from "@/lib/user"
 
 export function DropdownMenuUser() {
   const { logout, user } = useAuth()
+
+  const displayName = getDisplayName(user)
+  const initials = getUserInitials(user)
+  const roleName = getRoleName(user)
+  const canSeeSettings = hasModuleAccess(user, "configuracion")
+
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger 
-        render={ 
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar>
-            <AvatarImage
-              src=""
-              alt="@shadcn"
-              className="grayscale"
-            />
-            <AvatarFallback>CN</AvatarFallback>
+      <DropdownMenuTrigger
+        aria-label={`Menú de usuario: ${displayName}`}
+        render={
+          <Button variant="ghost" className="size-9 rounded-full p-0">
+            <Avatar>
+              <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+          </Button>
+        }
+      />
+
+      <DropdownMenuContent className="w-64" align="end">
+        <DropdownMenuGroup className="flex items-center gap-3 px-3 py-3">
+          <Avatar size="lg">
+            <AvatarFallback className="bg-primary/10 font-semibold text-primary">
+              {initials}
+            </AvatarFallback>
           </Avatar>
-        </Button> } />
-      <DropdownMenuContent className="w-60" align="start">
-        <DropdownMenuGroup className="flex items-center px-4 py-4">
-          <Avatar>
-            <AvatarImage
-              src=""
-              alt="@shadcn"
-              className="grayscale"
-            />
-            <AvatarFallback>CN</AvatarFallback>
-            <AvatarBadge className="bg-green-600 dark:bg-green-800" />
-          </Avatar>
-          <div className="flex flex-col ml-2">
-            <DropdownMenuLabel className="font-semibold pb-0">
-              Ronaldo Almirón
+          <div className="flex min-w-0 flex-col">
+            <DropdownMenuLabel className="truncate px-0 pb-0 font-semibold text-foreground">
+              {displayName}
             </DropdownMenuLabel>
-            <DropdownMenuLabel className="text-xs pt-0 text-muted-foreground">
+            <DropdownMenuLabel className="truncate px-0 pt-0 text-xs text-muted-foreground">
               {user?.email}
             </DropdownMenuLabel>
+            {roleName ? (
+              <DropdownMenuLabel className="px-0 pt-1 text-[0.7rem] tracking-wide text-primary uppercase">
+                {roleName}
+              </DropdownMenuLabel>
+            ) : null}
           </div>
         </DropdownMenuGroup>
+
         <DropdownMenuSeparator />
+
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <CircleUserIcon className="mr-2 h-4 w-4" />
-            Mi Perfil
+          <DropdownMenuItem render={<Link to="/perfil" />}>
+            <CircleUserIcon aria-hidden="true" />
+            Mi perfil
           </DropdownMenuItem>
+          {canSeeSettings && (
+            <DropdownMenuItem render={<Link to="/configuracion" />}>
+              <SettingsIcon aria-hidden="true" />
+              Configuración
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem>
-            <SettingsIcon className="mr-2 h-4 w-4" />
-            Configuración
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <BadgeQuestionMark className="mr-2 h-4 w-4" />
+            <BadgeQuestionMarkIcon aria-hidden="true" />
             Soporte
           </DropdownMenuItem>
         </DropdownMenuGroup>
+
         <DropdownMenuSeparator />
+
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <Button 
-              onClick={logout}
-              variant="destructive" 
-              className="w-full flex items-center gap-2 cursor-pointer
-              hover:bg-destructive/10 hover:text-destructive">
-              <LogOutIcon />
-                Cerrar sesión
-            </Button>
+          {/* Un solo elemento interactivo: el propio item (sin botones anidados) */}
+          <DropdownMenuItem variant="destructive" onClick={logout}>
+            <LogOutIcon aria-hidden="true" />
+            Cerrar sesión
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>

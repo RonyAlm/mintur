@@ -98,7 +98,7 @@ const LoginForm = () => {
           <Button
             type="submit"
             disabled={loading}
-            className="mt-1 h-10 w-full text-base font-semibold"
+            className="mt-1 h-10 w-full text-base font-semibold bg-green-700 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-500"
           >
             {loading && <Loader2Icon className="animate-spin" aria-hidden="true" />}
             {loading ? "Iniciando sesión…" : "Iniciar sesión"}

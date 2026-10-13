@@ -26,15 +26,15 @@ const AuthLayout = () => {
     return () => clearInterval(interval)
   })
 
-
   return (
-    <div className="relative flex min-h-screen w-full p-4 gap-4">
+    <div className="relative flex min-h-screen w-full p-4 gap-4
+     bg-background" >
       
       {/* Formulario */}
       <main
         id="auth-content"
         className="relative flex flex-1 items-center justify-center overflow-hidden px-4
-         border border-gray-300 rounded-2xl dark:border-gray-600">
+         border border-green-100 rounded-2xl bg-pattern-color">
     
         {/* Elegir el tema también desde el acceso, sin sesión iniciada */}
         <div className="absolute top-4 right-4 z-10">
@@ -49,15 +49,15 @@ const AuthLayout = () => {
       <aside className="relative hidden w-full max-w-[50%] flex-col justify-between overflow-hidden rounded-2xl
        bg-[url('@/assets/img/img-banado.jpg')] bg-cover bg-center bg-no-repeat text-left p-6 text-white lg:flex xl:max-w-2xl">
 
-        <div className="absolute inset-0 bg-forest-950/50 "></div>
+         <div className="absolute inset-0 bg-green-700/50 dark:bg-green-900/50"></div>
 
         <div className="relative flex items-center justify-between gap-4">
           
           <div className="animate-rise">
-            <p className="text-sm font-medium tracking-[0.2em] text-sun-400 uppercase">
+            <p className="text-sm font-medium tracking-[0.2em] text-white/80 uppercase">
               {today}
             </p>
-            <p className="text-2xl font-medium tracking-[0.2em] text-sun-400 uppercase">
+            <p className="text-2xl font-medium tracking-[0.2em] text-white/80 uppercase">
               {hours}
             </p>
           </div>
