@@ -16,8 +16,8 @@ function Header({ user }: HeaderProps) {
     const { logout } = useAuth();
 
     return (
-        <header className="w-full flex flex-row items-center justify-between bg-blue-50 p-2 px-4 border-b border-gray-400">
-            <h2 className="text-2xl font-bold text-sky-600">Mintur</h2>
+        <header className="flex w-full flex-row items-center justify-between border-b border-border bg-background p-2 px-4">
+            <h2 className="text-2xl font-bold text-foreground">Mintur</h2>
             <section className="flex flex-row justify-between gap-2 items-center">
                 <p>Bienvenido,</p>
                 <span>{user?.email}</span>
