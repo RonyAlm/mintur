@@ -6,7 +6,8 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  // .agents/skills contiene assets de terceros (skills), no código de la app.
+  globalIgnores(['dist', '.agents/**']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -17,6 +18,14 @@ export default defineConfig([
     ],
     languageOptions: {
       globals: globals.browser,
+    },
+  },
+  {
+    // Componentes shadcn/base-ui: exportan helpers (buttonVariants, hooks)
+    // junto a componentes; es el patrón esperado del registry.
+    files: ['src/components/ui/**/*.{ts,tsx}'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
     },
   },
 ])

@@ -12,6 +12,12 @@ dist
 dist-ssr
 *.local
 
+# Entorno
+.env
+.env.*
+!.env.example
+.agents
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -22,3 +28,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Artefactos de smoke tests (las capturas se generan con smoke-perfil.mjs)
+smoke-*.png
