@@ -16,8 +16,7 @@ import {
   SettingsIcon,
   BadgeQuestionMarkIcon,
 } from "lucide-react"
-import { useAuth } from "@/hooks/useAuth"
-import { hasModuleAccess } from "@/lib/modules"
+import { useAuth } from "@/modules/auth/hooks/useAuth"
 import { getDisplayName, getRoleName, getUserInitials } from "@/lib/user"
 
 export function DropdownMenuUser() {
@@ -26,7 +25,6 @@ export function DropdownMenuUser() {
   const displayName = getDisplayName(user)
   const initials = getUserInitials(user)
   const roleName = getRoleName(user)
-  const canSeeSettings = hasModuleAccess(user, "configuracion")
 
   return (
     <DropdownMenu>
@@ -72,12 +70,12 @@ export function DropdownMenuUser() {
             <CircleUserIcon aria-hidden="true" />
             Mi perfil
           </DropdownMenuItem>
-          {canSeeSettings && (
-            <DropdownMenuItem render={<Link to="/configuracion" />}>
-              <SettingsIcon aria-hidden="true" />
-              Configuración
-            </DropdownMenuItem>
-          )}
+          
+          <DropdownMenuItem render={<Link to="/perfil" />}>
+            <SettingsIcon aria-hidden="true" />
+            Configuración
+          </DropdownMenuItem>
+          
           <DropdownMenuItem>
             <BadgeQuestionMarkIcon aria-hidden="true" />
             Soporte

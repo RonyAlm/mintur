@@ -17,7 +17,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from "@/modules/auth/hooks/useAuth"
 import { getVisibleModules } from "@/lib/modules"
 import { cn } from "@/lib/utils"
 import estrellita from "@/assets/img/estrellita-blanco.png"

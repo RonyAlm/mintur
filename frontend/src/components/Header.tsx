@@ -1,5 +1,5 @@
 
-import { useAuth } from "../hooks/useAuth"
+import { useAuth } from "@/modules/auth/hooks/useAuth"
 import { Button } from "./ui/button"
 
 
