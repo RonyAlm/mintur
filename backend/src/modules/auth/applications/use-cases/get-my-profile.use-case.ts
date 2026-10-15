@@ -30,6 +30,7 @@ export class GetMyProfileUseCase {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
+      mustChangePassword: user.mustChangePassword,
       role: {
         id: role.id,
         name: role.name,
