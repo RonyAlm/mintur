@@ -1,14 +1,14 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { Toaster } from 'sonner'
 import './index.css'
 import App from './App.tsx'
-import AuthProvider from './context/auth/authProvider.tsx'
+import AuthProvider from './modules/auth/context/authProvider.tsx'
 import { ThemeProvider } from './context/theme/themeProvider.tsx'
 import { BrowserRouter } from 'react-router'
-import { AxiosInterceptor } from './interceptors'
-import { Toaster } from 'sonner'
+import { registerAxiosInterceptors } from '@/lib/axios.interceptor.ts'
 
-AxiosInterceptor()
+registerAxiosInterceptors()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

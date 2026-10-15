@@ -1,6 +1,6 @@
 import {
   BarChart3Icon,
-  HotelIcon,
+  // HotelIcon,
   SettingsIcon,
   ShieldCheckIcon,
   UsersIcon,
@@ -22,7 +22,7 @@ import type { User } from "@/models/user.model"
 /** Identificador único de cada módulo de la plataforma. */
 export type ModuleId =
   | "usuarios"
-  | "alojamientos"
+  // | "alojamientos"
   | "reportes"
   | "configuracion"
   | "roles"
@@ -49,7 +49,7 @@ export interface AppModule {
  * Catálogo de módulos: el orden de este array define el orden en el
  * sidebar y en las tarjetas del dashboard.
  */
-export const APP_MODULES: AppModule[] = [
+export const APP_MODULES: readonly AppModule[] = [
   {
     id: "usuarios",
     title: "Usuarios",
@@ -57,17 +57,19 @@ export const APP_MODULES: AppModule[] = [
     path: "/usuarios",
     icon: UsersIcon,
     group: "principal",
-    anyPermission: ["users:read"],
+    anyPermission: [
+      "users:read"
+    ],
   },
-  {
-    id: "alojamientos",
-    title: "Alojamientos",
-    description: "ABM de alojamientos y sus estadísticas periódicas.",
-    path: "/alojamientos",
-    icon: HotelIcon,
-    group: "principal",
-    anyPermission: ["accommodations:read"],
-  },
+  // {
+  //   id: "alojamientos",
+  //   title: "Alojamientos",
+  //   description: "ABM de alojamientos y sus estadísticas periódicas.",
+  //   path: "/alojamientos",
+  //   icon: HotelIcon,
+  //   group: "principal",
+  //   anyPermission: ["accommodations:read"],
+  // },
   {
     id: "reportes",
     title: "Reportes",
@@ -93,7 +95,7 @@ export const APP_MODULES: AppModule[] = [
     path: "/roles",
     icon: ShieldCheckIcon,
     group: "sistema",
-    anyPermission: ["roles:read", "roles:create", "roles:update", "roles:manage_permissions", "permissions:read", "permissions:create"],
+    anyPermission: ["roles:read"],
   },
 ]
 
@@ -123,8 +125,3 @@ export function getVisibleModules(user: User | null): AppModule[] {
   return APP_MODULES.filter((module) => allowed.has(module.id))
 }
 
-/** `true` si el usuario puede entrar al módulo indicado. */
-export function hasModuleAccess(user: User | null, moduleId: ModuleId): boolean {
-  const module = APP_MODULES.find((item) => item.id === moduleId)
-  return module ? hasAnyPermission(user, module.anyPermission) : false
-}

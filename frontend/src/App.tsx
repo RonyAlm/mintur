@@ -1,30 +1,34 @@
-import { lazy, Suspense } from "react"
-import { Navigate, Route, Routes } from "react-router"
 
-import RootLayout from "./pages/RootLayout"
-import { ProtectedRoute } from "./pages/ProtectedRoute"
-import { RequireModule } from "./pages/RequireModule"
-import { APP_MODULES } from "./lib/modules"
+import { lazy, Suspense } from "react";
+import { Navigate, Route, Routes } from "react-router";
 
-// Code splitting por ruta: el bundle inicial solo carga shell + login.
-const AuthLayout = lazy(() => import("./pages/auth/AuthLayout"))
-const Login = lazy(() => import("./pages/auth/Login"))
-const NotFound = lazy(() => import("./pages/NotFound"))
-const Dashboard = lazy(() => import("./pages/dashboard/Dashboard"))
-const ModuleSoon = lazy(() => import("./pages/ModuleSoon"))
-const Profile = lazy(() => import("./pages/perfil/Profile"))
-const ProfileAccount = lazy(() => import("./pages/perfil/ProfileAccount"))
-const ProfilePassword = lazy(() => import("./pages/perfil/ProfilePassword"))
-const UsersPage = lazy(() => import("./pages/users/UsersPage"))
-const RolesPage = lazy(() => import("./pages/access/RolesPage"))
+import RootLayout from "@/components/layout/RootLayout";
+import { ProtectedRoute } from "@/modules/auth/components/protected-route";
+import { PermissionRoute } from "@/modules/auth/components/permission-route";
+
+// Code splitting por ruta.
+const AuthLayout = lazy(() => import("@/modules/auth/pages/AuthLayout"));
+const Login = lazy(() => import("@/modules/auth/pages/Login"));
+const Dashboard = lazy(() => import("@/modules/dashboard/pages/Dashboard"));
+const Profile = lazy(() => import("@/modules/profile/pages/Profile"));
+const ProfileAccount = lazy(() => import("@/modules/profile/pages/ProfileAccount"));
+const ProfilePassword = lazy(() => import("@/modules/profile/pages/ProfilePassword"));
+const UsersPage = lazy(() => import("@/modules/users/pages/UsersPage"));
+const RolesPage = lazy(() => import("@/modules/roles/pages/RolesPage"));
+const NotFound = lazy(() => import("@/modules/system/pages/NotFound"));
+const Forbidden = lazy(() => import("@/modules/system/pages/Forbidden"));
+
 
 const RouteFallback = () => (
   <div
-    className="flex min-h-screen items-center justify-center bg-background"
+    className="flex min-h-screen items-center justify-center gap-3 bg-background"
     role="status"
     aria-label="Cargando"
   >
     <span className="size-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+    <span className="text-sm text-muted-foreground">
+      Cargando página...
+    </span>
   </div>
 )
 
@@ -33,46 +37,48 @@ function App() {
     <div className="min-h-screen w-full bg-background">
       <Suspense fallback={<RouteFallback />}>
         <Routes>
+          {/* Rutas públicas */}
           <Route path="/auth" element={<AuthLayout />}>
             <Route path="login" element={<Login />} />
           </Route>
 
+          {/* Rutas que requieren autenticación */}
           <Route element={<ProtectedRoute />}>
             <Route element={<RootLayout />}>
               <Route index element={<Dashboard />} />
-              {/* Enlaces legacy al path /dashboard */}
-              <Route path="dashboard" element={<Navigate to="/" replace />} />
+
+              <Route
+                path="dashboard"
+                element={<Navigate to="/" replace />}
+              />
+
+              {/* Perfil del usuario autenticado */}
               <Route path="perfil" element={<Profile />}>
                 <Route index element={<ProfileAccount />} />
-                <Route path="contrasena" element={<ProfilePassword />} />
+                <Route path="cambiar-password" element={<ProfilePassword />} />
               </Route>
-              {/* Módulos por permisos del perfil: sin acceso, responde 404. */}
-              <Route path="permisos" element={<Navigate to="/roles?tab=permissions" replace />} />
-              {APP_MODULES.map((module) => (
-                <Route
-                  key={module.id}
-                  // `APP_MODULES.path` es absoluto ("/usuarios"): el path del
-                  // route va relativo porque cuelga de un layout sin path.
-                  path={module.path.replace(/^\//, "")}
-                  element={
-                    <RequireModule moduleId={module.id}>
-                      {module.id === "usuarios" ? <UsersPage /> : module.id === "roles" ? <RolesPage /> : <ModuleSoon
-                        title={module.title}
-                        description={module.description}
-                        icon={module.icon}
-                      />}
-                    </RequireModule>
-                  }
-                />
-              ))}
+
+              {/* Administración de usuarios */}
+              <Route element={<PermissionRoute permission="users:read" />}>
+                <Route path="usuarios" element={<UsersPage />} />
+              </Route>
+
+              {/* Administración de roles y permisos */}
+              <Route element={<PermissionRoute permission="roles:read" />}>
+                <Route path="roles" element={<RolesPage />} />
+              </Route>
+
+              {/* Acceso denegado: no requiere el permiso faltante */}
+              <Route path="403" element={<Forbidden />} />
             </Route>
           </Route>
 
+          {/* Ruta no encontrada */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
