@@ -15,6 +15,8 @@ const ProfileAccount = lazy(() => import("@/modules/profile/pages/ProfileAccount
 const ProfilePassword = lazy(() => import("@/modules/profile/pages/ProfilePassword"));
 const UsersPage = lazy(() => import("@/modules/users/pages/UsersPage"));
 const RolesPage = lazy(() => import("@/modules/roles/pages/RolesPage"));
+const AccommodationsPage = lazy(() => import("@/modules/accommodations/pages/AccommodationsPage"));
+const AccommodationDetailPage = lazy(() => import("@/modules/accommodations/pages/AccommodationDetailPage"));
 const NotFound = lazy(() => import("@/modules/system/pages/NotFound"));
 const Forbidden = lazy(() => import("@/modules/system/pages/Forbidden"));
 
@@ -66,6 +68,12 @@ function App() {
               {/* Administración de roles y permisos */}
               <Route element={<PermissionRoute permission="roles:read" />}>
                 <Route path="roles" element={<RolesPage />} />
+              </Route>
+
+              {/* Administración de alojamientos */}
+              <Route element={<PermissionRoute permission="accommodations:read" />}>
+                <Route path="alojamientos" element={<AccommodationsPage />} />
+                <Route path="alojamientos/:id" element={<AccommodationDetailPage />} />
               </Route>
 
               {/* Acceso denegado: no requiere el permiso faltante */}

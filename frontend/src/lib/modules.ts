@@ -1,6 +1,6 @@
 import {
   BarChart3Icon,
-  // HotelIcon,
+  HotelIcon,
   SettingsIcon,
   ShieldCheckIcon,
   UsersIcon,
@@ -22,7 +22,7 @@ import type { User } from "@/models/user.model"
 /** Identificador único de cada módulo de la plataforma. */
 export type ModuleId =
   | "usuarios"
-  // | "alojamientos"
+  | "alojamientos"
   | "reportes"
   | "configuracion"
   | "roles"
@@ -61,15 +61,15 @@ export const APP_MODULES: readonly AppModule[] = [
       "users:read"
     ],
   },
-  // {
-  //   id: "alojamientos",
-  //   title: "Alojamientos",
-  //   description: "ABM de alojamientos y sus estadísticas periódicas.",
-  //   path: "/alojamientos",
-  //   icon: HotelIcon,
-  //   group: "principal",
-  //   anyPermission: ["accommodations:read"],
-  // },
+  {
+    id: "alojamientos",
+    title: "Alojamientos",
+    description: "ABM de alojamientos y sus estadísticas periódicas.",
+    path: "/alojamientos",
+    icon: HotelIcon,
+    group: "principal",
+    anyPermission: ["accommodations:read"],
+  },
   {
     id: "reportes",
     title: "Reportes",
