@@ -12,6 +12,10 @@ export interface AccommodationTable extends Accommodation {
   organizationId: string;
   type: AccommodationType;
   isActive: boolean;
+  capacity: number | null;
+  totalRooms: number | null;
+  totalBeds: number | null;
+  locality: string | null;
   image: string | null;
   address: string | null;
   addressMap: string | null;
@@ -25,6 +29,14 @@ export interface AccommodationTable extends Accommodation {
   updatedAt: Date;
 }
 
+export type AccommodationWithOrganizationTable = AccommodationTable & {
+  organization: {
+    id: string;
+    name: string;
+    description: string | null;
+  };
+};
+
 export class AccommodationMapper {
   static toDomain(raw: AccommodationTable): AccommodationEntity {
     return {
@@ -32,7 +44,11 @@ export class AccommodationMapper {
       organizationId: raw.organizationId,
       type: raw.type as AccommodationTypeEntity,
       isActive: raw.isActive,
+      capacity: raw.capacity,
+      totalRooms: raw.totalRooms,
+      totalBeds: raw.totalBeds,
       image: raw.image,
+      locality: raw.locality,
       address: raw.address,
       addressMap: raw.addressMap,
       phoneOne: raw.phoneOne,
@@ -46,8 +62,21 @@ export class AccommodationMapper {
     } as AccommodationEntity;
   }
 
+  static toDomainWithOrganization(raw: AccommodationWithOrganizationTable) {
+    return {
+      ...this.toDomain(raw),
+      organization: raw.organization,
+    };
+  }
+
   static toDomainList(raws: AccommodationTable[]): AccommodationEntity[] {
     return raws.map((raw) => this.toDomain(raw));
+  }
+
+  static toDomainListWithOrganization(
+    raws: AccommodationWithOrganizationTable[],
+  ) {
+    return raws.map((raw) => this.toDomainWithOrganization(raw));
   }
 
   static toPersistence(raw: AccommodationEntity): AccommodationTable {

@@ -2,17 +2,51 @@ import {
   IsEmail,
   IsEnum,
   IsOptional,
-  IsPhoneNumber,
   IsString,
   IsUrl,
   MinLength,
+  ValidateNested,
+  IsNumber,
 } from 'class-validator';
 import { AccommodationType } from '../../../domain';
+import { Type } from 'class-transformer';
+
+export class OrganizationDto {
+  @IsString()
+  @IsOptional()
+  name!: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+}
 
 export class UpdateAccommodationDto {
   @IsOptional()
+  @ValidateNested()
+  @Type(() => OrganizationDto)
+  organization!: OrganizationDto;
+
+  @IsOptional()
   @IsEnum(AccommodationType)
   type!: AccommodationType;
+
+  @IsOptional()
+  @IsNumber()
+  capacity?: number;
+
+  @IsOptional()
+  @IsNumber()
+  totalRooms?: number;
+
+  @IsOptional()
+  @IsNumber()
+  totalBeds?: number;
+
+  @IsOptional()
+  @IsString()
+  @MinLength(4)
+  locality?: string;
 
   @IsOptional()
   @IsString()
@@ -28,11 +62,11 @@ export class UpdateAccommodationDto {
   addressMap?: string;
 
   @IsOptional()
-  @IsPhoneNumber()
+  @IsString()
   phoneOne?: string;
 
   @IsOptional()
-  @IsPhoneNumber()
+  @IsString()
   phoneTwo?: string;
 
   @IsOptional()

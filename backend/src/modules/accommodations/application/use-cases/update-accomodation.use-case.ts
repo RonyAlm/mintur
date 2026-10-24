@@ -1,12 +1,19 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { AccommodationRepository, AccommodationType } from '../../domain';
+import {
+  Accommodation,
+  AccommodationRepository,
+  AccommodationType,
+} from '../../domain';
 import { OrganizationAccessService } from '../../../../modules/organizations/applications';
 
 export interface UpdateAccommodationInput {
   currentUser: { id: string; roleId: string };
 
+  organization?: {
+    name?: string;
+    description?: string;
+  };
   accommodationId: string;
-  organizationId?: string;
   type?: AccommodationType;
   image?: string;
   address?: string;
@@ -46,27 +53,29 @@ export class UpdateAccommodationUseCase {
       );
     }
 
-    const updatedAccommodation = {
-      ...existingAccommodation,
-      organizationId: existingAccommodation.organizationId,
-      type: input.type || existingAccommodation.type,
-      image: input.image || existingAccommodation.image,
-      address: input.address || existingAccommodation.address,
-      addressMap: input.addressMap || existingAccommodation.addressMap,
-      phoneOne: input.phoneOne || existingAccommodation.phoneOne,
-      phoneTwo: input.phoneTwo || existingAccommodation.phoneTwo,
-      email: input.email || existingAccommodation.email,
-      website: input.website || existingAccommodation.website,
-      instagram: input.instagram || existingAccommodation.instagram,
-      facebook: input.facebook || existingAccommodation.facebook,
-      updatedAt: new Date(),
-    };
+    const {
+      currentUser: _currentUser,
+      accommodationId: _accommodationId,
+      organization,
+      ...accommodationChanges
+    } = input;
 
-    Object.assign(existingAccommodation, updatedAccommodation);
+    const changes: Partial<
+      Omit<Accommodation, 'id' | 'organizationId' | 'createdAt' | 'updatedAt'>
+    > = {};
 
-    return this.accommodationRepository.update(
+    for (const [key, value] of Object.entries(accommodationChanges)) {
+      if (value !== undefined) {
+        Object.assign(changes, { [key]: value });
+      }
+    }
+
+    return this.accommodationRepository.updateWithOrganization(
       input.accommodationId,
-      updatedAccommodation,
+      {
+        accommodation: changes,
+        ...(organization ? { organization } : {}),
+      },
     );
   }
 }

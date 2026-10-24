@@ -22,7 +22,11 @@ export interface Accommodation {
   organizationId: string;
   type: AccommodationType;
   isActive: boolean;
+  capacity?: number; // Plazas
+  totalRooms?: number; // Habitaciones
+  totalBeds?: number; // Camas
   image?: string;
+  locality?: string;
   address?: string;
   addressMap?: string;
   phoneOne?: string;
@@ -44,3 +48,11 @@ export const AccommodationType = {
 
 export type AccommodationType =
   (typeof AccommodationType)[keyof typeof AccommodationType];
+
+export type AccommodationWithOrganization = Accommodation & {
+  organization: {
+    id: string;
+    name: string;
+    description: string | null;
+  };
+};

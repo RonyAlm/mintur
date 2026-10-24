@@ -1,26 +1,21 @@
-import {
-  ConflictException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import {
-  Accommodation,
-  AccommodationRepository,
-  AccommodationType,
-} from '../../domain';
-import {
-  OrganizationRepository,
-  OrganizationType,
-} from 'src/modules/organizations/domain';
-import { OrganizationAccessService } from 'src/modules/organizations/applications';
+import { ForbiddenException, Injectable } from '@nestjs/common';
+import { AccommodationRepository, AccommodationType } from '../../domain';
+import { OrganizationAccessService } from '../../../../modules/organizations/applications';
 
 export interface CreateAccommodationInput {
   currentUserRoleId: string;
 
-  organizationId: string;
+  organization: {
+    name: string;
+    description?: string;
+  };
+
   type: AccommodationType;
 
+  capacity?: number;
+  totalRooms?: number;
+  totalBeds?: number;
+  locality?: string;
   image?: string;
   address?: string;
   addressMap?: string;
@@ -36,7 +31,6 @@ export interface CreateAccommodationInput {
 export class CreateAccommodationUseCase {
   constructor(
     private readonly accommodationRepository: AccommodationRepository,
-    private readonly organizationRepository: OrganizationRepository,
     private readonly organizationAccessService: OrganizationAccessService,
   ) {}
 
@@ -51,45 +45,28 @@ export class CreateAccommodationUseCase {
       );
     }
 
-    const organization = await this.organizationRepository.findById(
-      input.organizationId,
-    );
-    if (!organization) throw new NotFoundException('La organización no existe');
-
-    if (!organization.isActive)
-      throw new ForbiddenException('La organización está desactivada');
-
-    if (organization.type !== OrganizationType.ACCOMMODATION)
-      throw new ConflictException('La organización no es de alojamientos');
-
-    const accommodationExists =
-      await this.accommodationRepository.findByOrganizationId(
-        input.organizationId,
-      );
-    if (accommodationExists)
-      throw new ConflictException(
-        'La organización ya tiene un alojamiento asociado',
-      );
-
-    const inputAccommodation: Accommodation = {
-      id: crypto.randomUUID(),
-      organizationId: input.organizationId,
-      isActive: true,
-      type: input.type,
-      image: input.image,
-      address: input.address,
-      addressMap: input.addressMap,
-      phoneOne: input.phoneOne,
-      phoneTwo: input.phoneTwo,
-      email: input.email,
-      website: input.website,
-      instagram: input.instagram,
-      facebook: input.facebook,
-
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    return this.accommodationRepository.create(inputAccommodation);
+    return this.accommodationRepository.createWithOrganization({
+      organization: {
+        name: input.organization.name.trim(),
+        description: input.organization.description?.trim(),
+      },
+      accommodation: {
+        isActive: true,
+        type: input.type,
+        capacity: input.capacity,
+        totalRooms: input.totalRooms,
+        totalBeds: input.totalBeds,
+        locality: input.locality,
+        image: input.image,
+        address: input.address,
+        addressMap: input.addressMap,
+        phoneOne: input.phoneOne,
+        phoneTwo: input.phoneTwo,
+        email: input.email,
+        website: input.website,
+        instagram: input.instagram,
+        facebook: input.facebook,
+      },
+    });
   }
 }
