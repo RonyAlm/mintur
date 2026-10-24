@@ -35,7 +35,7 @@ export const AccommodationType = {
   HOTEL: 'HOTEL',
   HOSTEL: 'HOSTEL',
   APART_HOTEL: 'APART_HOTEL',
-  OTRO: 'OTRO'
+  OTHER: 'OTHER'
 } as const
 
 export type AccommodationType = (typeof AccommodationType)[keyof typeof AccommodationType]

@@ -129,7 +129,7 @@ enum AccommodationType {
   HOTEL
   HOSTEL
   APART_HOTEL
-  OTRO
+  OTHER
 }
 
 model Accommodation {
@@ -138,7 +138,11 @@ model Accommodation {
   type           AccommodationType
 
   isActive    Boolean          @default(true)
-
+  
+  capacity       Int? // Plazas
+  totalRooms     Int? // Habitaciones
+  totalBeds      Int? // Camas
+  locality       String?
   image          String?
   address        String?
   addressMap     String?
