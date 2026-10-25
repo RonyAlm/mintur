@@ -1,5 +1,5 @@
 
-import { useCallback, useEffect, useState } from "react"
+import { useState } from "react"
 import { useNavigate } from "react-router"
 import { Building2Icon, RefreshCwIcon } from "lucide-react"
 
@@ -8,14 +8,13 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/modules/auth/hooks/useAuth"
 import { hasPermission } from "@/lib/modules"
-import { getApiErrorMessage } from "@/lib/api-error"
 
-import { accommodationsApi } from "../api/accommodations.api"
 import type { Accommodation } from "../types/accommodation.types"
 import { AccommodationsTable } from "../components/AccommodationsTable"
 import { PlusIcon } from "lucide-react"
 import { AccommodationFormDialog } from "../components/AccommodationFormDialog"
 import { toast } from "sonner"
+import { useAccommodations } from "../hooks/useAccommodations"
 import {
     AlertDialog,
     AlertDialogAction,
@@ -30,41 +29,25 @@ import {
 export default function AccommodationsPage() {
     const { user } = useAuth()
 
-    const [accommodations, setAccommodations] = useState<Accommodation[]>([])
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState<string | null>(null)
     const navigate = useNavigate()
+    const canRead = hasPermission(user, "accommodations:read")
+    const {
+        accommodations,
+        loading,
+        error,
+        loadAccommodations,
+        toggleAccommodation,
+    } = useAccommodations(canRead)
     const [formOpen, setFormOpen] = useState(false)
     const [editingAccommodation, setEditingAccommodation] =
         useState<Accommodation | null>(null)
     const [accommodationToToggle, setAccommodationToToggle] =
         useState<Accommodation | null>(null)
 
-    const canRead = hasPermission(user, "accommodations:read")
     const canCreate = hasPermission(user, "accommodations:create")
     // const canUpdate = hasPermission(user, "accommodations:update")
     const canActivate = hasPermission(user, "accommodations:activate")
     const canDeactivate = hasPermission(user, "accommodations:deactivate")
-
-    const loadAccommodations = useCallback(async () => {
-        setLoading(true)
-        setError(null)
-
-        try {
-            const result = await accommodationsApi.list()
-            setAccommodations(result)
-        } catch (err) {
-            setError(getApiErrorMessage(err))
-        } finally {
-            setLoading(false)
-        }
-    }, [])
-
-    useEffect(() => {
-        if (canRead) {
-            void Promise.resolve().then(() => loadAccommodations())
-        }
-    }, [canRead, loadAccommodations])
 
     if (!canRead) {
         return (
@@ -88,21 +71,15 @@ export default function AccommodationsPage() {
 
         const accommodation = accommodationToToggle
         setAccommodationToToggle(null)
-        setError(null)
 
         try {
-            if (accommodation.isActive) {
-                await accommodationsApi.deactivate(accommodation.id)
-            } else {
-                await accommodationsApi.activate(accommodation.id)
-            }
+            await toggleAccommodation(accommodation)
 
             toast.success(
                 `Alojamiento ${accommodation.isActive ? "desactivado" : "activado"} correctamente`,
             )
-            await loadAccommodations()
-        } catch (err) {
-            setError(getApiErrorMessage(err))
+        } catch {
+            // The hook retains the API error for the page-level alert.
         }
     }
 

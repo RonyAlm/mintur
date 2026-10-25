@@ -37,72 +37,25 @@ import {
   type UpdateAccommodationInput,
 } from "../types/accommodation.types"
 import { Tabs, TabsContent } from "@/components/ui/tabs"
+import {
+  accommodationLocalities,
+  accommodationTypeValues,
+  accommodationTypes,
+  normalizeAccommodationSearchText,
+} from "../constants/accommodation-options"
+import {
+  accommodationToFormValues,
+  emptyAccommodationFormValues,
+  formValuesToAccommodationInput,
+} from "../utils/accommodation-form-mappers"
 
 type FormValues = CreateAccommodationFormValues
-
-const accommodationTypes = [
-  { value: AccommodationType.HOTEL, label: "Hotel" },
-  { value: AccommodationType.APART_HOTEL, label: "Apart hotel" },
-  { value: AccommodationType.HOSTEL, label: "Hostel" },
-  { value: AccommodationType.OTHER, label: "Otro" },
-]
-const accommodationTypeValues = accommodationTypes.map(({ value }) => value)
-const localities = [
-  "Formosa", "Clorinda", "Pirané", "El Colorado", "Ingeniero Juárez", "Las Lomitas",
-  "Ibarreta", "Laguna Blanca", "Comandante Fontana", "Palo Santo", "Villa General Güemes",
-  "Villa Dos Trece", "Misión San Francisco de Laishí", "Estanislao del Campo", "Pozo del Tigre",
-  "Mayor Vicente Villafañe", "Riacho He-Hé", "El Espinillo", "General Manuel Belgrano",
-  "Laguna Yema", "San Martín 2", "General Lucio V. Mansilla", "Herradura", "Villa del Carmen",
-  "El Potrillo", "Misión Tacaaglé", "Laguna Naineck", "General Enrique Mosconi", "Tres Lagunas",
-  "Fortín Lugones", "Villa Escolar", "Los Chiriguanos", "Subteniente Perín", "Palma Sola",
-  "Mojón de Fierro", "Colonia Pastoril", "Gran Guardia", "Buena Vista", "Siete Palmas",
-  "Pozo de Maza", "San Hilario", "Riacho Negro", "San Martín 1", "Tatané", "Portón Negro",
-  "Posta Cambio Zalazar", "Pozo del Mortero", "Banco Payaguá", "Bartolomé de las Casas",
-  "Colonia Sarmiento", "El Recreo", "Fortín Sargento 1º Leyes", "Laguna Gallo", "Mariano Boedo",
-  "El Chorro",
-]
-
-function normalizeSearchText(value: string) {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLocaleLowerCase()
-}
 
 interface AccommodationFormDialogProps {
   open: boolean
   accommodation?: Accommodation | null
   onOpenChange: (open: boolean) => void
   onSaved: () => Promise<void> | void
-}
-
-const emptyValues: FormValues = {
-  organizationName: "",
-  organizationDescription: "",
-  type: AccommodationType.HOTEL,
-  capacity: "",
-  totalRooms: "",
-  totalBeds: "",
-  locality: "",
-  image: "",
-  address: "",
-  addressMap: "",
-  phoneOne: "",
-  phoneTwo: "",
-  email: "",
-  website: "",
-  instagram: "",
-  facebook: "",
-}
-
-function optionalText(value: string) {
-  return value.trim() || undefined
-}
-
-function optionalNumber(value: string) {
-  if (!value.trim()) return undefined
-  const number = Number(value)
-  return Number.isFinite(number) && number >= 0 ? number : undefined
 }
 
 export function AccommodationFormDialog({
@@ -118,7 +71,7 @@ export function AccommodationFormDialog({
 
   const form = useForm<FormValues>({
     resolver: zodResolver(accommodationFormSchema),
-    defaultValues: emptyValues,
+    defaultValues: emptyAccommodationFormValues,
   })
 
   useEffect(() => {
@@ -126,68 +79,20 @@ export function AccommodationFormDialog({
     setStep("organization")
 
     form.reset(
-      accommodation
-        ? {
-            organizationName: accommodation.organization.name,
-            organizationDescription:
-              accommodation.organization.description ?? "",
-            type: accommodation.type,
-            capacity: accommodation.capacity?.toString() ?? "",
-            totalRooms: accommodation.totalRooms?.toString() ?? "",
-            totalBeds: accommodation.totalBeds?.toString() ?? "",
-            locality: accommodation.locality ?? "",
-            image: accommodation.image ?? "",
-            address: accommodation.address ?? "",
-            addressMap: accommodation.addressMap ?? "",
-            phoneOne: accommodation.phoneOne ?? "",
-            phoneTwo: accommodation.phoneTwo ?? "",
-            email: accommodation.email ?? "",
-            website: accommodation.website ?? "",
-            instagram: accommodation.instagram ?? "",
-            facebook: accommodation.facebook ?? "",
-          }
-        : emptyValues,
+      accommodation ? accommodationToFormValues(accommodation) : emptyAccommodationFormValues,
     )
   }, [open, accommodation, form])
 
   const onSubmit = form.handleSubmit(async (values) => {
     form.clearErrors("root")
 
-    const organization = {
-      name: values.organizationName.trim(),
-      description: values.organizationDescription.trim(),
-    }
-
-    const accommodationData = {
-      type: values.type,
-      capacity: optionalNumber(values.capacity),
-      totalRooms: optionalNumber(values.totalRooms),
-      totalBeds: optionalNumber(values.totalBeds),
-      locality: optionalText(values.locality),
-      image: optionalText(values.image),
-      address: optionalText(values.address),
-      addressMap: optionalText(values.addressMap),
-      phoneOne: optionalText(values.phoneOne),
-      phoneTwo: optionalText(values.phoneTwo),
-      email: optionalText(values.email),
-      website: optionalText(values.website),
-      instagram: optionalText(values.instagram),
-      facebook: optionalText(values.facebook),
-    }
+    const input = formValuesToAccommodationInput(values)
 
     try {
       if (accommodation) {
-        const input: UpdateAccommodationInput = {
-          organization,
-          ...accommodationData,
-        }
-        await accommodationsApi.update(accommodation.id, input)
+        await accommodationsApi.update(accommodation.id, input satisfies UpdateAccommodationInput)
       } else {
-        const input: CreateAccommodationInput = {
-          organization,
-          ...accommodationData,
-        }
-        await accommodationsApi.create(input)
+        await accommodationsApi.create(input satisfies CreateAccommodationInput)
       }
 
       toast.success(
@@ -314,8 +219,8 @@ export function AccommodationFormDialog({
                       accommodationTypes.find((item) => item.value === value)?.label ?? ""
                     }
                     filter={(value, query, itemToString) =>
-                      normalizeSearchText(itemToString?.(value) ?? String(value)).includes(
-                        normalizeSearchText(query),
+                      normalizeAccommodationSearchText(itemToString?.(value) ?? String(value)).includes(
+                        normalizeAccommodationSearchText(query),
                       )
                     }
                     onValueChange={(value) => {
@@ -380,8 +285,8 @@ export function AccommodationFormDialog({
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="locality">Localidad</Label>
-                  <Combobox items={localities} value={form.watch("locality") || null}
-                    filter={(value, query) => normalizeSearchText(value).includes(normalizeSearchText(query))}
+                  <Combobox items={accommodationLocalities} value={form.watch("locality") || null}
+                    filter={(value, query) => normalizeAccommodationSearchText(value).includes(normalizeAccommodationSearchText(query))}
                     onValueChange={(value) => form.setValue("locality", value ?? "", { shouldDirty: true, shouldValidate: true })}>
                     <ComboboxInput id="locality" aria-label="Localidad" placeholder="Selecciona una localidad" className="w-full">
                       <ComboboxContent><ComboboxEmpty>No se encontraron resultados.</ComboboxEmpty><ComboboxList>

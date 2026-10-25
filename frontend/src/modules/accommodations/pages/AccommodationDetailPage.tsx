@@ -7,20 +7,16 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { getApiErrorMessage } from "@/lib/api-error"
 import { accommodationsApi } from "../api/accommodations.api"
+import { accommodationTypes } from "../constants/accommodation-options"
 import type { Accommodation } from "../types/accommodation.types"
-
-const typeLabels: Record<string, string> = {
-  HOTEL: "Hotel",
-  APART_HOTEL: "Apart hotel",
-  HOSTEL: "Hostel",
-  OTHER: "Otro",
-}
 
 function Detail({ label, value }: { label: string; value?: string | number | null }) {
   return (
     <div className="border-b border-border/70 py-3 last:border-0">
       <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
-      <p className="mt-1 break-words text-sm font-medium">{value || "No especificado"}</p>
+      <p className="mt-1 break-words text-sm font-medium">
+        {value === null || value === undefined || value === "" ? "No especificado" : value}
+      </p>
     </div>
   )
 }
@@ -72,7 +68,7 @@ export default function AccommodationDetailPage() {
                 <CardTitle>Información del establecimiento</CardTitle>
                 </CardHeader>
                 <CardContent className="grid gap-x-8 sm:grid-cols-2">
-                <Detail label="Tipo de alojamiento" value={typeLabels[accommodation.type] ?? accommodation.type} />
+                <Detail label="Tipo de alojamiento" value={accommodationTypes.find(({ value }) => value === accommodation.type)?.label ?? accommodation.type} />
                 <Detail label="Localidad" value={accommodation.locality} />
                 <Detail label="Dirección" value={accommodation.address} />
                 <Detail label="Capacidad (plazas)" value={accommodation.capacity} />
