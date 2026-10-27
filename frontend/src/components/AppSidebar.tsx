@@ -1,6 +1,6 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Link, useLocation } from "react-router"
-import { ChevronDownIcon, HomeIcon, LogOutIcon, ShieldCheckIcon, type LucideIcon, UsersIcon } from "lucide-react"
+import { Building2Icon, ChevronDownIcon, HomeIcon, LogOutIcon, ShieldCheckIcon, type LucideIcon, UsersIcon } from "lucide-react"
 
 import {
   Sidebar,
@@ -20,6 +20,7 @@ import {
 import { useAuth } from "@/modules/auth/hooks/useAuth"
 import { getVisibleModules } from "@/lib/modules"
 import { cn } from "@/lib/utils"
+import { organizationsApi } from "@/modules/organizations/api/organizations.api"
 import estrellita from "@/assets/img/estrellita-blanco.png"
 
 interface NavItem {
@@ -32,6 +33,15 @@ export function AppSidebar() {
   const { logout, user } = useAuth()
   const { pathname } = useLocation()
   const [usersOpen, setUsersOpen] = useState(pathname.startsWith("/usuarios") || pathname.startsWith("/roles"))
+  const [hasOrganizations, setHasOrganizations] = useState(false)
+
+  useEffect(() => {
+    let active = true
+    organizationsApi.listMine()
+      .then((organizations) => { if (active) setHasOrganizations(organizations.length > 0) })
+      .catch(() => { if (active) setHasOrganizations(false) })
+    return () => { active = false }
+  }, [user?.id])
 
   // Módulos permitidos por los permisos efectivos del perfil.
   const visibleModules = getVisibleModules(user)
@@ -40,6 +50,7 @@ export function AppSidebar() {
 
   const mainItems: NavItem[] = [
     { title: "Inicio", url: "/", icon: HomeIcon },
+    ...(hasOrganizations ? [{ title: "Mis organizaciones", url: "/mis-organizaciones", icon: Building2Icon }] : []),
     ...visibleModules
       .filter((module) => module.group === "principal" && module.id !== "usuarios")
       .map((module) => ({

@@ -19,8 +19,8 @@ export const accommodationsApi = {
 
   async getByOrganization(
     organizationId: string
-  ): Promise<Accommodation[]> {
-    const { data } = await api.get<Accommodation[]>(
+  ): Promise<Accommodation> {
+    const { data } = await api.get<Accommodation>(
       `/accommodations/organization/${organizationId}`
     )
     return data

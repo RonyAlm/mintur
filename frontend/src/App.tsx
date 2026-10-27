@@ -15,6 +15,7 @@ const ProfileAccount = lazy(() => import("@/modules/profile/pages/ProfileAccount
 const ProfilePassword = lazy(() => import("@/modules/profile/pages/ProfilePassword"));
 const UsersPage = lazy(() => import("@/modules/users/pages/UsersPage"));
 const RolesPage = lazy(() => import("@/modules/roles/pages/RolesPage"));
+const MyOrganizationsPage = lazy(() => import("@/modules/organizations/pages/MyOrganizationsPage"));
 const AccommodationsPage = lazy(() => import("@/modules/accommodations/pages/AccommodationsPage"));
 const AccommodationDetailPage = lazy(() => import("@/modules/accommodations/pages/AccommodationDetailPage"));
 const NotFound = lazy(() => import("@/modules/system/pages/NotFound"));
@@ -48,6 +49,9 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route element={<RootLayout />}>
               <Route index element={<Dashboard />} />
+
+              {/* Organizaciones propias; la API entrega solo las membresías del usuario autenticado. */}
+              <Route path="mis-organizaciones" element={<MyOrganizationsPage />} />
 
               <Route
                 path="dashboard"
