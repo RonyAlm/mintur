@@ -35,7 +35,7 @@ export class AccommodationController {
   }
 
   @Get('organization/:organizationId')
-  @Auth('accommodations:read')
+  @Auth('organizations:read')
   async getAccommodationByOrganizationId(
     @Param('organizationId') organizationId: string,
     @CurrentUser() currentUser: AuthenticatedUser,

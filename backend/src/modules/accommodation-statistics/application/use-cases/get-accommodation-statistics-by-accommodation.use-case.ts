@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { AccommodationStatisticRepository } from '../../domain';
 import { OrganizationAccessService } from '../../../../modules/organizations/applications';
 import { AccommodationRepository } from '../../../../modules/accommodations/domain';
@@ -39,11 +43,16 @@ export class GetAccommodationStatisticsByAccommodationUseCase {
 
     this.validateDateRange(input.from, input.to);
 
-    return this.accommodationStatisticRepository.findByAccommodationId(
-      input.accommodationId,
-      input.from,
-      input.to,
-    );
+    const result =
+      await this.accommodationStatisticRepository.findByAccommodationId(
+        input.accommodationId,
+        input.from,
+        input.to,
+      );
+
+    if (!result) throw new NotFoundException('No se encontraron estadísticas');
+
+    return result;
   }
 
   private validateDateRange(from?: Date, to?: Date) {
