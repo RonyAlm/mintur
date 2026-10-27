@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import {
   OrganizationMembership,
   OrganizationMembershipRepository,
+  OrganizationMembershipWithOrganization,
+  OrganizationMembershipWithUser,
 } from '../../domain';
 import { PrismaService } from '../../../../modules/prisma/prisma.service';
 import { OrganizationMembershipMapper } from './organization-membership.mapper';
@@ -39,29 +41,35 @@ export class PrismaOrganizationMembershipRepository implements OrganizationMembe
   }
   async findByOrganizationId(
     organizationId: string,
-  ): Promise<OrganizationMembership[] | []> {
+  ): Promise<OrganizationMembershipWithUser[] | []> {
     const memberships =
       await this.prismaService.organizationMembership.findMany({
         where: {
           organizationId,
         },
         orderBy: { createdAt: 'asc' },
+        include: { user: true },
       });
 
     if (!memberships) return [];
 
-    return OrganizationMembershipMapper.toDomainList(memberships);
+    return OrganizationMembershipMapper.toDomainListWithUser(memberships);
   }
 
-  async findByUserId(userId: string): Promise<OrganizationMembership[] | []> {
+  async findByUserId(
+    userId: string,
+  ): Promise<OrganizationMembershipWithOrganization[] | []> {
     const memberships =
       await this.prismaService.organizationMembership.findMany({
         where: { userId },
         orderBy: { createdAt: 'asc' },
+        include: { organization: true },
       });
     if (!memberships) return [];
 
-    return OrganizationMembershipMapper.toDomainList(memberships);
+    return OrganizationMembershipMapper.toDomainListWithOrganization(
+      memberships,
+    );
   }
 
   async update(

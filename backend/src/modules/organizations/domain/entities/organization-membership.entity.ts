@@ -1,3 +1,5 @@
+import { Organization } from './organization.entity';
+
 export const OrganizationMemberRole = {
   OWNER: 'OWNER',
   ADMIN: 'ADMIN',
@@ -14,3 +16,11 @@ export interface OrganizationMembership {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export type OrganizationMembershipWithOrganization = OrganizationMembership & {
+  organization: Organization;
+};
+
+export type OrganizationMembershipWithUser = OrganizationMembership & {
+  user: { id: string; email: string; username: string };
+};

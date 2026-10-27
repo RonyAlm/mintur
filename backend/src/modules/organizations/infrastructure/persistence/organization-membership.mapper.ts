@@ -1,4 +1,7 @@
-import { OrganizationMembership } from '../../../../core/lib/generated/prisma/client';
+import {
+  OrganizationMembership,
+  Organization,
+} from '../../../../core/lib/generated/prisma/client';
 import {
   OrganizationMembership as OrganizationMembershipEntity,
   OrganizationMemberRole,
@@ -10,6 +13,14 @@ interface OrganizationMembershipTable extends OrganizationMembership {
   role: OrganizationMemberRole;
   createdAt: Date;
   updatedAt: Date;
+}
+
+interface OrganizationMembershipWithOrganization extends OrganizationMembershipTable {
+  organization: Organization;
+}
+
+interface OrganizationMembershipWithUser extends OrganizationMembershipTable {
+  user: { id: string; email: string; username: string };
 }
 
 export class OrganizationMembershipMapper {
@@ -29,5 +40,43 @@ export class OrganizationMembershipMapper {
     raw: OrganizationMembershipTable[],
   ): OrganizationMembershipEntity[] {
     return raw.map((organization) => this.toDomain(organization));
+  }
+
+  static toDomainWithOrganization(raw: OrganizationMembershipWithOrganization) {
+    return {
+      ...this.toDomain(raw),
+      organization: {
+        id: raw.organization.id,
+        name: raw.organization.name,
+        type: raw.organization.type,
+        description: raw.organization.description || '',
+        isActive: raw.organization.isActive,
+        createdAt: raw.organization.createdAt,
+        updatedAt: raw.organization.updatedAt,
+      },
+    };
+  }
+
+  static toDomainListWithOrganization(
+    raw: OrganizationMembershipWithOrganization[],
+  ) {
+    return raw.map((organization) =>
+      this.toDomainWithOrganization(organization),
+    );
+  }
+
+  static toDomainWithUser(raw: OrganizationMembershipWithUser) {
+    return {
+      ...this.toDomain(raw),
+      user: {
+        id: raw.user.id,
+        email: raw.user.email,
+        username: raw.user.username,
+      },
+    };
+  }
+
+  static toDomainListWithUser(raw: OrganizationMembershipWithUser[]) {
+    return raw.map((organization) => this.toDomainWithUser(organization));
   }
 }

@@ -1,4 +1,8 @@
-import { OrganizationMembership } from '../entities';
+import {
+  OrganizationMembership,
+  OrganizationMembershipWithOrganization,
+  OrganizationMembershipWithUser,
+} from '../entities';
 
 export abstract class OrganizationMembershipRepository {
   abstract create(
@@ -12,9 +16,11 @@ export abstract class OrganizationMembershipRepository {
 
   abstract findByOrganizationId(
     organizationId: string,
-  ): Promise<OrganizationMembership[] | []>;
+  ): Promise<OrganizationMembershipWithUser[] | []>;
 
-  abstract findByUserId(userId: string): Promise<OrganizationMembership[] | []>;
+  abstract findByUserId(
+    userId: string,
+  ): Promise<OrganizationMembershipWithOrganization[] | []>;
 
   abstract update(
     membership: OrganizationMembership,
