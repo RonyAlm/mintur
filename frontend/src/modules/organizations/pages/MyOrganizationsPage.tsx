@@ -169,7 +169,7 @@ export default function MyOrganizationsPage() {
               )}
 
               {canManageMembers && canReadMembers && (
-                <div className="border-t pt-4">
+                <div className="border-t p-4">
                   <h3 className="mb-3 flex items-center gap-2 text-sm font-medium">
                     <UsersIcon className="size-4" aria-hidden="true" />
                     Miembros de {organization?.name ?? "la organización"}
