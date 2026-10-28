@@ -27,6 +27,7 @@ import { getDisplayName } from "@/lib/user"
 import permissionsApi from "@/modules/roles/api/permissions.api"
 import rolesApi from "@/modules/roles/api/roles.api"
 import usersApi from "@/modules/users/api/users.api"
+import { useMyOrganizationMemberships } from "@/modules/organizations/hooks/useMyOrganizationMemberships"
 
 interface ModuleCard {
   title: string
@@ -69,6 +70,8 @@ const categoryConfig = {
 
 const Dashboard = () => {
   const { user } = useAuth()
+  const memberships = useMyOrganizationMemberships(user?.id)
+  const hasOperatorMembership = memberships.some((membership) => membership.role === "OPERATOR")
   useDocumentTitle("Inicio")
   const [counts, setCounts] = useState<{ users?: number; roles?: number; permissions?: number }>({})
 
@@ -98,7 +101,7 @@ const Dashboard = () => {
     return () => { cancelled = true }
   }, [canReadPermissions, canReadRoles, canReadUsers])
 
-  const modules: ModuleCard[] = getVisibleModules(user).map(
+  const modules: ModuleCard[] = getVisibleModules(user, hasOperatorMembership).map(
     ({ title, description, path, icon }) => ({ title, description, to: path, icon })
   )
 
