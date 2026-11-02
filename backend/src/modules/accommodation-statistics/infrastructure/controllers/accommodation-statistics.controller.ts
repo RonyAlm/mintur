@@ -12,6 +12,7 @@ import {
   GetAccommodationDailyStatisticUseCase,
   GetAccommodationStatisticsByAccommodationUseCase,
   GetAccommodationStatisticsSummaryUseCase,
+  GetMemberAccommodationStatisticsUseCase,
   GetAllAccommodationsStatisticsSummaryUseCase,
   UpdateAccommodationDailyStatisticUseCase,
 } from '../../application';
@@ -38,6 +39,7 @@ export class AccommodationStatisticsController {
     private readonly updateAccommodationDailyStatisticUseCase: UpdateAccommodationDailyStatisticUseCase,
     private readonly getAccommodationStatisticsSummaryUseCase: GetAccommodationStatisticsSummaryUseCase,
     private readonly getAllAccommodationsStatisticsSummaryUseCase: GetAllAccommodationsStatisticsSummaryUseCase,
+    private readonly getMemberAccommodationStatisticsUseCase: GetMemberAccommodationStatisticsUseCase,
   ) {}
 
   @Get('/accommodation/:accommodationId')
@@ -82,6 +84,14 @@ export class AccommodationStatisticsController {
       currentUser,
       from: new Date(query.from),
       to: new Date(query.to),
+    });
+  }
+
+  @Get('/member/accommodations')
+  @Auth('accommodation-statistics:read')
+  getMemberAccommodations(@CurrentUser() currentUser: AuthenticatedUser) {
+    return this.getMemberAccommodationStatisticsUseCase.execute({
+      userId: currentUser.id,
     });
   }
 

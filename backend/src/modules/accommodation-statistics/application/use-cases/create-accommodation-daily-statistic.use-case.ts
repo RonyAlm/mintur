@@ -10,6 +10,7 @@ import {
   AccommodationStatisticTravelPurpose,
 } from '../../domain';
 import { OrganizationAccessService } from '../../../../modules/organizations/applications';
+import { OrganizationMemberRole } from '../../../../modules/organizations/domain';
 import { AccommodationRepository } from '../../../../modules/accommodations/domain';
 
 export interface CreateAccommodationDailyStatisticInput {
@@ -45,9 +46,10 @@ export class CreateAccommodationDailyStatisticUseCase {
       input.currentUser.roleId,
     );
     if (!isAdminSystem) {
-      await this.organizationAccessService.getMembership(
+      await this.organizationAccessService.requireRole(
         input.currentUser.id,
         accommodation.organizationId,
+        [OrganizationMemberRole.ADMIN, OrganizationMemberRole.OPERATOR],
       );
     }
 

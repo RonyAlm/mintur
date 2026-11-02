@@ -55,7 +55,7 @@ export class GetAccommodationStatisticsSummaryUseCase {
 
       totalGuests: statistics.reduce((acc, stat) => acc + stat.totalGuests, 0),
 
-      ageRages: this.aggregateAgeRanges(statistics),
+      ageRanges: this.aggregateAgeRanges(statistics),
       travelPurposes: this.aggregateTravelPurposes(statistics),
       origins: this.aggregateOrigins(statistics),
     };
@@ -89,7 +89,9 @@ export class GetAccommodationStatisticsSummaryUseCase {
 
     statistics.forEach((stat) => {
       stat.origins.forEach((origin) => {
-        const existingOrigin = origins.find((o) => o.name === origin.name);
+        const existingOrigin = origins.find(
+          (o) => o.type === origin.type && o.name === origin.name,
+        );
         if (existingOrigin) {
           existingOrigin.quantity += origin.quantity;
         } else {
