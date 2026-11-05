@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react"
 import { Link, useParams, useSearchParams } from "react-router"
-import { ArrowLeftIcon, CalendarDaysIcon } from "lucide-react"
+import { ArrowLeftIcon, BriefcaseIcon, CalendarDaysIcon, Globe2Icon, GroupIcon, PencilIcon, Users2Icon } from "lucide-react"
 import { toast } from "sonner"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -29,9 +29,35 @@ function formatDate(value: string) {
   return new Date(`${value.slice(0, 10)}T00:00:00`).toLocaleDateString("es-AR", { dateStyle: "long" })
 }
 
-function SummaryCard({ title, value, description }: { title: string; value: string | number; description: string }) {
-  return <Card><CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle></CardHeader>
-    <CardContent><div className="text-2xl font-semibold tracking-tight">{value}</div><p className="mt-1 text-xs text-muted-foreground">{description}</p></CardContent></Card>
+export function SummaryCard({ title, value, description, icon }: { title: string; value: string | number; description: string, icon: string }) {
+
+  let IconCard = Users2Icon
+  if (icon) {
+    if (icon === "users") {
+      IconCard = Users2Icon
+    } else if (icon === "calendar") {
+      IconCard = CalendarDaysIcon
+    } else if (icon === "globe") {
+      IconCard = Globe2Icon
+    } else if (icon === "pencil") {
+      IconCard = PencilIcon
+    } else if (icon === "group") {
+      IconCard = GroupIcon
+    }
+
+  }
+  return <Card>
+    <CardHeader className="flex flex-row gap-4 items-center">
+      <div className="p-3 rounded-full bg-green-200/20 dark:bg-green-200/10">
+        <IconCard className="text-green-600 size-4" />
+      </div>
+      <CardTitle className="text-lg font-medium text-muted-foreground">{title}</CardTitle>
+    </CardHeader>
+    <CardContent className="px-6">
+      <div className="text-4xl font-semibold tracking-tight">{value}</div>
+      <p className="mt-1 text-xs text-muted-foreground">{description}</p>
+    </CardContent>
+  </Card>
 }
 
 export default function AccommodationDailyStatisticDetailPage() {
@@ -75,23 +101,102 @@ export default function AccommodationDailyStatisticDetailPage() {
 
     {!loading && !error && record && <>
       <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-        <div><p className="text-sm text-muted-foreground">Mis Registros</p><h1 className="text-3xl font-semibold tracking-tight">Detalle del registro</h1><p className="mt-2 text-sm text-muted-foreground">Información del {formatDate(record.date)}.</p></div>
-        {canUpdate && !editing && <Button onClick={() => setEditing(true)}>Editar registro</Button>}
+        <div><p className="text-sm text-muted-foreground">Mis Registros</p>
+          <h1 className="text-3xl font-semibold tracking-tight">Detalle del registro</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Información del {formatDate(record.date)}.
+          </p>
+        </div>
+        {canUpdate && !editing &&
+          <Button size="lg"
+            className="flex items-center p-4 bg-green-600 hover:bg-green-700 cursor-pointer"
+            onClick={() => setEditing(true)}>
+            Editar registro
+            <PencilIcon className="ml-2 size-4" aria-hidden="true" />
+          </Button>}
       </header>
 
       <div className="space-y-5">
         <section className="grid gap-3 sm:grid-cols-3" aria-label="Resumen del registro">
-          <SummaryCard title="Total de huéspedes" value={record.totalGuests} description="Personas registradas" />
-          <SummaryCard title="Rangos de edad" value={ageRanges.length} description="Categorías con huéspedes" />
-          <SummaryCard title="Procedencias" value={origins.length} description="Orígenes con huéspedes" />
+          <SummaryCard
+            title="Total de huéspedes"
+            icon="users"
+            value={record.totalGuests}
+            description="Personas registradas" />
+          <SummaryCard
+            icon="users"
+            title="Rangos de edad"
+            value={ageRanges.length}
+            description="Categorías con huéspedes" />
+          <SummaryCard
+            title="Procedencias"
+            icon="globe"
+            value={origins.length}
+            description="Orígenes con huéspedes" />
         </section>
         <section className="grid gap-4 sm:grid-cols-2">
-          <Card><CardHeader><CardTitle className="text-base">Rangos de edad</CardTitle></CardHeader><CardContent className="space-y-2">{ageRanges.length ? ageRanges.map((row) => <div key={row.ageRange} className="flex justify-between gap-3 text-sm"><span>{ageLabels[row.ageRange]}</span><span className="font-medium tabular-nums">{row.quantity}</span></div>) : <p className="text-sm text-muted-foreground">Sin huéspedes registrados por edad.</p>}</CardContent></Card>
-          <Card><CardHeader><CardTitle className="text-base">Motivo del viaje</CardTitle></CardHeader><CardContent className="space-y-2">{travelPurposes.length ? travelPurposes.map((row) => <div key={row.purpose} className="flex justify-between gap-3 text-sm"><span>{purposeLabels[row.purpose]}</span><span className="font-medium tabular-nums">{row.quantity}</span></div>) : <p className="text-sm text-muted-foreground">Sin huéspedes registrados por motivo.</p>}</CardContent></Card>
+          <Card>
+            <CardHeader className="flex flex-row gap-4 items-center">
+              <div className="p-3 rounded-full bg-green-200/20 dark:bg-green-200/10">
+                <Users2Icon className="text-green-600 size-4" />
+              </div>
+              <CardTitle className="text-base">Rangos de edad</CardTitle>
+            </CardHeader>
+            <CardContent className="px-8 space-y-2">
+              {ageRanges.length ? ageRanges.map((row) =>
+                <div key={row.ageRange} className="flex justify-between gap-3 text-sm">
+                  <span>{ageLabels[row.ageRange]}</span>
+                  <span className="font-medium tabular-nums">{row.quantity}</span>
+                </div>)
+                : <p className="text-sm text-muted-foreground">Sin huéspedes registrados por edad.</p>}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row gap-4 items-center">
+              <div className="p-3 rounded-full bg-green-200/20 dark:bg-green-200/10">
+                <BriefcaseIcon className="text-green-600 size-4" />
+              </div>
+              <CardTitle className="text-base">Motivo del viaje</CardTitle>
+            </CardHeader>
+            <CardContent className=" px-8 space-y-2">
+              {travelPurposes.length ? travelPurposes.map((row) =>
+                <div key={row.purpose} className="flex justify-between gap-3 text-sm">
+                  <span>{purposeLabels[row.purpose]}</span>
+                  <span className="font-medium tabular-nums">{row.quantity}</span>
+                </div>)
+                : <p className="text-sm text-muted-foreground">Sin huéspedes registrados por motivo.</p>}
+            </CardContent>
+          </Card>
         </section>
-        <Card><CardHeader><CardTitle className="text-base">Procedencia de los huéspedes</CardTitle></CardHeader><CardContent>
-          {origins.length > 0 ? <Table><TableHeader><TableRow><TableHead>Procedencia</TableHead><TableHead>Tipo</TableHead><TableHead className="text-right">Huéspedes</TableHead></TableRow></TableHeader><TableBody>{origins.map((origin, index) => <TableRow key={`${origin.type}-${origin.name}-${index}`}><TableCell>{origin.name}</TableCell><TableCell>{origin.type === "PROVINCE" ? "Provincia" : "País"}</TableCell><TableCell className="text-right tabular-nums">{origin.quantity}</TableCell></TableRow>)}</TableBody></Table> : <p className="py-8 text-center text-sm text-muted-foreground">Sin datos de procedencia para mostrar.</p>}
-        </CardContent></Card>
+        <Card>
+          <CardHeader className="flex flex-row gap-4 items-center">
+            <div className="p-3 rounded-full bg-green-200/20 dark:bg-green-200/10">
+               <Globe2Icon className="text-green-600 size-4" />
+            </div>
+            <CardTitle className="text-base">
+              Procedencia de los huéspedes
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {origins.length > 0
+              ? <Table>
+                <TableHeader className="bg-green-100">
+                  <TableRow>
+                    <TableHead>Procedencia</TableHead>
+                    <TableHead>
+                      Tipo</TableHead>
+                    <TableHead className="text-right">Huéspedes</TableHead>
+                  </TableRow>
+                </TableHeader><TableBody>{origins.map((origin, index) =>
+                  <TableRow key={`${origin.type}-${origin.name}-${index}`}>
+                    <TableCell>{origin.name}</TableCell>
+                    <TableCell>{origin.type === "PROVINCE" ? "Provincia" : "País"}</TableCell>
+                    <TableCell className="text-right tabular-nums">{origin.quantity}</TableCell>
+                  </TableRow>)}
+                </TableBody>
+              </Table> : <p className="py-8 text-center text-sm text-muted-foreground">Sin datos de procedencia para mostrar.</p>}
+          </CardContent>
+        </Card>
       </div>
       <Dialog open={editing} onOpenChange={setEditing}>
         <DialogContent className="max-h-[90vh] max-w-3xl p-0 pb-4 overflow-auto  scrollbar-thin">
