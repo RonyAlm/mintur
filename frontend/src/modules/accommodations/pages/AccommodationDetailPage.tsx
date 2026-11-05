@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
-import { ArrowLeftIcon, Building2Icon, MapPinIcon, UserPlusIcon, UserRoundXIcon } from "lucide-react"
-import { Link, useParams } from "react-router"
+import { ArrowLeftIcon, BarChart3Icon, Building2Icon, MapPinIcon, UserPlusIcon, UserRoundXIcon } from "lucide-react"
+import { Link, useNavigate, useParams } from "react-router"
 import { toast } from "sonner"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -34,6 +34,7 @@ function Detail({ label, value }: { label: string; value?: string | number | nul
 
 export default function AccommodationDetailPage() {
   const { id = "" } = useParams()
+  const navigate = useNavigate()
   const { user } = useAuth()
   const [accommodation, setAccommodation] = useState<Accommodation | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -190,7 +191,12 @@ export default function AccommodationDetailPage() {
                     <p className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground"><MapPinIcon className="size-4" />{[accommodation.locality, accommodation.address].filter(Boolean).join(" · ") || "Ubicación no especificada"}</p>
                   </div>
                 </div>
-                <Badge variant={accommodation.isActive ? "secondary" : "outline"} className="w-fit px-3 py-1">{accommodation.isActive ? "Activo" : "Inactivo"}</Badge>
+                <div className="flex items-center gap-2">
+                  <Badge 
+                    variant={accommodation.isActive ? "secondary" : "outline"}
+                    className="w-fit px-3 py-1">{accommodation.isActive ? "Activo" : "Inactivo"}
+                    </Badge>
+                  {hasPermission(user, "accommodation-statistics:read") && <Button variant="outline" onClick={() => navigate(`/alojamientos/${id}/estadisticas`)}><BarChart3Icon className="size-4" />Ver estadísticas</Button>}</div>
               </div>
             </section>
             <div className="grid gap-5 lg:grid-cols-2">
