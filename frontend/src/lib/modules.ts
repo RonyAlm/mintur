@@ -72,9 +72,9 @@ export const APP_MODULES: readonly AppModule[] = [
   },
   {
     id: "reportes",
-    title: "Reportes",
-    description: "Indicadores, dashboards y exportaciones del sector.",
-    path: "/reportes",
+    title: "Estadísticas",
+    description: "Carga registros diarios, consulta el historial y revisa reportes de tus alojamientos.",
+    path: "/estadisticas/reportes",
     icon: BarChart3Icon,
     group: "principal",
     anyPermission: ["accommodation-statistics:read"],
@@ -112,6 +112,23 @@ export function hasAllPermissions(user: User | null, permissions: readonly strin
   return permissions.every((permission) => hasPermission(user, permission))
 }
 
+/** Roles de organización que habilitan la administración de estadísticas. */
+export const STATISTICS_MEMBER_ROLES = ["OPERATOR", "ADMIN"] as const
+
+/**
+ * Indica si el usuario puede CARGAR o EDITAR estadísticas, por pertenecer como
+ * OPERATOR o ADMIN a alguna organización. El backend aplica la misma regla
+ * (requireRole [ADMIN, OPERATOR]); los system admins tienen un bypass propio.
+ * La VISUALIZACIÓN no usa este helper: cualquier miembro con el permiso ve.
+ */
+export function canManageStatistics(
+  memberships: ReadonlyArray<{ role: string }>
+): boolean {
+  return memberships.some(({ role }) =>
+    (STATISTICS_MEMBER_ROLES as readonly string[]).includes(role)
+  )
+}
+
 /** IDs de módulos que habilitan los permisos efectivos del usuario. */
 export function getPermissionModuleIds(user: User | null): ModuleId[] {
   return APP_MODULES.filter((module) => hasAnyPermission(user, module.anyPermission)).map(
@@ -120,8 +137,9 @@ export function getPermissionModuleIds(user: User | null): ModuleId[] {
 }
 
 /** Módulos visibles para el usuario, en el orden del catálogo. */
-export function getVisibleModules(user: User | null): AppModule[] {
+export function getVisibleModules(user: User | null, hasStatisticsAccess = false): AppModule[] {
   const allowed = new Set<string>(getPermissionModuleIds(user))
-  return APP_MODULES.filter((module) => allowed.has(module.id))
+  return APP_MODULES.filter((module) =>
+    allowed.has(module.id) && (module.id !== "reportes" || hasStatisticsAccess)
+  )
 }
-
