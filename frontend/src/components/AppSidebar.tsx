@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Link, useLocation } from "react-router"
-import { Building2Icon, ChevronDownIcon, HomeIcon, LogOutIcon, ShieldCheckIcon, type LucideIcon, UsersIcon } from "lucide-react"
+import { BarChart3Icon, Building2Icon, ChevronDownIcon, HomeIcon, LogOutIcon, ShieldCheckIcon, type LucideIcon, UsersIcon } from "lucide-react"
 
 import {
   Sidebar,
@@ -20,7 +20,7 @@ import {
 import { useAuth } from "@/modules/auth/hooks/useAuth"
 import { getVisibleModules } from "@/lib/modules"
 import { cn } from "@/lib/utils"
-import { organizationsApi } from "@/modules/organizations/api/organizations.api"
+import { useMyOrganizationMemberships } from "@/modules/organizations/hooks/useMyOrganizationMemberships"
 import estrellita from "@/assets/img/estrellita-blanco.png"
 
 interface NavItem {
@@ -33,26 +33,23 @@ export function AppSidebar() {
   const { logout, user } = useAuth()
   const { pathname } = useLocation()
   const [usersOpen, setUsersOpen] = useState(pathname.startsWith("/usuarios") || pathname.startsWith("/roles"))
-  const [hasOrganizations, setHasOrganizations] = useState(false)
-
-  useEffect(() => {
-    let active = true
-    organizationsApi.listMine()
-      .then((organizations) => { if (active) setHasOrganizations(organizations.length > 0) })
-      .catch(() => { if (active) setHasOrganizations(false) })
-    return () => { active = false }
-  }, [user?.id])
+  const [statisticsOpen, setStatisticsOpen] = useState(pathname.startsWith("/estadisticas") || pathname === "/reportes")
+  const memberships = useMyOrganizationMemberships(user?.id)
+  const hasOrganizations = memberships.length > 0
 
   // Módulos permitidos por los permisos efectivos del perfil.
-  const visibleModules = getVisibleModules(user)
+  const visibleModules = getVisibleModules(user, hasOrganizations)
   const canSeeUsers = visibleModules.some((module) => module.id === "usuarios")
   const canSeeRoles = visibleModules.some((module) => module.id === "roles")
+  const canSeeStatistics = visibleModules.some((module) => module.id === "reportes")
 
   const mainItems: NavItem[] = [
     { title: "Inicio", url: "/", icon: HomeIcon },
-    ...(hasOrganizations ? [{ title: "Mis organizaciones", url: "/mis-organizaciones", icon: Building2Icon }] : []),
+    ...(hasOrganizations ? [
+      { title: "Mis organizaciones", url: "/mis-organizaciones", icon: Building2Icon }
+    ] : []),
     ...visibleModules
-      .filter((module) => module.group === "principal" && module.id !== "usuarios")
+      .filter((module) => module.group === "principal" && module.id !== "usuarios" && module.id !== "reportes")
       .map((module) => ({
         title: module.title,
         url: module.path,
@@ -112,8 +109,27 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Principal</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu className="my-4">{renderItems(mainItems)}</SidebarMenu>
+          <SidebarGroupContent className="">
+            <SidebarMenu className="">{renderItems(mainItems)}</SidebarMenu>
+            {canSeeStatistics && <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={pathname.startsWith("/estadisticas") || pathname === "/reportes"}
+                  tooltip="Estadísticas"
+                  aria-expanded={statisticsOpen}
+                  onClick={() => setStatisticsOpen((open) => !open)}
+                >
+                  <BarChart3Icon aria-hidden="true" />
+                  <span>Estadísticas</span>
+                  <ChevronDownIcon className={cn("ml-auto transition-transform", statisticsOpen && "rotate-180")} aria-hidden="true" />
+                </SidebarMenuButton>
+                {statisticsOpen && <SidebarMenuSub>
+                  <SidebarMenuSubItem><SidebarMenuSubButton isActive={pathname === "/estadisticas/carga-diaria"} render={<Link to="/estadisticas/carga-diaria" />}><span>Carga diaria</span></SidebarMenuSubButton></SidebarMenuSubItem>
+                  <SidebarMenuSubItem><SidebarMenuSubButton isActive={pathname === "/estadisticas/mis-registros"} render={<Link to="/estadisticas/mis-registros" />}><span>Mis Registros</span></SidebarMenuSubButton></SidebarMenuSubItem>
+                  <SidebarMenuSubItem><SidebarMenuSubButton isActive={pathname === "/estadisticas/reportes" || pathname === "/reportes"} render={<Link to="/estadisticas/reportes" />}><span>Reportes</span></SidebarMenuSubButton></SidebarMenuSubItem>
+                </SidebarMenuSub>}
+              </SidebarMenuItem>
+            </SidebarMenu>}
             {(canSeeUsers || canSeeRoles) && (
               <SidebarMenu>
                 <SidebarMenuItem>

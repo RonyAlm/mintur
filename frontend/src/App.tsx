@@ -18,6 +18,9 @@ const RolesPage = lazy(() => import("@/modules/roles/pages/RolesPage"));
 const MyOrganizationsPage = lazy(() => import("@/modules/organizations/pages/MyOrganizationsPage"));
 const AccommodationsPage = lazy(() => import("@/modules/accommodations/pages/AccommodationsPage"));
 const AccommodationDetailPage = lazy(() => import("@/modules/accommodations/pages/AccommodationDetailPage"));
+const AccommodationStatisticsPage = lazy(() => import("@/modules/accommodations/pages/AccommodationStatisticsPage"));
+const OrganizationStatisticsPage = lazy(() => import("@/modules/accommodations/pages/OrganizationStatisticsPage"));
+const AccommodationDailyStatisticDetailPage = lazy(() => import("@/modules/accommodations/pages/AccommodationDailyStatisticDetailPage"));
 const NotFound = lazy(() => import("@/modules/system/pages/NotFound"));
 const Forbidden = lazy(() => import("@/modules/system/pages/Forbidden"));
 
@@ -58,6 +61,14 @@ function App() {
                 element={<Navigate to="/" replace />}
               />
 
+              <Route element={<PermissionRoute permission="accommodation-statistics:read" />}>
+                <Route path="reportes" element={<Navigate to="/estadisticas/reportes" replace />} />
+                <Route path="estadisticas/carga-diaria" element={<OrganizationStatisticsPage view="entry" />} />
+                <Route path="estadisticas/mis-registros" element={<OrganizationStatisticsPage view="records" />} />
+                <Route path="estadisticas/mis-registros/:recordId" element={<AccommodationDailyStatisticDetailPage />} />
+                <Route path="estadisticas/reportes" element={<OrganizationStatisticsPage view="reports" />} />
+              </Route>
+
               {/* Perfil del usuario autenticado */}
               <Route path="perfil" element={<Profile />}>
                 <Route index element={<ProfileAccount />} />
@@ -78,6 +89,9 @@ function App() {
               <Route element={<PermissionRoute permission="accommodations:read" />}>
                 <Route path="alojamientos" element={<AccommodationsPage />} />
                 <Route path="alojamientos/:id" element={<AccommodationDetailPage />} />
+                <Route element={<PermissionRoute permission="accommodation-statistics:read" />}>
+                  <Route path="alojamientos/:id/estadisticas" element={<AccommodationStatisticsPage />} />
+                </Route>
               </Route>
 
               {/* Acceso denegado: no requiere el permiso faltante */}
