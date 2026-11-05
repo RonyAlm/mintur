@@ -180,7 +180,7 @@ export default function AccommodationDailyStatisticDetailPage() {
           <CardContent>
             {origins.length > 0
               ? <Table>
-                <TableHeader className="bg-green-100">
+                <TableHeader className="bg-green-100 dark:bg-green-900/30">
                   <TableRow>
                     <TableHead>Procedencia</TableHead>
                     <TableHead>
