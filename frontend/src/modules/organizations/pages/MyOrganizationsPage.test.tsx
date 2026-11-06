@@ -1,5 +1,6 @@
 import { cleanup, render, screen, waitFor } from "@testing-library/react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
+import { MemoryRouter } from "react-router"
 import { AuthContext, type AuthContextType } from "@/modules/auth/context/authContext"
 import { organizationsApi } from "../api/organizations.api"
 import { accommodationsApi } from "@/modules/accommodations/api/accommodations.api"
@@ -52,7 +53,9 @@ function renderPage(permissions: string[]) {
 
   return render(
     <AuthContext.Provider value={value}>
-      <MyOrganizationsPage />
+      <MemoryRouter>
+        <MyOrganizationsPage />
+      </MemoryRouter>
     </AuthContext.Provider>,
   )
 }
@@ -86,11 +89,16 @@ describe("MyOrganizationsPage", () => {
   })
 
   it("shows the user's organizations and loads member lists only for OWNER/ADMIN when authorized", async () => {
-    renderPage(["organization_members:read"])
+    renderPage(["organization_members:read", "accommodation-statistics:read"])
 
     expect(await screen.findByText("Organization OWNER")).toBeInTheDocument()
     expect(screen.getByText("Organization ADMIN")).toBeInTheDocument()
     expect(screen.getByText("Organization OPERATOR")).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "Mis organizaciones" })).toBeInTheDocument()
+    expect(screen.getByRole("article", { name: "3 Organizaciones" })).toBeInTheDocument()
+    expect(screen.getByRole("article", { name: "5 Miembros" })).toBeInTheDocument()
+    expect(screen.getByRole("article", { name: "2 Administrador" })).toBeInTheDocument()
+    expect(screen.getByRole("article", { name: "3 Operador" })).toBeInTheDocument()
 
     await waitFor(() => {
       expect(organizationsApi.listMembers).toHaveBeenCalledTimes(2)
@@ -100,10 +108,36 @@ describe("MyOrganizationsPage", () => {
     })
     expect(await screen.findAllByText("laura.perez")).toHaveLength(2)
     expect(screen.getAllByText("laura@example.com")).toHaveLength(2)
-    expect(await screen.findByText("Información general del alojamiento")).toBeInTheDocument()
-    expect(screen.getByText("Hotel")).toBeInTheDocument()
-    expect(screen.getByText("Salta")).toBeInTheDocument()
+    expect(await screen.findByText("Información general")).toBeInTheDocument()
+    expect(screen.getAllByText("Hotel")).toHaveLength(2)
+    expect(screen.getAllByText("Salta")).toHaveLength(2)
+    expect(screen.getByRole("link", { name: "Ver estadísticas de Organization OWNER" }))
+      .toHaveAttribute("href", "/estadisticas/reportes?accommodationId=stay-1")
     expect(accommodationsApi.getByOrganization).toHaveBeenCalledWith("org-owner")
+  })
+
+  it("counts operators from the organization members instead of the current user's role", async () => {
+    vi.mocked(organizationsApi.listMine).mockResolvedValue([membership("ADMIN")])
+    vi.mocked(organizationsApi.listMembers).mockResolvedValue([
+      {
+        organizationId: "org-admin",
+        userId: "user-1",
+        role: "ADMIN",
+        user: { id: "user-1", username: "person", email: "person@example.com" },
+      },
+      {
+        organizationId: "org-admin",
+        userId: "user-2",
+        role: "OPERATOR",
+        user: { id: "user-2", username: "laura.perez", email: "laura@example.com" },
+      },
+    ])
+
+    renderPage(["organization_members:read"])
+
+    expect(await screen.findByRole("article", { name: "1 Operador" })).toBeInTheDocument()
+    expect(screen.getByRole("article", { name: "1 Administrador" })).toBeInTheDocument()
+    expect(screen.getByRole("article", { name: "2 Miembros" })).toBeInTheDocument()
   })
 
   it("does not request or show member lists without the global read permission", async () => {
@@ -132,7 +166,9 @@ describe("MyOrganizationsPage", () => {
     } satisfies AuthContextType
     view.rerender(
       <AuthContext.Provider value={updatedAuth}>
-        <MyOrganizationsPage />
+        <MemoryRouter>
+          <MyOrganizationsPage />
+        </MemoryRouter>
       </AuthContext.Provider>,
     )
 
