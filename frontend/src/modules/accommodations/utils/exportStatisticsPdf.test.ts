@@ -2,9 +2,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 import type { AccommodationDailyStatistic, AccommodationStatisticsSummary } from "../types/accommodation-statistics.types"
 import { exportAccommodationStatisticsToPdf } from "./exportStatisticsPdf"
 
-const { saveMock, autoTableMock } = vi.hoisted(() => ({
+const { saveMock, autoTableMock, textMock } = vi.hoisted(() => ({
   saveMock: vi.fn(),
   autoTableMock: vi.fn(),
+  textMock: vi.fn(),
 }))
 
 vi.mock("jspdf", () => {
@@ -15,7 +16,8 @@ vi.mock("jspdf", () => {
     setDrawColor = vi.fn()
     setFillColor = vi.fn()
     setLineWidth = vi.fn()
-    text = vi.fn()
+    text = textMock
+    splitTextToSize = (text: string) => [text]
     moveTo = vi.fn()
     lineTo = vi.fn()
     close = vi.fn()
@@ -70,6 +72,21 @@ describe("exportAccommodationStatisticsToPdf", () => {
 
     expect(saveMock).toHaveBeenCalledTimes(1)
     expect(saveMock).toHaveBeenCalledWith("reporte-de-estadisticas.pdf")
+  })
+
+  it("includes accommodation name, description, and locality in the PDF", () => {
+    exportAccommodationStatisticsToPdf(summary, records, {
+      range: { from: "2026-10-01", to: "2026-10-31" },
+      accommodation: {
+        name: "Hotel Central",
+        description: "Alojamiento en el centro de la ciudad.",
+        locality: "Formosa",
+      },
+    })
+
+    expect(textMock).toHaveBeenCalledWith("Alojamiento: Hotel Central", 14, expect.any(Number))
+    expect(textMock).toHaveBeenCalledWith(["Descripción: Alojamiento en el centro de la ciudad."], 14, expect.any(Number))
+    expect(textMock).toHaveBeenCalledWith("Localidad: Formosa", 14, expect.any(Number))
   })
 
   it("builds one table per report section with the mapped labels", () => {

@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react"
-import { Link, useParams, useSearchParams } from "react-router"
+import { Link, useLocation, useParams, useSearchParams } from "react-router"
 import { ArrowLeftIcon, BriefcaseIcon, CalendarDaysIcon, Globe2Icon, GroupIcon, PencilIcon, Users2Icon } from "lucide-react"
 import { toast } from "sonner"
 
@@ -62,6 +62,7 @@ export function SummaryCard({ title, value, description, icon }: { title: string
 
 export default function AccommodationDailyStatisticDetailPage() {
   const { recordId = "" } = useParams()
+  const location = useLocation()
   const [searchParams] = useSearchParams()
   const accommodationId = searchParams.get("accommodationId") ?? ""
   const auth = useContext(AuthContext)
@@ -89,11 +90,23 @@ export default function AccommodationDailyStatisticDetailPage() {
     return () => { active = false }
   }, [recordId, retryCount])
 
-  const returnPath = `/estadisticas/mis-registros${accommodationId ? `?accommodationId=${encodeURIComponent(accommodationId)}` : ""}`
+  const returnTo = (location.state as { returnTo?: unknown } | null)?.returnTo
+  const isAllowedReturnPath = (path: unknown): path is string =>
+    typeof path === "string" && (
+      /^\/alojamientos\/[^/?]+\/estadisticas(?:\?.*)?$/.test(path) ||
+      /^\/estadisticas\/(?:registros|carga-diaria)(?:\?.*)?$/.test(path) ||
+      /^\/estadisticas\/mis-registros(?:\?.*)?$/.test(path)
+    )
+  const returnPath = isAllowedReturnPath(returnTo)
+    ? returnTo
+    : `/estadisticas/registros${accommodationId ? `?accommodationId=${encodeURIComponent(accommodationId)}` : ""}`
+  const returnLabel = returnPath.startsWith("/alojamientos/")
+    ? "Volver a estadísticas del alojamiento"
+    : "Volver a Registros"
 
   return <main className="mx-auto w-full max-w-6xl space-y-6">
     <Link to={returnPath} className="inline-flex h-9 items-center rounded-md px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground">
-      <ArrowLeftIcon className="mr-2 size-4" />Volver a Mis Registros
+      <ArrowLeftIcon className="mr-2 size-4" />{returnLabel}
     </Link>
 
     {loading && <div role="status" aria-label="Cargando detalle del registro" className="space-y-4"><Skeleton className="h-10 w-72" /><Skeleton className="h-48 w-full" /></div>}
@@ -101,7 +114,7 @@ export default function AccommodationDailyStatisticDetailPage() {
 
     {!loading && !error && record && <>
       <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-        <div><p className="text-sm text-muted-foreground">Mis Registros</p>
+        <div><p className="text-sm text-muted-foreground">Registros</p>
           <h1 className="text-3xl font-semibold tracking-tight">Detalle del registro</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Información del {formatDate(record.date)}.

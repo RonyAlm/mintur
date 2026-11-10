@@ -35,7 +35,7 @@ export default function OrganizationStatisticsPage({ view = "reports" }: Organiz
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const createFormRef = useRef<AccommodationStatisticsPageHandle>(null)
-  const { canCreate } = useStatisticsPermissions()
+  const { canCreate, isSystemRole } = useStatisticsPermissions()
 
   const loadAccommodations = useCallback(async () => {
     setLoading(true)
@@ -88,12 +88,14 @@ export default function OrganizationStatisticsPage({ view = "reports" }: Organiz
       {!loading && !selectedAccommodation && 
       <header className="space-y-2">
         <h1 className="text-3xl font-semibold tracking-tight">
-          {view === "entry" ? "Carga diaria" : view === "records" ? "Mis Registros" : "Reportes"}</h1>
+          {view === "entry" ? "Carga diaria" : view === "records" ? isSystemRole ? "Registros cargados por los miembros" : "Mis Registros" : "Reportes"}</h1>
         <p className="text-sm text-muted-foreground">
           { view === "entry" 
             ? "Registra la actividad diaria de tu alojamiento." 
             : view === "records" 
-              ? "Consulta y edita las cargas anteriores." 
+              ? isSystemRole
+                ? "Consulta las cargas realizadas por los miembros de los alojamientos asignados."
+                : "Consulta y edita las cargas anteriores."
               : "Analiza la actividad estadística de tu alojamiento."
           }
         </p>

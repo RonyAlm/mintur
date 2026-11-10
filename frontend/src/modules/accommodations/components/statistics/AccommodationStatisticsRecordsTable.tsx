@@ -1,4 +1,4 @@
-import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon, ChevronLeftIcon, ChevronRightIcon, EyeIcon } from "lucide-react"
+import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon, CalendarDaysIcon, ChevronLeftIcon, ChevronRightIcon, EyeIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -11,6 +11,7 @@ interface AccommodationStatisticsRecordsTableProps {
   currentPage: number
   pageCount: number
   dateSort: "asc" | "desc" | null
+  isSystemRole: boolean
   canUpdate: boolean
   onSort: () => void
   onPageChange: (page: number) => void
@@ -25,6 +26,7 @@ export default function AccommodationStatisticsRecordsTable({
   currentPage,
   pageCount,
   dateSort,
+  isSystemRole,
   canUpdate,
   onSort,
   onPageChange,
@@ -32,11 +34,19 @@ export default function AccommodationStatisticsRecordsTable({
   onEdit,
 }: AccommodationStatisticsRecordsTableProps) {
   return <Card>
-    <CardHeader>
-      <CardTitle>Mis Registros</CardTitle>
+    <CardHeader className="flex flex-row gap-4 items-center">
+      <div className="p-3 rounded-full bg-green-200/20 dark:bg-green-200/10">
+        <CalendarDaysIcon className="text-green-600 size-4" />
+      </div>
+      <div>
+      <CardTitle>{isSystemRole ? "Registros cargados por los miembros" : "Mis Registros"}</CardTitle>
       <CardDescription className="text-sm text-muted-foreground">
-        Historial de cargas diarias en el período seleccionado.
+        {isSystemRole
+          ? "Historial de cargas diarias realizadas por los miembros en el período seleccionado."
+          : "Historial de cargas diarias en el período seleccionado."}
       </CardDescription>
+      </div>
+
     </CardHeader>
     <CardContent>
       <div className="overflow-x-auto">

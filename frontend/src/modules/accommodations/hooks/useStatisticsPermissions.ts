@@ -32,6 +32,7 @@ export function useStatisticsPermissions() {
   const canManageRecords = isSystemRole || canManageStatistics(memberships)
 
   return {
+    isSystemRole,
     canCreate: canManageRecords && hasPermission(auth?.user ?? null, "accommodation-statistics:create"),
     canUpdate: canManageRecords && hasPermission(auth?.user ?? null, "accommodation-statistics:update"),
   }

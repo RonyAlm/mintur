@@ -7,6 +7,7 @@ import { createTestQueryClient } from "@/test/query-client"
 import { AuthContext, type AuthContextType } from "@/modules/auth/context/authContext"
 import { organizationsApi } from "@/modules/organizations/api/organizations.api"
 import rolesApi from "@/modules/roles/api/roles.api"
+import { accommodationsApi } from "../api/accommodations.api"
 import { accommodationStatisticsApi } from "../api/accommodation-statistics.api"
 import type { AccommodationDailyStatistic, AccommodationStatisticsSummary } from "../types/accommodation-statistics.types"
 import AccommodationStatisticsPage from "./AccommodationStatisticsPage"
@@ -21,6 +22,10 @@ vi.mock("../api/accommodation-statistics.api", () => ({
     getSummary: vi.fn(),
     createDailyStatistic: vi.fn(),
   },
+}))
+
+vi.mock("../api/accommodations.api", () => ({
+  accommodationsApi: { getById: vi.fn() },
 }))
 
 vi.mock("../api/georef.api", () => ({
@@ -40,7 +45,7 @@ vi.mock("@/modules/roles/api/roles.api", () => ({
   default: { getById: vi.fn() },
 }))
 
-vi.mock("sonner", () => ({ toast: { success: vi.fn() } }))
+vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
 
 const { exportMock } = vi.hoisted(() => ({
   exportMock: vi.fn(),
@@ -118,7 +123,7 @@ function renderPage(
         <MemoryRouter initialEntries={["/alojamientos/stay-1/estadisticas"]}>
           <Routes>
             <Route path="/alojamientos/:id/estadisticas" element={<AccommodationStatisticsPage view={view} />} />
-            <Route path="/estadisticas/mis-registros/:recordId" element={<AccommodationDailyStatisticDetailPage />} />
+            <Route path="/estadisticas/registros/:recordId" element={<AccommodationDailyStatisticDetailPage />} />
           </Routes>
         </MemoryRouter>
       </QueryClientProvider>
@@ -133,6 +138,11 @@ describe("AccommodationStatisticsPage", () => {
     vi.mocked(accommodationStatisticsApi.getDailyStatistic).mockResolvedValue(records[0])
     vi.mocked(accommodationStatisticsApi.getSummary).mockResolvedValue(summary)
     vi.mocked(accommodationStatisticsApi.createDailyStatistic).mockResolvedValue(records[0])
+    vi.mocked(accommodationsApi.getById).mockResolvedValue({
+      id: "stay-1",
+      locality: "Formosa",
+      organization: { id: "org-1", name: "Hotel Central", description: "Alojamiento céntrico." },
+    } as never)
   })
 
   afterEach(cleanup)
@@ -147,6 +157,8 @@ describe("AccommodationStatisticsPage", () => {
     expect(screen.getAllByText("Buenos Aires")).toHaveLength(2)
     expect(screen.getByText("Provincia")).toBeInTheDocument()
     expect(screen.getByText("País")).toBeInTheDocument()
+    expect(screen.getByText("Registros cargados por los miembros")).toBeInTheDocument()
+    expect(screen.queryByText("Mis Registros")).not.toBeInTheDocument()
     await waitFor(() => expect(accommodationStatisticsApi.getSummary).toHaveBeenCalledWith(
       "stay-1",
       expect.any(String),
@@ -182,6 +194,13 @@ describe("AccommodationStatisticsPage", () => {
     expect(screen.queryByRole("button", { name: "Nueva Estadística" })).not.toBeInTheDocument()
   })
 
+  it("keeps the personal records label for organization members", async () => {
+    renderPage(["accommodation-statistics:read"], undefined, { memberRole: "OPERATOR", isSystemRole: false })
+
+    expect(await screen.findByText("Mis Registros")).toBeInTheDocument()
+    expect(screen.queryByText("Registros cargados por los miembros")).not.toBeInTheDocument()
+  })
+
   it("opens the daily entry form in a dialog", async () => {
     renderPage(["accommodation-statistics:read", "accommodation-statistics:create"], "entry")
 
@@ -209,12 +228,27 @@ describe("AccommodationStatisticsPage", () => {
     const recordSummary = screen.getByRole("region", { name: "Resumen del registro" })
     expect(within(recordSummary).getByText("2")).toBeInTheDocument()
     expect(screen.queryByText("31 a 45 años")).not.toBeInTheDocument()
-    expect(screen.getByRole("link", { name: "Volver a Mis Registros" })).toHaveAttribute("href", "/estadisticas/mis-registros?accommodationId=stay-1")
+    expect(screen.getByRole("link", { name: "Volver a estadísticas del alojamiento" })).toHaveAttribute("href", "/alojamientos/stay-1/estadisticas")
+    expect(screen.getByText("Registros")).toBeInTheDocument()
+    expect(screen.queryByText("Mis Registros")).not.toBeInTheDocument()
     expect(accommodationStatisticsApi.getDailyStatistic).toHaveBeenCalledWith("record-1")
 
     fireEvent.click(screen.getByRole("button", { name: "Editar registro" }))
     expect(await screen.findByRole("dialog")).toHaveTextContent("Editar registro")
     expect(screen.getByRole("button", { name: "Guardar cambios" })).toBeInTheDocument()
+  })
+
+  it("returns from a record detail to the accommodation statistics table", async () => {
+    const user = userEvent.setup()
+    vi.mocked(accommodationStatisticsApi.getDailyStatistic).mockResolvedValue(records[0])
+    renderPage(["accommodation-statistics:read"])
+
+    await user.click(await screen.findByRole("button", { name: "Ver registro del 27/10/2026" }))
+    expect(await screen.findByRole("heading", { name: "Detalle del registro" })).toBeInTheDocument()
+    await user.click(screen.getByRole("link", { name: "Volver a estadísticas del alojamiento" }))
+
+    expect(await screen.findByRole("heading", { name: "Estadísticas del alojamiento" })).toBeInTheDocument()
+    expect(screen.getByText("Registros cargados por los miembros")).toBeInTheDocument()
   })
 
   it("paginates the Mis Registros table with shadcn-style controls", async () => {
@@ -337,18 +371,36 @@ describe("AccommodationStatisticsPage", () => {
     await screen.findByText("Evolución diaria de huéspedes")
     fireEvent.click(screen.getByRole("button", { name: "Exportar PDF" }))
 
-    expect(exportMock).toHaveBeenCalledWith(
-      summary,
-      records,
-      expect.objectContaining({
-        range: expect.objectContaining({ from: expect.any(String), to: expect.any(String) }),
-        title: "Reporte de estadísticas",
-      }),
-    )
+    await waitFor(() => expect(exportMock).toHaveBeenCalledWith(
+        summary,
+        records,
+        expect.objectContaining({
+          range: expect.objectContaining({ from: expect.any(String), to: expect.any(String) }),
+          title: "Reporte de estadísticas",
+          accommodation: { name: "Hotel Central", description: "Alojamiento céntrico.", locality: "Formosa" },
+        }),
+      ))
+  })
+
+  it("allows system users to export accommodation statistics as PDF", async () => {
+    renderPage()
+
+    await screen.findByText("Evolución diaria de huéspedes")
+    fireEvent.click(screen.getByRole("button", { name: "Exportar PDF" }))
+
+    await waitFor(() => expect(exportMock).toHaveBeenCalledWith(
+        summary,
+        records,
+        expect.objectContaining({
+          range: expect.objectContaining({ from: expect.any(String), to: expect.any(String) }),
+          title: "Reporte de estadísticas",
+          accommodation: { name: "Hotel Central", description: "Alojamiento céntrico.", locality: "Formosa" },
+        }),
+      ))
   })
 
   it("does not show the export action outside the reports view", async () => {
-    renderPage(["accommodation-statistics:read"], "records")
+    renderPage(["accommodation-statistics:read"], "records", { memberRole: "OPERATOR", isSystemRole: false })
     expect(await screen.findByRole("heading", { name: "Mis Registros" })).toBeInTheDocument()
     expect(screen.queryByRole("button", { name: "Exportar PDF" })).not.toBeInTheDocument()
   })

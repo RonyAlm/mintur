@@ -121,6 +121,18 @@ describe("OrganizationStatisticsPage", () => {
     expect(screen.queryByRole("heading", { name: "Huéspedes por rango de edad" })).not.toBeInTheDocument()
   })
 
+  it("labels system-user history as member-loaded records", async () => {
+    vi.mocked(accommodationStatisticsApi.listByAccommodation).mockResolvedValue([{
+      id: "record-1", accommodationId: accommodation.id, date: "2026-11-10", totalGuests: 12,
+      ageRanges: [], travelPurposes: [], origins: [],
+    }])
+    renderPage("records", ["accommodation-statistics:read"], { isSystemRole: true })
+
+    expect(await screen.findByRole("heading", { name: "Registros cargados por los miembros" })).toBeInTheDocument()
+    expect(await screen.findByText("Historial de cargas diarias realizadas por los miembros en el período seleccionado.")).toBeInTheDocument()
+    expect(screen.getByText("12")).toBeInTheDocument()
+  })
+
   it("renders reports separately from record history", async () => {
     renderPage("reports")
     expect(await screen.findByRole("heading", { name: "Reportes" })).toBeInTheDocument()

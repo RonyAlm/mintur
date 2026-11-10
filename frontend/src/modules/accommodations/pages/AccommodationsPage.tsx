@@ -1,7 +1,7 @@
 
 import { useState } from "react"
 import { useNavigate } from "react-router"
-import { Building2Icon, RefreshCwIcon } from "lucide-react"
+import { Building2Icon, ListIcon, RefreshCwIcon } from "lucide-react"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
@@ -88,8 +88,8 @@ export default function AccommodationsPage() {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                        <Building2Icon className="size-6 text-muted-foreground" />
-                        <h1 className="text-2xl font-semibold tracking-tight">
+                        <Building2Icon className="size-6 text-green-600/60" />
+                        <h1 className="text-2xl font-semibold tracking-tight text-green-600">
                             Alojamientos
                         </h1>
                     </div>
@@ -111,7 +111,7 @@ export default function AccommodationsPage() {
                     {
                         canCreate &&
                         <Button
-                            className="p-4 cursor-pointer"
+                            className="bg-green-600 hover:bg-green-700 p-4 cursor-pointer"
                             size="lg"
                             onClick={() => {
                                 setEditingAccommodation(null)
@@ -146,12 +146,15 @@ export default function AccommodationsPage() {
             )}
 
             <Card>
-                <CardHeader>
+                <CardHeader className="flex flex-row gap-4 items-center">
+                
+                        <ListIcon className="size-6 text-green-600/60" />
+                    
                     <CardTitle className="text-base">
                         Listado de alojamientos
                     </CardTitle>
                 </CardHeader>
-                <CardContent className="p-0">
+                <CardContent className="mt-0 p-0">
                     <AccommodationsTable
                         accommodations={accommodations}
                         loading={loading}

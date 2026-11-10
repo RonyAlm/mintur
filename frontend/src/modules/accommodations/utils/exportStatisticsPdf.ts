@@ -15,6 +15,11 @@ interface ExportStatisticsPdfOptions {
   range: ExportStatisticsPdfRange
   title?: string
   fileName?: string
+  accommodation?: {
+    name: string
+    description?: string | null
+    locality?: string | null
+  }
 }
 
 type Rgb = [number, number, number]
@@ -262,7 +267,7 @@ export function exportAccommodationStatisticsToPdf(
   records: AccommodationDailyStatistic[],
   options: ExportStatisticsPdfOptions,
 ) {
-  const { range, title = "Reporte de estadísticas", fileName } = options
+  const { range, title = "Reporte de estadísticas", fileName, accommodation } = options
   const doc = new jsPDF() as PdfDoc
   const marginX = PAGE_MARGIN
   const contentWidth = 210 - PAGE_MARGIN * 2
@@ -322,6 +327,22 @@ export function exportAccommodationStatisticsToPdf(
   doc.setTextColor(60, 60, 60)
   doc.text(`Período: ${formatDate(range.from)} – ${formatDate(range.to)}`, marginX, cursorY)
   cursorY += 6
+
+  if (accommodation) {
+    doc.setFontSize(10)
+    doc.text(`Alojamiento: ${accommodation.name || "No especificado"}`, marginX, cursorY)
+    cursorY += 5
+
+    const descriptionLines = doc.splitTextToSize(
+      `Descripción: ${accommodation.description?.trim() || "No especificada"}`,
+      contentWidth,
+    )
+    doc.text(descriptionLines, marginX, cursorY)
+    cursorY += descriptionLines.length * 5
+
+    doc.text(`Localidad: ${accommodation.locality?.trim() || "No especificada"}`, marginX, cursorY)
+    cursorY += 6
+  }
 
   doc.setFontSize(10)
   doc.text(

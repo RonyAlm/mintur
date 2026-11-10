@@ -1,4 +1,4 @@
-import { EyeIcon, MoreHorizontalIcon, PencilIcon, PowerIcon } from "lucide-react"
+import { ArrowRightIcon, MoreHorizontalIcon, PencilIcon, PowerIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -39,21 +39,23 @@ export function AccommodationActionsMenu({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-44">
         {onSelect && (
-          <DropdownMenuItem onClick={() => onSelect(accommodation)}>
-            <EyeIcon aria-hidden="true" />
-            Ver
+          <DropdownMenuItem 
+            className="cursor-pointer"
+             onClick={() => onSelect(accommodation)}>
+            Mostrar detalles
+            <ArrowRightIcon className="ml-auto" aria-hidden="true" />
           </DropdownMenuItem>
         )}
         {onEdit && (
           <DropdownMenuItem onClick={() => onEdit(accommodation)}>
-            <PencilIcon aria-hidden="true" />
             Editar
+            <PencilIcon className="ml-auto" aria-hidden="true" />
           </DropdownMenuItem>
         )}
         {onToggleStatus && (
           <DropdownMenuItem onClick={() => onToggleStatus(accommodation)}>
-            <PowerIcon aria-hidden="true" />
             {accommodation.isActive ? "Desactivar" : "Activar"}
+            <PowerIcon className="ml-auto" aria-hidden="true" />
           </DropdownMenuItem>
         )}
       </DropdownMenuContent>
