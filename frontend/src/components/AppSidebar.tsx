@@ -125,7 +125,7 @@ export function AppSidebar() {
                 </SidebarMenuButton>
                 {statisticsOpen && <SidebarMenuSub>
                   <SidebarMenuSubItem><SidebarMenuSubButton isActive={pathname === "/estadisticas/carga-diaria"} render={<Link to="/estadisticas/carga-diaria" />}><span>Carga diaria</span></SidebarMenuSubButton></SidebarMenuSubItem>
-                  <SidebarMenuSubItem><SidebarMenuSubButton isActive={pathname === "/estadisticas/mis-registros"} render={<Link to="/estadisticas/mis-registros" />}><span>Mis Registros</span></SidebarMenuSubButton></SidebarMenuSubItem>
+                  <SidebarMenuSubItem><SidebarMenuSubButton isActive={pathname.startsWith("/estadisticas/registros") || pathname.startsWith("/estadisticas/mis-registros")} render={<Link to="/estadisticas/registros" />}><span>Registros</span></SidebarMenuSubButton></SidebarMenuSubItem>
                   <SidebarMenuSubItem><SidebarMenuSubButton isActive={pathname === "/estadisticas/reportes" || pathname === "/reportes"} render={<Link to="/estadisticas/reportes" />}><span>Reportes</span></SidebarMenuSubButton></SidebarMenuSubItem>
                 </SidebarMenuSub>}
               </SidebarMenuItem>

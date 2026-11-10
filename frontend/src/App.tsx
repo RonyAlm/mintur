@@ -64,6 +64,9 @@ function App() {
               <Route element={<PermissionRoute permission="accommodation-statistics:read" />}>
                 <Route path="reportes" element={<Navigate to="/estadisticas/reportes" replace />} />
                 <Route path="estadisticas/carga-diaria" element={<OrganizationStatisticsPage view="entry" />} />
+                <Route path="estadisticas/registros" element={<OrganizationStatisticsPage view="records" />} />
+                <Route path="estadisticas/registros/:recordId" element={<AccommodationDailyStatisticDetailPage />} />
+                {/* Legacy URLs remain available for existing bookmarks. */}
                 <Route path="estadisticas/mis-registros" element={<OrganizationStatisticsPage view="records" />} />
                 <Route path="estadisticas/mis-registros/:recordId" element={<AccommodationDailyStatisticDetailPage />} />
                 <Route path="estadisticas/reportes" element={<OrganizationStatisticsPage view="reports" />} />
