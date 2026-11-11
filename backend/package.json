@@ -5,6 +5,7 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
+  "packageManager": "pnpm@11.20.0",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -36,6 +37,7 @@
     "morgan": "^1.11.0",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
+    "pg": "^8.23.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
@@ -55,6 +57,7 @@
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.0.0",
     "@types/passport-jwt": "^4.0.1",
+    "@types/pg": "^8.23.1",
     "@types/supertest": "^7.2.0",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
@@ -88,5 +91,8 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "engines": {
+    "node": ">=24.12.0 <25"
   }
 }

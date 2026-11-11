@@ -1,10 +1,10 @@
-import 'dotenv/config';
 import {
   Injectable,
   OnModuleInit,
   OnModuleDestroy,
   Logger,
 } from '@nestjs/common';
+
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../../core/lib/generated/prisma/client';
 
@@ -13,30 +13,38 @@ export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
+  private readonly logger = new Logger(PrismaService.name);
+
   constructor() {
+    const connectionString = process.env.DATABASE_URL;
+
+    if (!connectionString) {
+      throw new Error('DATABASE_URL is not configured');
+    }
+
     const adapter = new PrismaPg({
-      connectionString: process.env.DATABASE_URL,
+      connectionString,
     });
 
-    super({
-      adapter,
-    });
+    super({ adapter });
   }
 
   async onModuleInit() {
     try {
       await this.$connect();
-      // console.log(connection);
-      // if (connection === undefined)
-      //   return Logger.error("Couldn't connect to the database");
-      Logger.log('Connected to the database');
+      this.logger.log('Connected to the database');
     } catch (error) {
-      Logger.error("Couldn't connect to the database", error);
+      this.logger.error(
+        "Couldn't connect to the database",
+        error instanceof Error ? error.stack : String(error),
+      );
+
+      throw error;
     }
   }
 
   async onModuleDestroy() {
     await this.$disconnect();
-    Logger.log('Disconnected from the database');
+    this.logger.log('Disconnected from the database');
   }
 }
