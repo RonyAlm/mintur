@@ -10,7 +10,7 @@ import {
   AccommodationStatisticRepository,
   AccommodationTravelPurpose,
 } from '../../domain';
-import { OrganizationAccessService } from 'src/modules/organizations/applications';
+import { OrganizationAccessService } from '../../../../modules/organizations/applications';
 
 export interface GetAllAccommodationsStatisticsSummaryInput {
   currentUser: { id: string; roleId: string };
@@ -116,18 +116,27 @@ export class GetAllAccommodationsStatisticsSummaryUseCase {
   }
 
   private aggregateOrigins(statistics: AccommodationDailyStatistic[]) {
-    const quantities = new Map<AccommodationOriginType, number>();
+    const quantities = new Map<
+      string,
+      { type: AccommodationOriginType; name: string; quantity: number }
+    >();
 
     for (const stat of statistics) {
       for (const origin of stat.origins) {
-        const quantity = quantities.get(origin.type) || 0;
-        quantities.set(origin.type, quantity + origin.quantity);
+        const key = `${origin.type}\u0000${origin.name}`;
+        const aggregated = quantities.get(key);
+        if (aggregated) {
+          aggregated.quantity += origin.quantity;
+        } else {
+          quantities.set(key, {
+            type: origin.type,
+            name: origin.name,
+            quantity: origin.quantity,
+          });
+        }
       }
     }
 
-    return Array.from(quantities.entries()).map(([type, quantity]) => ({
-      type,
-      quantity,
-    }));
+    return Array.from(quantities.values());
   }
 }
