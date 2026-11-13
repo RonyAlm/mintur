@@ -3,6 +3,7 @@ import autoTable from "jspdf-autotable"
 import type {
   AccommodationDailyStatistic,
   AccommodationStatisticsSummary,
+  AllAccommodationsStatisticsSummary,
 } from "../types/accommodation-statistics.types"
 import { ageLabels, originTypeLabels, purposeLabels } from "../constants/accommodation-statistics-labels"
 
@@ -15,6 +16,7 @@ interface ExportStatisticsPdfOptions {
   range: ExportStatisticsPdfRange
   title?: string
   fileName?: string
+  scopeLabel?: string
   accommodation?: {
     name: string
     description?: string | null
@@ -263,11 +265,13 @@ function drawLineChart(
 }
 
 export function exportAccommodationStatisticsToPdf(
-  summary: AccommodationStatisticsSummary,
+  summary: AccommodationStatisticsSummary | AllAccommodationsStatisticsSummary,
   records: AccommodationDailyStatistic[],
   options: ExportStatisticsPdfOptions,
 ) {
-  const { range, title = "Reporte de estadísticas", fileName, accommodation } = options
+  const { range, title = "Reporte de estadísticas", fileName, scopeLabel, accommodation } = options
+  const isGlobalSummary = "accomodationsCount" in summary
+  const totalRecords = isGlobalSummary ? summary.totalRecords : records.length
   const doc = new jsPDF() as PdfDoc
   const marginX = PAGE_MARGIN
   const contentWidth = 210 - PAGE_MARGIN * 2
@@ -342,17 +346,25 @@ export function exportAccommodationStatisticsToPdf(
 
     doc.text(`Localidad: ${accommodation.locality?.trim() || "No especificada"}`, marginX, cursorY)
     cursorY += 6
+  } else if (scopeLabel) {
+    doc.setFontSize(10)
+    doc.text(`Alcance: ${scopeLabel}`, marginX, cursorY)
+    cursorY += 6
   }
 
   doc.setFontSize(10)
   doc.text(
-    `Huéspedes registrados: ${toNumber(summary.totalGuests)}   ·   Registros diarios: ${records.length}   ·   Origenes registrados: ${summary.origins.length}`,
+    isGlobalSummary
+      ? `Huéspedes registrados: ${toNumber(summary.totalGuests)}   ·   Registros diarios: ${totalRecords}   ·   Alojamientos con registros: ${summary.accomodationsCount}`
+      : `Huéspedes registrados: ${toNumber(summary.totalGuests)}   ·   Registros diarios: ${totalRecords}   ·   Origenes registrados: ${summary.origins.length}`,
     marginX,
     cursorY,
   )
   cursorY += 12
 
   // ── Evolución diaria de huéspedes ────────────────────────────────────────
+  // El resumen global no expone registros diarios por alojamiento, así que la
+  // sección se omite en lugar de imprimir una nota vacía.
   const guestTrendData = [...records]
     .sort((left, right) => left.date.slice(0, 10).localeCompare(right.date.slice(0, 10)))
     .map((record) => ({
@@ -360,23 +372,25 @@ export function exportAccommodationStatisticsToPdf(
       value: record.totalGuests,
     }))
 
-  addSectionTitle("Evolución diaria de huéspedes")
-  if (guestTrendData.length) {
-    ensureSpace(60)
-    drawLineChart(doc, guestTrendData, {
-      x: marginX,
-      y: cursorY,
-      width: contentWidth,
-      height: 50,
-      color: [21, 238, 57],
-    })
-    cursorY += 55
-    drawTable(
-      ["Fecha", "Huéspedes"],
-      guestTrendData.map((d) => [d.label, toNumber(d.value)]),
-    )
-  } else {
-    drawEmptyNote()
+  if (!isGlobalSummary) {
+    addSectionTitle("Evolución diaria de huéspedes")
+    if (guestTrendData.length) {
+      ensureSpace(60)
+      drawLineChart(doc, guestTrendData, {
+        x: marginX,
+        y: cursorY,
+        width: contentWidth,
+        height: 50,
+        color: [21, 238, 57],
+      })
+      cursorY += 55
+      drawTable(
+        ["Fecha", "Huéspedes"],
+        guestTrendData.map((d) => [d.label, toNumber(d.value)]),
+      )
+    } else {
+      drawEmptyNote()
+    }
   }
 
   // ── Huéspedes por rango de edad ──────────────────────────────────────────

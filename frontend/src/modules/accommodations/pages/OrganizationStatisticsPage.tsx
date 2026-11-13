@@ -16,7 +16,7 @@ import type { Accommodation } from "../types/accommodation.types"
 import AccommodationStatisticsPage, { type AccommodationStatisticsPageHandle } from "./AccommodationStatisticsPage"
 import { PlusIcon, RefreshCwIcon } from "lucide-react"
 
-export type StatisticsView = "entry" | "records" | "reports"
+export type StatisticsView = "entry" | "records" | "reports" | "summary"
 
 interface OrganizationStatisticsPageProps {
   view?: StatisticsView

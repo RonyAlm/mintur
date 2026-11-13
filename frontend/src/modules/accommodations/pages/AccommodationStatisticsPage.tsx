@@ -19,13 +19,10 @@ import { useStatisticsPermissions } from "../hooks/useStatisticsPermissions"
 import type { StatisticsView } from "./OrganizationStatisticsPage"
 import type { AccommodationDailyStatistic } from "../types/accommodation-statistics.types"
 import { exportAccommodationStatisticsToPdf } from "../utils/exportStatisticsPdf"
+import { getMonthRange, getWeekRange, getYearRange, toDateInputValue } from "../utils/statisticsPeriods"
 import { accommodationsApi } from "../api/accommodations.api"
 
 const RECORDS_PER_PAGE = 10
-
-function toDateInputValue(date: Date) {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`
-}
 
 function formatConfirmationDate(value: string) {
   return new Date(`${value.slice(0, 10)}T00:00:00`).toLocaleDateString("es-AR", {
@@ -33,25 +30,6 @@ function formatConfirmationDate(value: string) {
     month: "long",
     year: "numeric",
   })
-}
-
-function getWeekRange(today: Date) {
-  const from = new Date(today.getFullYear(), today.getMonth(), today.getDate())
-  from.setDate(from.getDate() - ((from.getDay() + 6) % 7))
-  const to = new Date(from)
-  to.setDate(to.getDate() + 6)
-  return { from: toDateInputValue(from), to: toDateInputValue(to) }
-}
-
-function getMonthRange(today: Date) {
-  return {
-    from: toDateInputValue(new Date(today.getFullYear(), today.getMonth(), 1)),
-    to: toDateInputValue(new Date(today.getFullYear(), today.getMonth() + 1, 0)),
-  }
-}
-
-function getYearRange(today: Date) {
-  return { from: toDateInputValue(new Date(today.getFullYear(), 0, 1)), to: toDateInputValue(new Date(today.getFullYear(), 11, 31)) }
 }
 
 interface AccommodationStatisticsPageProps {
@@ -73,7 +51,7 @@ const AccommodationStatisticsPage = forwardRef<AccommodationStatisticsPageHandle
     const id = accommodationId ?? routeId
     const [initialRange] = useState(() => {
       if (view === "entry") return getMonthRange(new Date())
-      if (view === "records" || view === "reports") return getWeekRange(new Date())
+      if (view === "records" || view === "reports" || view === "summary") return getWeekRange(new Date())
       return undefined
     })
     const { range, setRange, summary, records, loading, error, reload } = useAccommodationStatistics(id, initialRange)
@@ -91,10 +69,11 @@ const AccommodationStatisticsPage = forwardRef<AccommodationStatisticsPageHandle
     }), [])
     const [recordsPage, setRecordsPage] = useState(1)
     const [dateSort, setDateSort] = useState<"asc" | "desc" | null>(null)
-    const [recordsPeriod, setRecordsPeriod] = useState<StatisticsPeriod>(() => view === "records" || view === "reports" ? "week" : "custom")
+    const [recordsPeriod, setRecordsPeriod] = useState<StatisticsPeriod>(() => view === "records" || view === "reports" || view === "summary" ? "week" : "custom")
     const entryOnly = view === "entry"
     const recordsOnly = view === "records"
     const reportsOnly = view === "reports"
+    const summaryOnly = view === "summary"
     const sortedRecords = dateSort
       ? [...records].sort((left, right) => {
         const comparison = left.date.slice(0, 10).localeCompare(right.date.slice(0, 10))
@@ -156,22 +135,22 @@ const AccommodationStatisticsPage = forwardRef<AccommodationStatisticsPageHandle
         <AccommodationStatisticsPageHeader
           accommodationId={id}
           hideBackLink={hideBackLink}
-          title={entryOnly ? "Estadísticas diarias" : recordsOnly ? isSystemRole ? "Registros cargados por los miembros" : "Mis Registros" : reportsOnly ? "Reportes" : "Estadísticas del alojamiento"}
+          title={entryOnly ? "Estadísticas diarias" : recordsOnly ? isSystemRole ? "Registros cargados por los miembros" : "Mis Registros" : reportsOnly ? "Reportes" : summaryOnly ? "Resumen" : "Estadísticas del alojamiento"}
           description={entryOnly ? "Gestioná la información estadística de tu alojamiento." : recordsOnly ? "Historial de cargas diarias de tu alojamiento." : "Consulta la actividad y composición de los huéspedes."}
           entryOnly={entryOnly}
           canCreate={canCreate}
           showCreateAction={!hideCreateAction}
-          showPeriodFilters={recordsOnly || reportsOnly}
-          periodFilterLabel={reportsOnly ? "Filtrar reportes por período" : "Filtrar registros por período"}
+          showPeriodFilters={recordsOnly || reportsOnly || summaryOnly}
+          periodFilterLabel={reportsOnly ? "Filtrar reportes por período" : summaryOnly ? "Filtrar resumen por período" : "Filtrar registros por período"}
           period={recordsPeriod}
           range={range}
           onPeriodChange={selectRecordsPeriod}
           onRangeChange={(nextRange) => {
             setRecordsPage(1)
-            if (recordsOnly || reportsOnly) setRecordsPeriod("custom")
+            if (recordsOnly || reportsOnly || summaryOnly) setRecordsPeriod("custom")
             setRange(nextRange)
           }}
-          showExportAction={reportsOnly || (isSystemRole && !entryOnly)}
+          showExportAction={reportsOnly || (isSystemRole && !entryOnly && !summaryOnly)}
           onExport={handleExport}
           onCreate={() => {
             setCreateInitialDate(undefined)
@@ -248,7 +227,7 @@ const AccommodationStatisticsPage = forwardRef<AccommodationStatisticsPageHandle
                 <p className="mt-1 text-sm text-muted-foreground">Prueba con otro rango de fechas o carga un registro diario.</p>
               </div>
             }
-            {(recordsOnly || !reportsOnly) && records.length > 0 && <AccommodationStatisticsRecordsTable
+            {(recordsOnly || (!reportsOnly && !summaryOnly)) && records.length > 0 && <AccommodationStatisticsRecordsTable
               records={pageRecords}
               totalRecords={records.length}
               pageSize={RECORDS_PER_PAGE}

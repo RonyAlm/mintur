@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { ArrowLeftIcon, BedDoubleIcon, BedIcon, Building2Icon, CheckCircle2Icon, Globe2Icon, HotelIcon, InfoIcon, ListTree, MailIcon, MapPinIcon, MessageCircle, PhoneIcon, SquareUser, UserPlusIcon, UserRoundXIcon, UsersIcon } from "lucide-react"
 import { Link, useParams } from "react-router"
 import { toast } from "sonner"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
@@ -14,12 +15,12 @@ import { accommodationsApi } from "../api/accommodations.api"
 import { organizationsApi, type OrganizationMember, type OrganizationMemberRole } from "@/modules/organizations/api/organizations.api"
 import { useAuth } from "@/modules/auth/hooks/useAuth"
 import { hasPermission } from "@/lib/modules"
-import rolesApi, { type ManagedRole } from "@/modules/roles/api/roles.api"
-import usersApi, { type ManagedUser } from "@/modules/users/api/users.api"
+import rolesApi from "@/modules/roles/api/roles.api"
+import usersApi from "@/modules/users/api/users.api"
 import { getEligibleMemberUsers } from "@/modules/organizations/utils/eligible-member-users"
 import AccommodationWeeklyStatisticsCard from "../components/statistics/AccommodationWeeklyStatisticsCard"
 import { accommodationTypes } from "../constants/accommodation-options"
-import { AccommodationType, type Accommodation } from "../types/accommodation.types"
+import { AccommodationType } from "../types/accommodation.types"
 
 function Detail({ label, value, icon, link }:
   { label: string; value?: string | number | null, icon?: React.ReactNode, link?: string | null }) {
@@ -49,69 +50,87 @@ function Detail({ label, value, icon, link }:
 export default function AccommodationDetailPage() {
   const { id = "" } = useParams()
   const { user } = useAuth()
-  const [accommodation, setAccommodation] = useState<Accommodation | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [members, setMembers] = useState<OrganizationMember[]>([])
+  const queryClient = useQueryClient()
+
   const [memberRole, setMemberRole] = useState<OrganizationMemberRole>("OPERATOR")
   const [memberError, setMemberError] = useState<string | null>(null)
   const [addMemberDialogOpen, setAddMemberDialogOpen] = useState(false)
-  const [candidateUsers, setCandidateUsers] = useState<ManagedUser[]>([])
-  const [candidateRoles, setCandidateRoles] = useState<ManagedRole[]>([])
   const [selectedUserId, setSelectedUserId] = useState("")
-  const [loadingCandidates, setLoadingCandidates] = useState(false)
   const [savingMember, setSavingMember] = useState(false)
   const [memberToRemove, setMemberToRemove] = useState<OrganizationMember | null>(null)
-  const [isSystemUser, setIsSystemUser] = useState(false)
-  const [canViewOrgMembers, setCanViewOrgMembers] = useState(false)
 
-  useEffect(() => {
-    let active = true
-    if (!user?.role.id) {
-      setIsSystemUser(false)
-      return () => { active = false }
-    }
-    rolesApi.getById(user.role.id)
-      .then((role) => { if (active) setIsSystemUser(role.isSystemRole) })
-      .catch(() => { if (active) setIsSystemUser(false) })
-    return () => { active = false }
-  }, [user?.role.id])
+  const roleId = user?.role.id
+  const roleQuery = useQuery({
+    queryKey: ["role", roleId],
+    queryFn: () => {
+      if (!roleId) throw new Error("El usuario no tiene un rol asociado.")
+      return rolesApi.getById(roleId)
+    },
+    enabled: Boolean(roleId),
+    retry: false,
+  })
+  const isSystemUser = roleQuery.data?.isSystemRole ?? false
+  const isRoleLoading = Boolean(roleId) && roleQuery.isPending
 
-  useEffect(() => {
-    let active = true
-    // setLoading(true)
-    accommodationsApi.getById(id)
-      .then((result) => { if (active) setAccommodation(result) })
-      .catch((reason) => { if (active) setError(getApiErrorMessage(reason)) })
-      .finally(() => { if (active) setLoading(false) })
-    return () => { active = false }
-  }, [id])
+  const accommodationQuery = useQuery({
+    queryKey: ["accommodation", id],
+    queryFn: () => {
+      if (!id) throw new Error("Falta el identificador del alojamiento.")
+      return accommodationsApi.getById(id)
+    },
+    enabled: Boolean(id),
+    retry: false,
+  })
+  const accommodation = accommodationQuery.data ?? null
+  const error = accommodationQuery.isError ? getApiErrorMessage(accommodationQuery.error) : null
 
-  useEffect(() => {
-    let active = true
-    if (!accommodation) return () => { active = false }
-    if (isSystemUser) setCanViewOrgMembers(true)
-    else {
-      organizationsApi.listMine().then((mine) => {
-        const membership = mine.find(({ organizationId }) => organizationId === accommodation.organizationId)
-        if (active) setCanViewOrgMembers(membership?.role === "OWNER" || membership?.role === "ADMIN")
-      }).catch(() => { if (active) setCanViewOrgMembers(false) })
-    }
-    return () => { active = false }
-  }, [accommodation, isSystemUser])
-
-  useEffect(() => {
-    if (!accommodation || !canViewOrgMembers || !hasPermission(user, "organization_members:read")) return
-    let active = true
-    organizationsApi.listMembers(accommodation.organizationId)
-      .then((result) => { if (active) setMembers(result) })
-      .catch(() => { if (active) setMemberError("No se pudieron cargar los miembros de la organización.") })
-    return () => { active = false }
-  }, [accommodation, canViewOrgMembers, user])
-
-  const canReadMembers = canViewOrgMembers && hasPermission(user, "organization_members:read")
+  const membershipQuery = useQuery({
+    queryKey: ["my-organization-memberships", user?.id],
+    queryFn: () => organizationsApi.listMine(),
+    enabled: Boolean(accommodation) && !isRoleLoading && !isSystemUser,
+    retry: false,
+  })
+  const membership = membershipQuery.data?.find(
+    ({ organizationId }) => organizationId === accommodation?.organizationId,
+  )
+  const canViewOrgMembers = isSystemUser
+    || membership?.role === "OWNER"
+    || membership?.role === "ADMIN"
+  const canReadMembersPermission = hasPermission(user, "organization_members:read")
+  const canReadMembers = canViewOrgMembers && canReadMembersPermission
   const canReadStatistics = hasPermission(user, "accommodation-statistics:read")
   const canManageMembers = isSystemUser && hasPermission(user, "organization_members:create") && hasPermission(user, "organization_members:delete")
+
+  const membersQueryKey = ["organization-members", accommodation?.organizationId]
+  const membersQuery = useQuery({
+    queryKey: membersQueryKey,
+    queryFn: () => {
+      if (!accommodation) throw new Error("No se cargó el alojamiento.")
+      return organizationsApi.listMembers(accommodation.organizationId)
+    },
+    enabled: Boolean(accommodation) && canReadMembers,
+    retry: false,
+  })
+  const members = useMemo(() => membersQuery.data ?? [], [membersQuery.data])
+  const membersError = membersQuery.isError
+    ? "No se pudieron cargar los miembros de la organización."
+    : null
+
+  const candidatesQuery = useQuery({
+    queryKey: ["member-candidates"],
+    queryFn: async () => {
+      const [users, roles] = await Promise.all([usersApi.list(), rolesApi.list()])
+      return { users, roles }
+    },
+    enabled: addMemberDialogOpen,
+    retry: false,
+  })
+  const candidateUsers = useMemo(() => candidatesQuery.data?.users ?? [], [candidatesQuery.data])
+  const candidateRoles = useMemo(() => candidatesQuery.data?.roles ?? [], [candidatesQuery.data])
+  const loadingCandidates = addMemberDialogOpen && candidatesQuery.isPending
+  const candidatesError = candidatesQuery.isError && !candidatesQuery.isFetching
+    ? "No se pudo cargar la lista de usuarios disponibles."
+    : null
 
   const eligibleUsers = useMemo(
     () => getEligibleMemberUsers(
@@ -130,39 +149,23 @@ export default function AccommodationDetailPage() {
   )
   const selectedUser = userOptions.find(({ value }) => value === selectedUserId) ?? null
 
-  useEffect(() => {
-    if (!addMemberDialogOpen) return
-    let active = true
-    setLoadingCandidates(true)
-    setMemberError(null)
-    Promise.all([usersApi.list(), rolesApi.list()])
-      .then(([users, roles]) => {
-        if (!active) return
-        setCandidateUsers(users)
-        setCandidateRoles(roles)
-      })
-      .catch(() => {
-        if (active) setMemberError("No se pudo cargar la lista de usuarios disponibles.")
-      })
-      .finally(() => { if (active) setLoadingCandidates(false) })
-    return () => { active = false }
-  }, [addMemberDialogOpen])
-
   async function addMember(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!accommodation || !selectedUserId) return
     setMemberError(null)
     setSavingMember(true)
     try {
-      await organizationsApi.addMember(accommodation.organizationId, { userId: selectedUserId, role: memberRole })
+      const createdMember = await organizationsApi.addMember(
+        accommodation.organizationId,
+        { userId: selectedUserId, role: memberRole },
+      )
+      queryClient.setQueryData<OrganizationMember[]>(
+        ["organization-members", accommodation.organizationId],
+        (current) => current ? [...current, createdMember] : [createdMember],
+      )
       toast.success("El miembro se agregó correctamente.")
       setSelectedUserId("")
       setAddMemberDialogOpen(false)
-      try {
-        setMembers(await organizationsApi.listMembers(accommodation.organizationId))
-      } catch {
-        setMemberError("El miembro se agregó, pero no se pudo actualizar la lista.")
-      }
     } catch {
       setMemberError("No se pudo agregar el miembro. Verifica tus permisos.")
       toast.error("No se pudo agregar el miembro.")
@@ -175,7 +178,10 @@ export default function AccommodationDetailPage() {
     setMemberError(null)
     try {
       await organizationsApi.removeMember(accommodation.organizationId, userId)
-      setMembers((current) => current.filter((member) => member.userId !== userId))
+      queryClient.setQueryData<OrganizationMember[]>(
+        ["organization-members", accommodation.organizationId],
+        (current) => current?.filter((member) => member.userId !== userId) ?? [],
+      )
       toast.success("El miembro se removió correctamente.")
     } catch {
       setMemberError("No se pudo remover el miembro.")
@@ -188,7 +194,7 @@ export default function AccommodationDetailPage() {
       <Link to="/alojamientos" className="inline-flex h-9 items-center rounded-md px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground">
         <ArrowLeftIcon className="mr-2 size-4" />Volver a alojamientos
       </Link>
-      {loading ? <div className="rounded-xl border bg-card p-10 text-sm text-muted-foreground" role="status">Cargando detalle del alojamiento…</div>
+      {accommodationQuery.isLoading ? <div className="rounded-xl border bg-card p-10 text-sm text-muted-foreground" role="status">Cargando detalle del alojamiento…</div>
         : error || !accommodation ? (
           <Alert variant="destructive"><AlertTitle>No se pudo cargar el alojamiento</AlertTitle>
             <AlertDescription>{error ?? "No se encontró el alojamiento solicitado."}</AlertDescription>
@@ -339,8 +345,8 @@ export default function AccommodationDetailPage() {
                     <CardTitle>Miembros de la organización</CardTitle>
                   </CardHeader>
                   <CardContent className="flex flex-col gap-2 px-4">
-                    {memberError &&
-                      <p role="alert" className="text-sm text-destructive">{memberError}</p>}
+                    {(memberError ?? membersError) &&
+                      <p role="alert" className="text-sm text-destructive">{memberError ?? membersError}</p>}
                     {members.length === 0 ?
                       <p className="text-sm text-muted-foreground">No hay miembros para mostrar.</p> : (
                         <ul className="space-y-2">
@@ -392,7 +398,7 @@ export default function AccommodationDetailPage() {
                               <DialogDescription>Selecciona un usuario que no tenga un rol de sistema para agregarlo a esta organización.</DialogDescription>
                             </DialogHeader>
                             <form onSubmit={(event) => void addMember(event)} className="grid gap-4">
-                              {memberError && <p role="alert" className="text-sm text-destructive">{memberError}</p>}
+                              {(memberError ?? candidatesError) && <p role="alert" className="text-sm text-destructive">{memberError ?? candidatesError}</p>}
                               <Combobox
                                 items={userOptions}
                                 value={selectedUser}
@@ -448,7 +454,9 @@ export default function AccommodationDetailPage() {
                 </Card>
                 <AccommodationWeeklyStatisticsCard
                   accommodationId={id}
-                  detailsPath={`/alojamientos/${id}/estadisticas`}
+                  detailsPath={isSystemUser
+                    ? `/alojamientos/estadisticas/reportes?accommodationId=${encodeURIComponent(id)}`
+                    : `/alojamientos/${id}/estadisticas`}
                 />
               </section>
             )}

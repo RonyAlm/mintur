@@ -2,7 +2,7 @@ import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, Too
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import type { AccommodationDailyStatistic, AccommodationStatisticsSummary } from "../../types/accommodation-statistics.types"
+import type { AccommodationDailyStatistic, AccommodationStatisticsSummary, AllAccommodationsStatisticsSummary } from "../../types/accommodation-statistics.types"
 import { ageLabels, originTypeLabels, purposeLabels } from "../../constants/accommodation-statistics-labels"
 import { CalendarDaysIcon, ChartArea, ChartBar, ChartPie, Globe2Icon, Users2Icon } from "lucide-react"
 
@@ -41,11 +41,12 @@ function SummaryCard({ title, value, description, icon }: { title: string; value
 }
 
 interface AccommodationStatisticsReportsProps {
-  summary: AccommodationStatisticsSummary
+  summary: AccommodationStatisticsSummary | AllAccommodationsStatisticsSummary
   records: AccommodationDailyStatistic[]
 }
 
 export default function AccommodationStatisticsReports({ summary, records }: AccommodationStatisticsReportsProps) {
+  const isGlobalSummary = "accomodationsCount" in summary
   const chartData = summary.ageRanges.map(({ ageRange, quantity }) => ({ name: ageLabels[ageRange] ?? ageRange, quantity }))
   const purposeChartData = summary.travelPurposes.map(({ purpose, quantity }) => ({ name: purposeLabels[purpose] ?? purpose, quantity }))
   const originChartData = summary.origins.map((origin) => ({
@@ -65,13 +66,13 @@ export default function AccommodationStatisticsReports({ summary, records }: Acc
         value={summary.totalGuests.toLocaleString("es-AR")}
         description="Total para el período seleccionado" />
       <SummaryCard title="Registros diarios" icon="calendar"
-        value={records.length.toLocaleString("es-AR")}
-        description="Días con información cargada" />
-      <SummaryCard title="Origen registrado" icon="globe"
-        value={summary.origins.length.toLocaleString("es-AR")}
-        description="Procedencias incluidas en el período" />
+        value={(isGlobalSummary ? summary.totalRecords : records.length).toLocaleString("es-AR")}
+        description={isGlobalSummary ? "Registros en el período seleccionado" : "Días con información cargada"} />
+      <SummaryCard title={isGlobalSummary ? "Alojamientos con registros" : "Origen registrado"} icon="globe"
+        value={(isGlobalSummary ? summary.accomodationsCount : summary.origins.length).toLocaleString("es-AR")}
+        description={isGlobalSummary ? "Alojamientos con actividad en el período" : "Procedencias incluidas en el período"} />
     </section>
-    <Card>
+    {!isGlobalSummary && <Card>
       <CardHeader className="flex flex-row gap-4 items-center mb-4">
         <div className="p-3 rounded-full bg-green-200/20 dark:bg-green-200/10">
           <ChartArea className="text-green-600 size-4" />
@@ -103,7 +104,7 @@ export default function AccommodationStatisticsReports({ summary, records }: Acc
           </ChartContainer>
           : <p className="py-12 text-center text-sm text-muted-foreground">Sin registros diarios para mostrar en este período.</p>}
       </CardContent>
-    </Card>
+    </Card>}
     <section className="grid gap-5 lg:grid-cols-2">
       <Card>
         <CardHeader className="flex flex-row gap-4 items-center mb-4">

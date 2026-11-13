@@ -20,6 +20,7 @@ const AccommodationsPage = lazy(() => import("@/modules/accommodations/pages/Acc
 const AccommodationDetailPage = lazy(() => import("@/modules/accommodations/pages/AccommodationDetailPage"));
 const AccommodationStatisticsPage = lazy(() => import("@/modules/accommodations/pages/AccommodationStatisticsPage"));
 const OrganizationStatisticsPage = lazy(() => import("@/modules/accommodations/pages/OrganizationStatisticsPage"));
+const SystemAccommodationStatisticsPage = lazy(() => import("@/modules/accommodations/pages/SystemAccommodationStatisticsPage"));
 const AccommodationDailyStatisticDetailPage = lazy(() => import("@/modules/accommodations/pages/AccommodationDailyStatisticDetailPage"));
 const NotFound = lazy(() => import("@/modules/system/pages/NotFound"));
 const Forbidden = lazy(() => import("@/modules/system/pages/Forbidden"));
@@ -93,6 +94,9 @@ function App() {
                 <Route path="alojamientos" element={<AccommodationsPage />} />
                 <Route path="alojamientos/:id" element={<AccommodationDetailPage />} />
                 <Route element={<PermissionRoute permission="accommodation-statistics:read" />}>
+                  <Route path="alojamientos/estadisticas" element={<SystemAccommodationStatisticsPage view="summary" />} />
+                  <Route path="alojamientos/estadisticas/registros" element={<SystemAccommodationStatisticsPage view="records" />} />
+                  <Route path="alojamientos/estadisticas/reportes" element={<SystemAccommodationStatisticsPage view="reports" />} />
                   <Route path="alojamientos/:id/estadisticas" element={<AccommodationStatisticsPage />} />
                 </Route>
               </Route>

@@ -21,6 +21,7 @@ import { useAuth } from "@/modules/auth/hooks/useAuth"
 import { getVisibleModules } from "@/lib/modules"
 import { cn } from "@/lib/utils"
 import { useMyOrganizationMemberships } from "@/modules/organizations/hooks/useMyOrganizationMemberships"
+import { useStatisticsPermissions } from "@/modules/accommodations/hooks/useStatisticsPermissions"
 import estrellita from "@/assets/img/estrellita-blanco.png"
 
 interface NavItem {
@@ -34,14 +35,19 @@ export function AppSidebar() {
   const { pathname } = useLocation()
   const [usersOpen, setUsersOpen] = useState(pathname.startsWith("/usuarios") || pathname.startsWith("/roles"))
   const [statisticsOpen, setStatisticsOpen] = useState(pathname.startsWith("/estadisticas") || pathname === "/reportes")
+  const [accommodationsOpen, setAccommodationsOpen] = useState(pathname.startsWith("/alojamientos"))
+  const [accommodationStatisticsOpen, setAccommodationStatisticsOpen] = useState(pathname.startsWith("/alojamientos/estadisticas"))
   const memberships = useMyOrganizationMemberships(user?.id)
   const hasOrganizations = memberships.length > 0
+  const { isSystemRole } = useStatisticsPermissions()
 
   // Módulos permitidos por los permisos efectivos del perfil.
-  const visibleModules = getVisibleModules(user, hasOrganizations)
+  const visibleModules = getVisibleModules(user, hasOrganizations || isSystemRole)
   const canSeeUsers = visibleModules.some((module) => module.id === "usuarios")
   const canSeeRoles = visibleModules.some((module) => module.id === "roles")
   const canSeeStatistics = visibleModules.some((module) => module.id === "reportes")
+  const canSeeAccommodations = visibleModules.some((module) => module.id === "alojamientos")
+  const hasSystemAccommodationStatistics = isSystemRole && canSeeAccommodations && canSeeStatistics
 
   const mainItems: NavItem[] = [
     { title: "Inicio", url: "/", icon: HomeIcon },
@@ -50,6 +56,7 @@ export function AppSidebar() {
     ] : []),
     ...visibleModules
       .filter((module) => module.group === "principal" && module.id !== "usuarios" && module.id !== "reportes")
+      .filter((module) => !(hasSystemAccommodationStatistics && module.id === "alojamientos"))
       .map((module) => ({
         title: module.title,
         url: module.path,
@@ -111,7 +118,68 @@ export function AppSidebar() {
           <SidebarGroupLabel>Principal</SidebarGroupLabel>
           <SidebarGroupContent className="">
             <SidebarMenu className="">{renderItems(mainItems)}</SidebarMenu>
-            {canSeeStatistics && <SidebarMenu>
+            {hasSystemAccommodationStatistics && <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={pathname.startsWith("/alojamientos")}
+                  tooltip="Alojamientos"
+                  aria-expanded={accommodationsOpen}
+                  onClick={() => setAccommodationsOpen((open) => !open)}
+                >
+                  <Building2Icon aria-hidden="true" />
+                  <span>Alojamientos</span>
+                  <ChevronDownIcon className={cn("ml-auto transition-transform", accommodationsOpen && "rotate-180")} aria-hidden="true" />
+                </SidebarMenuButton>
+                {accommodationsOpen && <SidebarMenuSub>
+                  <SidebarMenuSubItem>
+                    <SidebarMenuSubButton
+                      isActive={pathname === "/alojamientos"}
+                      render={<Link to="/alojamientos" />}
+                    >
+                      <span>Todos los alojamientos</span>
+                    </SidebarMenuSubButton>
+                  </SidebarMenuSubItem>
+                  <SidebarMenuSubItem>
+                    <SidebarMenuSubButton
+                      isActive={pathname.startsWith("/alojamientos/estadisticas")}
+                      aria-expanded={accommodationStatisticsOpen}
+                      onClick={() => setAccommodationStatisticsOpen((open) => !open)}
+                    >
+                      <BarChart3Icon aria-hidden="true" />
+                      <span>Estadísticas</span>
+                      <ChevronDownIcon className={cn("ml-auto transition-transform", accommodationStatisticsOpen && "rotate-180")} aria-hidden="true" />
+                    </SidebarMenuSubButton>
+                    {accommodationStatisticsOpen && <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          isActive={pathname === "/alojamientos/estadisticas"}
+                          render={<Link to="/alojamientos/estadisticas" />}
+                        >
+                          <span>Resumen</span>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          isActive={pathname.startsWith("/alojamientos/estadisticas/registros")}
+                          render={<Link to="/alojamientos/estadisticas/registros" />}
+                        >
+                          <span>Registros diarios</span>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          isActive={pathname === "/alojamientos/estadisticas/reportes"}
+                          render={<Link to="/alojamientos/estadisticas/reportes" />}
+                        >
+                          <span>Reportes</span>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>}
+                  </SidebarMenuSubItem>
+                </SidebarMenuSub>}
+              </SidebarMenuItem>
+            </SidebarMenu>}
+            {canSeeStatistics && !hasSystemAccommodationStatistics && <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton
                   isActive={pathname.startsWith("/estadisticas") || pathname === "/reportes"}
@@ -124,9 +192,27 @@ export function AppSidebar() {
                   <ChevronDownIcon className={cn("ml-auto transition-transform", statisticsOpen && "rotate-180")} aria-hidden="true" />
                 </SidebarMenuButton>
                 {statisticsOpen && <SidebarMenuSub>
-                  <SidebarMenuSubItem><SidebarMenuSubButton isActive={pathname === "/estadisticas/carga-diaria"} render={<Link to="/estadisticas/carga-diaria" />}><span>Carga diaria</span></SidebarMenuSubButton></SidebarMenuSubItem>
-                  <SidebarMenuSubItem><SidebarMenuSubButton isActive={pathname.startsWith("/estadisticas/registros") || pathname.startsWith("/estadisticas/mis-registros")} render={<Link to="/estadisticas/registros" />}><span>Registros</span></SidebarMenuSubButton></SidebarMenuSubItem>
-                  <SidebarMenuSubItem><SidebarMenuSubButton isActive={pathname === "/estadisticas/reportes" || pathname === "/reportes"} render={<Link to="/estadisticas/reportes" />}><span>Reportes</span></SidebarMenuSubButton></SidebarMenuSubItem>
+                  <SidebarMenuSubItem>
+                     <SidebarMenuSubButton 
+                         isActive={pathname === "/estadisticas/carga-diaria"} 
+                         render={<Link to="/estadisticas/carga-diaria" />}>
+                           <span>Carga diaria</span>
+                     </SidebarMenuSubButton>
+                  </SidebarMenuSubItem>
+                  <SidebarMenuSubItem>
+                     <SidebarMenuSubButton 
+                         isActive={pathname.startsWith("/estadisticas/registros") || pathname.startsWith("/estadisticas/mis-registros")} 
+                         render={<Link to="/estadisticas/registros" />}>
+                           <span>Registros</span>
+                     </SidebarMenuSubButton>
+                  </SidebarMenuSubItem>
+                  <SidebarMenuSubItem>
+                     <SidebarMenuSubButton 
+                         isActive={pathname === "/estadisticas/reportes" || pathname === "/reportes"} 
+                         render={<Link to="/estadisticas/reportes" />}>
+                           <span>Reportes</span>
+                     </SidebarMenuSubButton>
+                  </SidebarMenuSubItem>
                 </SidebarMenuSub>}
               </SidebarMenuItem>
             </SidebarMenu>}

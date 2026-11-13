@@ -1,6 +1,6 @@
 import { api } from "@/lib/axios"
 import type { Accommodation } from "../types/accommodation.types"
-import type { AccommodationDailyStatistic, AccommodationStatisticsSummary, CreateAccommodationDailyStatisticRequest, UpdateAccommodationDailyStatisticRequest } from "../types/accommodation-statistics.types"
+import type { AccommodationDailyStatistic, AccommodationStatisticsSummary, AllAccommodationsStatisticsSummary, CreateAccommodationDailyStatisticRequest, UpdateAccommodationDailyStatisticRequest } from "../types/accommodation-statistics.types"
 
 export const accommodationStatisticsApi = {
   async listMemberAccommodations(): Promise<Accommodation[]> {
@@ -32,6 +32,13 @@ export const accommodationStatisticsApi = {
 
   async getSummary(accommodationId: string, from: string, to: string): Promise<AccommodationStatisticsSummary> {
     const { data } = await api.get<AccommodationStatisticsSummary>(`/accommodation-statistics/accommodation/${accommodationId}/summary`, {
+      params: { from, to },
+    })
+    return data
+  },
+
+  async getAllSummary(from: string, to: string): Promise<AllAccommodationsStatisticsSummary> {
+    const { data } = await api.get<AllAccommodationsStatisticsSummary>("/accommodation-statistics/summary", {
       params: { from, to },
     })
     return data

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import type { AccommodationDailyStatistic, AccommodationStatisticsSummary } from "../types/accommodation-statistics.types"
+import type { AccommodationDailyStatistic, AccommodationStatisticsSummary, AllAccommodationsStatisticsSummary } from "../types/accommodation-statistics.types"
 import { exportAccommodationStatisticsToPdf } from "./exportStatisticsPdf"
 
 const { saveMock, autoTableMock, textMock } = vi.hoisted(() => ({
@@ -59,6 +59,12 @@ const records: AccommodationDailyStatistic[] = [
   { id: "r2", accommodationId: "a1", date: "2026-10-02", totalGuests: 10, ageRanges: [], travelPurposes: [], origins: [] },
   { id: "r1", accommodationId: "a1", date: "2026-10-01", totalGuests: 5, ageRanges: [], travelPurposes: [], origins: [] },
 ]
+
+const globalSummary: AllAccommodationsStatisticsSummary = {
+  ...summary,
+  totalRecords: 7,
+  accomodationsCount: 3,
+}
 
 describe("exportAccommodationStatisticsToPdf", () => {
   beforeEach(() => {
@@ -124,5 +130,26 @@ describe("exportAccommodationStatisticsToPdf", () => {
       ["Formosa", "Provincia", "25"],
       ["Brasil", "País", "15"],
     ])
+  })
+
+  it("reports the global summary scope with its own counters and without a daily trend", () => {
+    exportAccommodationStatisticsToPdf(globalSummary, [], {
+      range: { from: "2026-10-01", to: "2026-10-31" },
+      scopeLabel: "Todos los alojamientos",
+    })
+
+    expect(textMock).toHaveBeenCalledWith("Alcance: Todos los alojamientos", 14, expect.any(Number))
+    expect(textMock).toHaveBeenCalledWith(
+      expect.stringContaining("Registros diarios: 7"),
+      14,
+      expect.any(Number),
+    )
+    expect(textMock).toHaveBeenCalledWith(
+      expect.stringContaining("Alojamientos con registros: 3"),
+      14,
+      expect.any(Number),
+    )
+    // Sin registros diarios globales no se dibuja la sección de evolución.
+    expect(autoTableMock).toHaveBeenCalledTimes(3)
   })
 })

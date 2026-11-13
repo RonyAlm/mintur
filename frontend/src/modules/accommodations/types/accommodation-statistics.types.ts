@@ -50,3 +50,8 @@ export interface AccommodationStatisticsSummary {
   travelPurposes: { purpose: AccommodationTravelPurpose; quantity: number }[]
   origins: { type: AccommodationOriginType; name: string; quantity: number }[]
 }
+
+export interface AllAccommodationsStatisticsSummary extends AccommodationStatisticsSummary {
+  totalRecords: number
+  accomodationsCount: number
+}

@@ -108,6 +108,7 @@ function renderPage() {
         <MemoryRouter initialEntries={["/alojamientos/stay-1"]}>
           <Routes>
             <Route path="/alojamientos/:id" element={<AccommodationDetailPage />} />
+            <Route path="/alojamientos/estadisticas/reportes" element={<div>Reportes de estadísticas</div>} />
             <Route path="/alojamientos/:id/estadisticas" element={<div>Estadísticas del alojamiento</div>} />
           </Routes>
         </MemoryRouter>
@@ -157,6 +158,7 @@ describe("AccommodationDetailPage member controls", () => {
       role: "OPERATOR",
     }))
     expect(toast.success).toHaveBeenCalledWith("El miembro se agregó correctamente.")
+    expect(await screen.findByText("regular-user")).toBeInTheDocument()
   })
 
   it("requires confirmation before removing a member and shows a success toast", async () => {
@@ -176,9 +178,10 @@ describe("AccommodationDetailPage member controls", () => {
 
     await waitFor(() => expect(organizationsApi.removeMember).toHaveBeenCalledWith("org-1", "member-1"))
     expect(toast.success).toHaveBeenCalledWith("El miembro se removió correctamente.")
+    await waitFor(() => expect(screen.queryByText("existing-member")).not.toBeInTheDocument())
   })
 
-  it("summarizes the current week and links to the statistics page", async () => {
+  it("summarizes the current week and links system users to the reports view", async () => {
     const user = userEvent.setup()
     const monday = startOfWeek(new Date(), { weekStartsOn: 1 })
     vi.mocked(accommodationStatisticsApi.listByAccommodation).mockResolvedValue([
@@ -198,7 +201,28 @@ describe("AccommodationDetailPage member controls", () => {
     )
 
     const detailsLink = screen.getByRole("link", { name: /Ver más detalles/ })
-    expect(detailsLink).toHaveAttribute("href", "/alojamientos/stay-1/estadisticas")
+    await waitFor(() => expect(detailsLink).toHaveAttribute(
+      "href",
+      "/alojamientos/estadisticas/reportes?accommodationId=stay-1",
+    ))
+    await user.click(detailsLink)
+    expect(await screen.findByText("Reportes de estadísticas")).toBeInTheDocument()
+  })
+
+  it("keeps the per-accommodation statistics link for non-system users", async () => {
+    vi.mocked(rolesApi.getById).mockResolvedValue({ id: "role-user", name: "User", description: null, isSystemRole: false })
+    vi.mocked(organizationsApi.listMine).mockResolvedValue([{
+      organizationId: "org-1",
+      userId: "member-1",
+      role: "ADMIN",
+      organization: { id: "org-1", name: "Hotel Uno", type: "PRIVATE", isActive: true },
+    }])
+    const user = userEvent.setup()
+
+    renderPage()
+
+    const detailsLink = await screen.findByRole("link", { name: /Ver más detalles/ })
+    await waitFor(() => expect(detailsLink).toHaveAttribute("href", "/alojamientos/stay-1/estadisticas"))
     await user.click(detailsLink)
     expect(await screen.findByText("Estadísticas del alojamiento")).toBeInTheDocument()
   })
