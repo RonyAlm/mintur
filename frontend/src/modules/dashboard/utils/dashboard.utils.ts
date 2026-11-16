@@ -1,6 +1,9 @@
-import { format, parseISO, startOfWeek } from "date-fns"
+import { differenceInCalendarDays, format, parseISO, startOfMonth, startOfWeek, subDays } from "date-fns"
 import { es } from "date-fns/locale"
-import { purposeLabels } from "@/modules/accommodations/constants/accommodation-statistics-labels"
+import {
+  originTypeLabels,
+  purposeLabels,
+} from "@/modules/accommodations/constants/accommodation-statistics-labels"
 import type { Accommodation } from "@/modules/accommodations/types/accommodation.types"
 import type {
   AccommodationDailyStatistic,
@@ -8,10 +11,18 @@ import type {
 } from "@/modules/accommodations/types/accommodation-statistics.types"
 import type {
   DailyGuestPoint,
+  DashboardDateRange,
   DashboardVariant,
+  LatestRecord,
+  LoadAlert,
+  MinistryPeriod,
+  OriginSlice,
+  PeriodComparison,
   PurposeSlice,
   WeeklyGuestPoint,
 } from "../types/dashboard.types"
+
+const DATE_KEY = "yyyy-MM-dd"
 
 /**
  * Nombre visible de un alojamiento: organización + localidad, cuando existe.
@@ -115,4 +126,117 @@ export function countDistinctOrigins(
     if (normalized) names.add(normalized)
   }
   return names.size
+}
+
+/**
+ * Rango de fechas para los períodos rápidos del dashboard de Ministerio.
+ * `7d`/`30d` son ventanas hacia atrás desde hoy; `month` es el mes corriente.
+ */
+export function getMinistryPeriodRange(
+  period: Exclude<MinistryPeriod, "custom">,
+  today = new Date(),
+): DashboardDateRange {
+  if (period === "month") {
+    return {
+      from: format(startOfMonth(today), DATE_KEY),
+      to: format(today, DATE_KEY),
+    }
+  }
+  const days = period === "30d" ? 30 : 7
+  return {
+    from: format(subDays(today, days - 1), DATE_KEY),
+    to: format(today, DATE_KEY),
+  }
+}
+
+/**
+ * Período inmediatamente anterior al rango dado, con la misma duración.
+ * Útil para la comparación entre períodos.
+ */
+export function getPreviousPeriodRange(range: DashboardDateRange): DashboardDateRange {
+  const from = parseISO(range.from)
+  const to = parseISO(range.to)
+  const duration = differenceInCalendarDays(to, from)
+  const prevTo = subDays(from, 1)
+  const prevFrom = subDays(prevTo, duration)
+  return { from: format(prevFrom, DATE_KEY), to: format(prevTo, DATE_KEY) }
+}
+
+/**
+ * Ordena los registros por fecha descendente y resuelve el nombre del
+ * alojamiento para los más recientes.
+ */
+export function buildLatestRecords(
+  records: AccommodationDailyStatistic[],
+  accommodationNameById: ReadonlyMap<string, string>,
+  limit = 5,
+): LatestRecord[] {
+  return [...records]
+    .sort((left, right) => right.date.slice(0, 10).localeCompare(left.date.slice(0, 10)))
+    .slice(0, limit)
+    .map((record) => ({
+      id: record.id,
+      accommodationId: record.accommodationId,
+      accommodationName: accommodationNameById.get(record.accommodationId) ?? record.accommodationId,
+      date: record.date,
+      totalGuests: record.totalGuests,
+    }))
+}
+
+/**
+ * Alojamientos activos que llevan `thresholdDays` o más sin cargar (o que
+ * nunca cargaron). Ordenados del más crítico (nunca cargó) al menos crítico.
+ */
+export function computeLoadAlerts(
+  activeAccommodations: ReadonlyArray<{ id: string; name: string }>,
+  latestLoadDates: ReadonlyMap<string, string | null>,
+  now: Date,
+  thresholdDays: number,
+): LoadAlert[] {
+  const alerts: LoadAlert[] = []
+
+  for (const accommodation of activeAccommodations) {
+    const latest = latestLoadDates.get(accommodation.id)
+    let daysSinceLoad: number | null
+    if (latest) {
+      daysSinceLoad = differenceInCalendarDays(now, parseISO(latest))
+      if (daysSinceLoad < thresholdDays) continue
+    } else {
+      daysSinceLoad = null
+    }
+    alerts.push({
+      accommodationId: accommodation.id,
+      accommodationName: accommodation.name,
+      daysSinceLoad,
+    })
+  }
+
+  return alerts.sort((left, right) => {
+    const lv = left.daysSinceLoad === null ? Number.POSITIVE_INFINITY : left.daysSinceLoad
+    const rv = right.daysSinceLoad === null ? Number.POSITIVE_INFINITY : right.daysSinceLoad
+    return rv - lv
+  })
+}
+
+/**
+ * Convierte la procedencia del resumen en porciones etiquetadas.
+ */
+export function buildOriginDistribution(
+  summary: AccommodationStatisticsSummary | null,
+): OriginSlice[] {
+  if (!summary) return []
+  return summary.origins.map((origin) => ({
+    name: origin.name,
+    type: originTypeLabels[origin.type] ?? origin.type,
+    quantity: origin.quantity,
+  }))
+}
+
+/**
+ * Compara el total de visitantes entre el período actual y el anterior.
+ */
+export function buildComparison(current: number, previous: number): PeriodComparison {
+  const delta = current - previous
+  const deltaPercent = previous === 0 ? null : Math.round((delta / previous) * 100)
+  return { current, previous, delta, deltaPercent }
 }

@@ -1,10 +1,15 @@
 import { describe, expect, it } from "vitest"
 import type { AccommodationStatisticsSummary } from "@/modules/accommodations/types/accommodation-statistics.types"
 import {
+  buildComparison,
   buildDailyEvolution,
+  buildLatestRecords,
   buildPurposeDistribution,
   buildWeeklyGuests,
+  computeLoadAlerts,
   countDistinctOrigins,
+  getMinistryPeriodRange,
+  getPreviousPeriodRange,
   resolveDashboardVariant,
 } from "./dashboard.utils"
 
@@ -91,5 +96,74 @@ describe("countDistinctOrigins", () => {
 
   it("returns zero when there is no summary", () => {
     expect(countDistinctOrigins(null)).toBe(0)
+  })
+})
+
+describe("getMinistryPeriodRange", () => {
+  const today = new Date(2026, 10, 16) // 16/11/2026
+
+  it("computes the last 7 days", () => {
+    expect(getMinistryPeriodRange("7d", today)).toEqual({ from: "2026-11-10", to: "2026-11-16" })
+  })
+
+  it("computes the last 30 days", () => {
+    expect(getMinistryPeriodRange("30d", today)).toEqual({ from: "2026-10-18", to: "2026-11-16" })
+  })
+
+  it("computes the current month", () => {
+    expect(getMinistryPeriodRange("month", today)).toEqual({ from: "2026-11-01", to: "2026-11-16" })
+  })
+})
+
+describe("getPreviousPeriodRange", () => {
+  it("returns the immediately preceding range of the same duration", () => {
+    expect(getPreviousPeriodRange({ from: "2026-11-10", to: "2026-11-16" })).toEqual({
+      from: "2026-11-03",
+      to: "2026-11-09",
+    })
+  })
+})
+
+describe("buildLatestRecords", () => {
+  const records = [
+    { id: "1", accommodationId: "a", date: "2026-11-10", totalGuests: 4, ageRanges: [], travelPurposes: [], origins: [] },
+    { id: "2", accommodationId: "b", date: "2026-11-15", totalGuests: 9, ageRanges: [], travelPurposes: [], origins: [] },
+  ]
+
+  it("sorts by date desc and resolves the accommodation name", () => {
+    const result = buildLatestRecords(records, new Map([["a", "Hotel A"], ["b", "Hotel B"]]))
+    expect(result.map((r) => r.accommodationName)).toEqual(["Hotel B", "Hotel A"])
+    expect(result[0].totalGuests).toBe(9)
+  })
+})
+
+describe("computeLoadAlerts", () => {
+  const now = new Date(2026, 10, 16)
+  const accommodations = [
+    { id: "a", name: "Hotel A" },
+    { id: "b", name: "Hotel B" },
+    { id: "c", name: "Hotel C" },
+  ]
+
+  it("flags accommodations with no recent load, never-loaded first", () => {
+    const latest = new Map<string, string | null>([
+      ["a", "2026-11-15"],
+      ["b", "2026-11-10"],
+      ["c", null],
+    ])
+    const result = computeLoadAlerts(accommodations, latest, now, 5)
+    expect(result.map((r) => r.accommodationId)).toEqual(["c", "b"])
+    expect(result[0].daysSinceLoad).toBeNull()
+    expect(result[1].daysSinceLoad).toBe(6)
+  })
+})
+
+describe("buildComparison", () => {
+  it("computes delta and percentage", () => {
+    expect(buildComparison(120, 100)).toEqual({ current: 120, previous: 100, delta: 20, deltaPercent: 20 })
+  })
+
+  it("returns null percentage when previous is zero", () => {
+    expect(buildComparison(80, 0)).toEqual({ current: 80, previous: 0, delta: 80, deltaPercent: null })
   })
 })
