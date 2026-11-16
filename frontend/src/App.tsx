@@ -9,7 +9,7 @@ import { PermissionRoute } from "@/modules/auth/components/permission-route";
 // Code splitting por ruta.
 const AuthLayout = lazy(() => import("@/modules/auth/pages/AuthLayout"));
 const Login = lazy(() => import("@/modules/auth/pages/Login"));
-const Dashboard = lazy(() => import("@/modules/dashboard/pages/Dashboard"));
+const Dashboard = lazy(() => import("@/modules/dashboard/pages/DashboardPage"));
 const Profile = lazy(() => import("@/modules/profile/pages/Profile"));
 const ProfileAccount = lazy(() => import("@/modules/profile/pages/ProfileAccount"));
 const ProfilePassword = lazy(() => import("@/modules/profile/pages/ProfilePassword"));
