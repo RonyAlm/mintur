@@ -13,6 +13,7 @@ Test runner: `pnpm test` (vitest), `pnpm build`, `pnpm lint`
 - S4: Organización de carpetas: `src/modules/dashboard/` con `pages/DashboardPage.tsx`, `components/` (MinistryDashboard, OwnerDashboard, OperatorDashboard, DashboardHeader, DashboardFilters, StatCard, WeeklyLoadStatus, RecentRecords), `hooks/` (useMinistryDashboard, useOwnerDashboard, useOperatorDashboard), `types/dashboard.types.ts`.
 - S5: "Quiero que respete la arquitectura y la organizacion del codigo, adapta el contrato del backend api, no modifique el backend solo el fronend." — Sin cambios en backend; reutiliza `accommodation-statistics` API y hooks existentes.
 - S6: "Utiliza los componentes shadcn." — Usar `@/components/ui/*`.
+- S7: Vista Ministerio — "Vista global" de supervisión. Encabezado: "Saludo personalizado", "Nombre del usuario", "Selector de período: últimos 7 días, 30 días, mes actual o personalizado", "Notificaciones". Indicadores: "Visitantes" (total), "Alojamientos activos" (habilitados), "Cargas registradas" (estadísticas diarias). Gráficos: "Evolución de visitantes", "Motivos del viaje", "Procedencia de visitantes", "Comparación entre períodos". Secciones: "Estado de carga" (registraron vs pendientes), "Últimos registros" (alojamiento, fecha, visitantes, estado). Acciones rápidas: "Ver alojamientos", "Consultar registros diarios", "Ver reportes", "Administrar organizaciones". Recomendación: "alertas de alojamientos que llevan varios días sin cargar estadísticas". Mantener "los modulos habilitados".
 
 ## Tasks
 
@@ -21,9 +22,13 @@ Test runner: `pnpm test` (vitest), `pnpm build`, `pnpm lint`
 - [x] T3 (S2, S3, S5) route=inline — Hooks: useMinistryDashboard, useOwnerDashboard, useOperatorDashboard. commit=d1c5472
 - [x] T4 (S2, S3, S6) route=inline — Componentes de vista: MinistryDashboard, OwnerDashboard, OperatorDashboard. commit=d1c5472
 - [x] T5 (S1) route=inline — `pages/DashboardPage.tsx`, cablear ruta en App.tsx, retirar Dashboard.tsx anterior. commit=1db50ef
+- [x] T6 (S7) route=inline — Vista global Ministerio: períodos/rangos, `useMinistryDashboard` con resumen global + comparación + detalle por alojamiento, `MinistryPeriodFilters`, `NotificationsMenu`, `MinistryDashboard` (indicadores, 4 gráficos, estado de carga, últimos registros, alertas, acciones rápidas, módulos). commit=4b19fe6,0ccadd2
 
 ## Log
 
 - L1: "quiero mejorar el dashboard del frontend, cada usuarios tiene su su propio dashboard de inicio. ... (spec completa Owner/Admin, Operador, estructura de carpetas, shadcn)"
 - L2 (verificación): `tsc -b` OK, `eslint src/modules/dashboard src/App.tsx` OK, `pnpm build` OK, tests de `dashboard.utils` 10/10 verdes. Fallas preexistentes en `accommodations` (4 timeouts) no relacionadas con este cambio.
+- L3: "Ahora el usuario de sistema, quiero tenga los siguientes; Administrador del Ministerio — Vista global ..." (spec completa). Implementado frontend-only: el backend no expone serie diaria global ni listado de últimos registros, por lo que se combinan registros por alojamiento (`listByAccommodation` por cada alojamiento activo) con `Promise.allSettled`.
+- L4 (verificación T6): `tsc -b` OK, `eslint` OK, `pnpm build` OK, tests `dashboard.utils` 18/18 verdes.
+
 
