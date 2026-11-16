@@ -16,12 +16,14 @@ Test runner: `pnpm test` (vitest), `pnpm build`, `pnpm lint`
 
 ## Tasks
 
-- T1 (S1, S4, S5) route=inline — `types/dashboard.types.ts` + `utils/dashboard.utils.ts` (resolución de rol y métricas puras) + tests. commit=—
-- T2 (S4, S6) route=inline — Componentes compartidos: StatCard, DashboardHeader, DashboardFilters, WeeklyLoadStatus, RecentRecords. commit=—
-- T3 (S2, S3, S5) route=inline — Hooks: useMinistryDashboard, useOwnerDashboard, useOperatorDashboard. commit=—
-- T4 (S2, S3, S6) route=inline — Componentes de vista: MinistryDashboard, OwnerDashboard, OperatorDashboard. commit=—
-- T5 (S1) route=inline — `pages/DashboardPage.tsx`, cablear ruta en App.tsx, retirar Dashboard.tsx anterior. commit=—
+- [x] T1 (S1, S4, S5) route=inline — `types/dashboard.types.ts` + `utils/dashboard.utils.ts` (resolución de rol y métricas puras) + tests. commit=5a4d985
+- [x] T2 (S4, S6) route=inline — Componentes compartidos: StatCard, DashboardHeader, DashboardFilters, WeeklyLoadStatus, RecentRecords. commit=5a4d985
+- [x] T3 (S2, S3, S5) route=inline — Hooks: useMinistryDashboard, useOwnerDashboard, useOperatorDashboard. commit=d1c5472
+- [x] T4 (S2, S3, S6) route=inline — Componentes de vista: MinistryDashboard, OwnerDashboard, OperatorDashboard. commit=d1c5472
+- [x] T5 (S1) route=inline — `pages/DashboardPage.tsx`, cablear ruta en App.tsx, retirar Dashboard.tsx anterior. commit=1db50ef
 
 ## Log
 
 - L1: "quiero mejorar el dashboard del frontend, cada usuarios tiene su su propio dashboard de inicio. ... (spec completa Owner/Admin, Operador, estructura de carpetas, shadcn)"
+- L2 (verificación): `tsc -b` OK, `eslint src/modules/dashboard src/App.tsx` OK, `pnpm build` OK, tests de `dashboard.utils` 10/10 verdes. Fallas preexistentes en `accommodations` (4 timeouts) no relacionadas con este cambio.
+
