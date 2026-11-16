@@ -1,8 +1,8 @@
 
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import { toast } from "sonner"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -51,9 +51,19 @@ import {
 
 type FormValues = CreateAccommodationFormValues
 
+const steps = ["organization", "general", "address", "contacts"] as const
+
+type FormStep = typeof steps[number]
+
 interface AccommodationFormDialogProps {
   open: boolean
   accommodation?: Accommodation | null
+  onOpenChange: (open: boolean) => void
+  onSaved: () => Promise<void> | void
+}
+
+interface AccommodationFormProps {
+  accommodation: Accommodation | null
   onOpenChange: (open: boolean) => void
   onSaved: () => Promise<void> | void
 }
@@ -64,24 +74,38 @@ export function AccommodationFormDialog({
   onOpenChange,
   onSaved,
 }: AccommodationFormDialogProps) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+        <AccommodationForm
+          key={accommodation?.id ?? "new"}
+          accommodation={accommodation ?? null}
+          onOpenChange={onOpenChange}
+          onSaved={onSaved}
+        />
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function AccommodationForm({
+  accommodation,
+  onOpenChange,
+  onSaved,
+}: AccommodationFormProps) {
   const editing = Boolean(accommodation)
-  const [step, setStep] = useState<typeof steps[number]>("organization")
-  const steps = ["organization", "general", "address", "contacts"] as const
+  const [step, setStep] = useState<FormStep>("organization")
   const allowSubmitRef = useRef(false)
 
   const form = useForm<FormValues>({
     resolver: zodResolver(accommodationFormSchema),
-    defaultValues: emptyAccommodationFormValues,
+    defaultValues: accommodation
+      ? accommodationToFormValues(accommodation)
+      : emptyAccommodationFormValues,
   })
 
-  useEffect(() => {
-    if (!open) return
-    setStep("organization")
-
-    form.reset(
-      accommodation ? accommodationToFormValues(accommodation) : emptyAccommodationFormValues,
-    )
-  }, [open, accommodation, form])
+  const selectedType = useWatch({ control: form.control, name: "type" })
+  const selectedLocality = useWatch({ control: form.control, name: "locality" })
 
   const onSubmit = form.handleSubmit(async (values) => {
     form.clearErrors("root")
@@ -153,213 +177,211 @@ export function AccommodationFormDialog({
   ]
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>
-            {editing ? "Editar alojamiento" : "Nuevo alojamiento"}
-          </DialogTitle>
-          <DialogDescription>
-            Completá los datos de la organización y del establecimiento.
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <DialogHeader>
+        <DialogTitle>
+          {editing ? "Editar alojamiento" : "Nuevo alojamiento"}
+        </DialogTitle>
+        <DialogDescription>
+          Completá los datos de la organización y del establecimiento.
+        </DialogDescription>
+      </DialogHeader>
 
-        <form
-          onSubmit={(event) => {
-            event.preventDefault()
-            if (!allowSubmitRef.current) return
-            allowSubmitRef.current = false
-            void onSubmit(event)
-          }}
-          className="space-y-6"
-        >
-          <Tabs value={step}>
-          <ol aria-label="Pasos del formulario" className="grid grid-cols-4 gap-2 text-center text-xs">
-            {steps.map((value, index) => (
-              <li key={value} aria-current={step === value ? "step" : undefined} className={step === value ? "border-b-2 border-primary pb-2 font-semibold text-foreground" : "border-b pb-2 text-muted-foreground"}>
-                <span className="mr-1">{index + 1}.</span>{["Organización", "Alojamiento", "Dirección", "Contactos"][index]}
-              </li>
-            ))}
-          </ol>
-          <TabsContent value="organization">
-            <section className="space-y-4 py-8">
-              {/* <h3 className="font-semibold">Organización</h3> */}
+      <form
+        onSubmit={(event) => {
+          event.preventDefault()
+          if (!allowSubmitRef.current) return
+          allowSubmitRef.current = false
+          void onSubmit(event)
+        }}
+        className="space-y-6"
+      >
+        <Tabs value={step}>
+        <ol aria-label="Pasos del formulario" className="grid grid-cols-4 gap-2 text-center text-xs">
+          {steps.map((value, index) => (
+            <li key={value} aria-current={step === value ? "step" : undefined} className={step === value ? "border-b-2 border-primary pb-2 font-semibold text-foreground" : "border-b pb-2 text-muted-foreground"}>
+              <span className="mr-1">{index + 1}.</span>{["Organización", "Alojamiento", "Dirección", "Contactos"][index]}
+            </li>
+          ))}
+        </ol>
+        <TabsContent value="organization">
+          <section className="space-y-4 py-8">
+            {/* <h3 className="font-semibold">Organización</h3> */}
 
-              <div className="space-y-2">
-                <Label htmlFor="organizationName">Nombre *</Label>
-                <Input
-                  id="organizationName"
-                  {...form.register("organizationName")}
-                />
-                {form.formState.errors.organizationName && (
+            <div className="space-y-2">
+              <Label htmlFor="organizationName">Nombre *</Label>
+              <Input
+                id="organizationName"
+                {...form.register("organizationName")}
+              />
+              {form.formState.errors.organizationName && (
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.organizationName.message}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="organizationDescription">Descripción</Label>
+              <Textarea
+                id="organizationDescription"
+                {...form.register("organizationDescription")}
+              />
+            </div>
+          </section>
+        </TabsContent>
+
+        <TabsContent value="general">
+            <section className="space-y-4">
+              <div className="space-y-2 my-4">
+                <Label htmlFor="type">Tipo de Alojamiento *</Label>
+                <Combobox
+                  items={accommodationTypeValues}
+                  value={selectedType}
+                  itemToStringLabel={(value) =>
+                    accommodationTypes.find((item) => item.value === value)?.label ?? ""
+                  }
+                  filter={(value, query, itemToString) =>
+                    normalizeAccommodationSearchText(itemToString?.(value) ?? String(value)).includes(
+                      normalizeAccommodationSearchText(query),
+                    )
+                  }
+                  onValueChange={(value) => {
+                    if (value) {
+                      form.setValue("type", value as AccommodationType, {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      })
+                    }
+                  }}
+                >
+                  <ComboboxInput
+                    id="type"
+                    aria-label="Tipo de alojamiento"
+                    placeholder="Selecciona un tipo"
+                    className="w-full"
+                  >
+                    <ComboboxContent>
+                      <ComboboxEmpty>No se encontraron resultados.</ComboboxEmpty>
+                      <ComboboxList>
+                        {(value) => (
+                          <ComboboxItem key={value} value={value}>
+                            {accommodationTypes.find((item) => item.value === value)?.label}
+                          </ComboboxItem>
+                        )}
+                      </ComboboxList>
+                    </ComboboxContent>
+                  </ComboboxInput>
+                </Combobox>
+                {form.formState.errors.type && (
                   <p className="text-sm text-destructive">
-                    {form.formState.errors.organizationName.message}
+                    {form.formState.errors.type.message}
                   </p>
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="organizationDescription">Descripción</Label>
-                <Textarea
-                  id="organizationDescription"
-                  {...form.register("organizationDescription")}
-                />
-              </div>
-            </section>
-          </TabsContent>
-
-          <TabsContent value="general">
-              <section className="space-y-4">
-                <div className="space-y-2 my-4">
-                  <Label htmlFor="type">Tipo de Alojamiento *</Label>
-                  <Combobox
-                    items={accommodationTypeValues}
-                    value={form.watch("type")}
-                    itemToStringLabel={(value) =>
-                      accommodationTypes.find((item) => item.value === value)?.label ?? ""
-                    }
-                    filter={(value, query, itemToString) =>
-                      normalizeAccommodationSearchText(itemToString?.(value) ?? String(value)).includes(
-                        normalizeAccommodationSearchText(query),
-                      )
-                    }
-                    onValueChange={(value) => {
-                      if (value) {
-                        form.setValue("type", value as AccommodationType, {
-                          shouldDirty: true,
-                          shouldValidate: true,
-                        })
-                      }
-                    }}
-                  >
-                    <ComboboxInput
-                      id="type"
-                      aria-label="Tipo de alojamiento"
-                      placeholder="Selecciona un tipo"
-                      className="w-full"
-                    >
-                      <ComboboxContent>
-                        <ComboboxEmpty>No se encontraron resultados.</ComboboxEmpty>
-                        <ComboboxList>
-                          {(value) => (
-                            <ComboboxItem key={value} value={value}>
-                              {accommodationTypes.find((item) => item.value === value)?.label}
-                            </ComboboxItem>
-                          )}
-                        </ComboboxList>
-                      </ComboboxContent>
-                    </ComboboxInput>
-                  </Combobox>
-                  {form.formState.errors.type && (
-                    <p className="text-sm text-destructive">
-                      {form.formState.errors.type.message}
-                    </p>
-                  )}
-                </div>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {fieldsAccommodation.map((field) => {
-                    const errorMessage = form.formState.errors[field.name]?.message
-
-                    return (
-                      <div key={field.name} className="space-y-2">
-                        <Label htmlFor={field.name}>{field.label}</Label>
-                        <Input
-                          id={field.name}
-                          type={field.type ?? "text"}
-                          min={field.type === "number" ? 0 : undefined}
-                          {...form.register(field.name)}
-                        />
-                        {errorMessage && (
-                          <p className="text-sm text-destructive">{errorMessage}</p>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              </section>
-          </TabsContent>
-
-          <TabsContent value="address">
-            <section className="space-y-4 py-8">
               <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="locality">Localidad</Label>
-                  <Combobox items={accommodationLocalities} value={form.watch("locality") || null}
-                    filter={(value, query) => normalizeAccommodationSearchText(value).includes(normalizeAccommodationSearchText(query))}
-                    onValueChange={(value) => form.setValue("locality", value ?? "", { shouldDirty: true, shouldValidate: true })}>
-                    <ComboboxInput id="locality" aria-label="Localidad" placeholder="Selecciona una localidad" className="w-full">
-                      <ComboboxContent><ComboboxEmpty>No se encontraron resultados.</ComboboxEmpty><ComboboxList>
-                        {(locality) => <ComboboxItem key={locality} value={locality}>{locality}</ComboboxItem>}
-                      </ComboboxList></ComboboxContent>
-                    </ComboboxInput>
-                  </Combobox>
-                  {form.formState.errors.locality && <p className="text-sm text-destructive">{form.formState.errors.locality.message}</p>}
-                </div>
-                <div className="space-y-2"><Label htmlFor="address">Dirección</Label><Input id="address" {...form.register("address")} />
-                  {form.formState.errors.address && <p className="text-sm text-destructive">{form.formState.errors.address.message}</p>}
-                </div>
-                <div className="space-y-2"><Label htmlFor="addressMap">Enlace al mapa</Label><Input id="addressMap" type="url" {...form.register("addressMap")} />
-                  {form.formState.errors.addressMap && <p className="text-sm text-destructive">{form.formState.errors.addressMap.message}</p>}
-                </div>
+                {fieldsAccommodation.map((field) => {
+                  const errorMessage = form.formState.errors[field.name]?.message
+
+                  return (
+                    <div key={field.name} className="space-y-2">
+                      <Label htmlFor={field.name}>{field.label}</Label>
+                      <Input
+                        id={field.name}
+                        type={field.type ?? "text"}
+                        min={field.type === "number" ? 0 : undefined}
+                        {...form.register(field.name)}
+                      />
+                      {errorMessage && (
+                        <p className="text-sm text-destructive">{errorMessage}</p>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             </section>
-          </TabsContent>
+        </TabsContent>
 
-          <TabsContent value="contacts">
-            <section className="space-y-4 py-8">
-              
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {fieldsContact.map((field) => {
-                    const errorMessage = form.formState.errors[field.name]?.message
+        <TabsContent value="address">
+          <section className="space-y-4 py-8">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="locality">Localidad</Label>
+                <Combobox items={accommodationLocalities} value={selectedLocality || null}
+                  filter={(value, query) => normalizeAccommodationSearchText(value).includes(normalizeAccommodationSearchText(query))}
+                  onValueChange={(value) => form.setValue("locality", value ?? "", { shouldDirty: true, shouldValidate: true })}>
+                  <ComboboxInput id="locality" aria-label="Localidad" placeholder="Selecciona una localidad" className="w-full">
+                    <ComboboxContent><ComboboxEmpty>No se encontraron resultados.</ComboboxEmpty><ComboboxList>
+                      {(locality) => <ComboboxItem key={locality} value={locality}>{locality}</ComboboxItem>}
+                    </ComboboxList></ComboboxContent>
+                  </ComboboxInput>
+                </Combobox>
+                {form.formState.errors.locality && <p className="text-sm text-destructive">{form.formState.errors.locality.message}</p>}
+              </div>
+              <div className="space-y-2"><Label htmlFor="address">Dirección</Label><Input id="address" {...form.register("address")} />
+                {form.formState.errors.address && <p className="text-sm text-destructive">{form.formState.errors.address.message}</p>}
+              </div>
+              <div className="space-y-2"><Label htmlFor="addressMap">Enlace al mapa</Label><Input id="addressMap" type="url" {...form.register("addressMap")} />
+                {form.formState.errors.addressMap && <p className="text-sm text-destructive">{form.formState.errors.addressMap.message}</p>}
+              </div>
+            </div>
+          </section>
+        </TabsContent>
 
-                    return (
-                      <div key={field.name} className="space-y-2">
-                        <Label htmlFor={field.name}>{field.label}</Label>
-                        <Input
-                          id={field.name}
-                          type={field.type ?? "text"}
-                          min={field.type === "number" ? 0 : undefined}
-                          {...form.register(field.name)}
-                        />
-                        {errorMessage && (
-                          <p className="text-sm text-destructive">{errorMessage}</p>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-            </section>
-          </TabsContent>
-
-              {form.formState.errors.root?.message && (
-                <p role="alert" className="text-sm text-destructive">
-                  {form.formState.errors.root.message}
-                </p>
-              )}
-
+        <TabsContent value="contacts">
+          <section className="space-y-4 py-8">
             
+              <div className="grid gap-4 sm:grid-cols-2">
+                {fieldsContact.map((field) => {
+                  const errorMessage = form.formState.errors[field.name]?.message
 
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={form.formState.isSubmitting}
-              >
-                Cancelar
+                  return (
+                    <div key={field.name} className="space-y-2">
+                      <Label htmlFor={field.name}>{field.label}</Label>
+                      <Input
+                        id={field.name}
+                        type={field.type ?? "text"}
+                        min={field.type === "number" ? 0 : undefined}
+                        {...form.register(field.name)}
+                      />
+                      {errorMessage && (
+                        <p className="text-sm text-destructive">{errorMessage}</p>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+          </section>
+        </TabsContent>
+
+            {form.formState.errors.root?.message && (
+              <p role="alert" className="text-sm text-destructive">
+                {form.formState.errors.root.message}
+              </p>
+            )}
+
+          
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={form.formState.isSubmitting}
+            >
+              Cancelar
+            </Button>
+            {step !== "organization" && <Button type="button" variant="outline" onClick={() => setStep(steps[steps.indexOf(step) - 1])} disabled={form.formState.isSubmitting}>Anterior</Button>}
+            {step === "contacts" ? (
+              <Button type="submit" onClick={() => { allowSubmitRef.current = true }} disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting ? "Guardando..." : editing ? "Guardar cambios" : "Crear alojamiento"}
               </Button>
-              {step !== "organization" && <Button type="button" variant="outline" onClick={() => setStep(steps[steps.indexOf(step) - 1])} disabled={form.formState.isSubmitting}>Anterior</Button>}
-              {step === "contacts" ? (
-                <Button type="submit" onClick={() => { allowSubmitRef.current = true }} disabled={form.formState.isSubmitting}>
-                  {form.formState.isSubmitting ? "Guardando..." : editing ? "Guardar cambios" : "Crear alojamiento"}
-                </Button>
-              ) : <Button type="button" onClick={nextStep}>Siguiente</Button>}
-            </DialogFooter>
-           
-          </Tabs>
-        </form>
-      </DialogContent>
-    </Dialog>
+            ) : <Button type="button" onClick={nextStep}>Siguiente</Button>}
+          </DialogFooter>
+         
+        </Tabs>
+      </form>
+    </>
   )
 }

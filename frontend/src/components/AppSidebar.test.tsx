@@ -47,9 +47,9 @@ describe("AppSidebar", () => {
 
     expect(screen.getByRole("button", { name: /Alojamientos/ })).toHaveAttribute("aria-expanded", "true")
     expect(screen.getByRole("link", { name: "Todos los alojamientos" })).toHaveAttribute("href", "/alojamientos")
-    expect(screen.getByRole("link", { name: "Resumen" })).toHaveAttribute("href", "/alojamientos/estadisticas")
     expect(screen.getByRole("link", { name: "Registros diarios" })).toHaveAttribute("href", "/alojamientos/estadisticas/registros")
     expect(screen.getByRole("link", { name: "Reportes" })).toHaveAttribute("href", "/alojamientos/estadisticas/reportes")
+    expect(screen.queryByRole("link", { name: "Resumen" })).not.toBeInTheDocument()
     expect(screen.queryByRole("link", { name: "Carga diaria" })).not.toBeInTheDocument()
   })
 })

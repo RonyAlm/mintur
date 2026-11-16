@@ -1,6 +1,9 @@
 import { act, renderHook, waitFor } from "@testing-library/react"
+import { QueryClientProvider } from "@tanstack/react-query"
+import type { ReactNode } from "react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
+import { createTestQueryClient } from "@/test/query-client"
 import { accommodationsApi } from "../api/accommodations.api"
 import type { Accommodation } from "../types/accommodation.types"
 import { useAccommodations } from "./useAccommodations"
@@ -38,6 +41,13 @@ const accommodation: Accommodation = {
 
 const mockedApi = vi.mocked(accommodationsApi)
 
+function createWrapper() {
+  const queryClient = createTestQueryClient()
+  return ({ children }: { children: ReactNode }) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  )
+}
+
 describe("useAccommodations", () => {
   beforeEach(() => {
     vi.resetAllMocks()
@@ -47,7 +57,7 @@ describe("useAccommodations", () => {
   })
 
   it("loads accommodations and clears loading when enabled", async () => {
-    const { result } = renderHook(() => useAccommodations())
+    const { result } = renderHook(() => useAccommodations(), { wrapper: createWrapper() })
 
     expect(result.current.loading).toBe(true)
     await waitFor(() => expect(result.current.loading).toBe(false))
@@ -58,7 +68,7 @@ describe("useAccommodations", () => {
   })
 
   it("does not load accommodations when disabled", async () => {
-    const { result } = renderHook(() => useAccommodations(false))
+    const { result } = renderHook(() => useAccommodations(false), { wrapper: createWrapper() })
 
     expect(result.current.loading).toBe(false)
     expect(mockedApi.list).not.toHaveBeenCalled()
@@ -66,7 +76,7 @@ describe("useAccommodations", () => {
 
   it("sets an error and clears loading when loading fails", async () => {
     mockedApi.list.mockRejectedValueOnce(new Error("List failed"))
-    const { result } = renderHook(() => useAccommodations())
+    const { result } = renderHook(() => useAccommodations(), { wrapper: createWrapper() })
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
@@ -78,7 +88,7 @@ describe("useAccommodations", () => {
     { isActive: true, method: "deactivate" as const },
     { isActive: false, method: "activate" as const },
   ])("$method an accommodation and reloads the list", async ({ isActive, method }) => {
-    const { result } = renderHook(() => useAccommodations())
+    const { result } = renderHook(() => useAccommodations(), { wrapper: createWrapper() })
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     await act(async () => {
@@ -92,7 +102,7 @@ describe("useAccommodations", () => {
   it("retains the mutation error and propagates a failed activation", async () => {
     const mutationError = new Error("Activation failed")
     mockedApi.activate.mockRejectedValueOnce(mutationError)
-    const { result } = renderHook(() => useAccommodations())
+    const { result } = renderHook(() => useAccommodations(), { wrapper: createWrapper() })
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     let rejectedError: unknown

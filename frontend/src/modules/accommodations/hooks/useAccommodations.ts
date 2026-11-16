@@ -1,36 +1,32 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useState } from "react"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 
 import { getApiErrorMessage } from "@/lib/api-error"
 
 import { accommodationsApi } from "../api/accommodations.api"
 import type { Accommodation } from "../types/accommodation.types"
 
+const accommodationsQueryKey = ["accommodations"] as const
+
 export function useAccommodations(enabled = true) {
-  const [accommodations, setAccommodations] = useState<Accommodation[]>([])
-  const [loading, setLoading] = useState(enabled)
-  const [error, setError] = useState<string | null>(null)
+  const queryClient = useQueryClient()
+  const [mutationError, setMutationError] = useState<string | null>(null)
+
+  const accommodationsQuery = useQuery({
+    queryKey: accommodationsQueryKey,
+    queryFn: () => accommodationsApi.list(),
+    enabled,
+    retry: false,
+  })
 
   const loadAccommodations = useCallback(async () => {
-    setLoading(true)
-    setError(null)
-
-    try {
-      const result = await accommodationsApi.list()
-      setAccommodations(result)
-    } catch (err) {
-      setError(getApiErrorMessage(err))
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (enabled) void loadAccommodations()
-  }, [enabled, loadAccommodations])
+    setMutationError(null)
+    await queryClient.refetchQueries({ queryKey: accommodationsQueryKey })
+  }, [queryClient])
 
   const toggleAccommodation = useCallback(
     async (accommodation: Accommodation) => {
-      setError(null)
+      setMutationError(null)
 
       try {
         if (accommodation.isActive) {
@@ -40,17 +36,21 @@ export function useAccommodations(enabled = true) {
         }
         await loadAccommodations()
       } catch (err) {
-        setError(getApiErrorMessage(err))
+        setMutationError(getApiErrorMessage(err))
         throw err
       }
     },
     [loadAccommodations],
   )
 
+  const queryError = accommodationsQuery.isError
+    ? getApiErrorMessage(accommodationsQuery.error)
+    : null
+
   return {
-    accommodations,
-    loading,
-    error,
+    accommodations: accommodationsQuery.data ?? [],
+    loading: accommodationsQuery.isLoading || accommodationsQuery.isFetching,
+    error: mutationError ?? queryError,
     loadAccommodations,
     toggleAccommodation,
   }

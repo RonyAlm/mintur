@@ -1,6 +1,19 @@
 import { useState } from "react"
 import { Link, useLocation } from "react-router"
-import { BarChart3Icon, Building2Icon, ChevronDownIcon, HomeIcon, LogOutIcon, ShieldCheckIcon, type LucideIcon, UsersIcon } from "lucide-react"
+import {
+  BarChart3Icon,
+  Building2Icon,
+  ChevronDownIcon,
+  HomeIcon,
+  LogOutIcon,
+  ShieldCheckIcon,
+  type LucideIcon,
+  UsersIcon,
+  FileChartPieIcon,
+  CalendarPlusIcon,
+  CalendarCheckIcon,
+  Table2Icon
+} from "lucide-react"
 
 import {
   Sidebar,
@@ -136,7 +149,8 @@ export function AppSidebar() {
                       isActive={pathname === "/alojamientos"}
                       render={<Link to="/alojamientos" />}
                     >
-                      <span>Todos los alojamientos</span>
+                      <Table2Icon aria-hidden="true" />
+                      <span>Todos</span>
                     </SidebarMenuSubButton>
                   </SidebarMenuSubItem>
                   <SidebarMenuSubItem>
@@ -152,17 +166,10 @@ export function AppSidebar() {
                     {accommodationStatisticsOpen && <SidebarMenuSub>
                       <SidebarMenuSubItem>
                         <SidebarMenuSubButton
-                          isActive={pathname === "/alojamientos/estadisticas"}
-                          render={<Link to="/alojamientos/estadisticas" />}
-                        >
-                          <span>Resumen</span>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton
                           isActive={pathname.startsWith("/alojamientos/estadisticas/registros")}
                           render={<Link to="/alojamientos/estadisticas/registros" />}
                         >
+
                           <span>Registros diarios</span>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
@@ -171,6 +178,7 @@ export function AppSidebar() {
                           isActive={pathname === "/alojamientos/estadisticas/reportes"}
                           render={<Link to="/alojamientos/estadisticas/reportes" />}
                         >
+
                           <span>Reportes</span>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
@@ -193,25 +201,28 @@ export function AppSidebar() {
                 </SidebarMenuButton>
                 {statisticsOpen && <SidebarMenuSub>
                   <SidebarMenuSubItem>
-                     <SidebarMenuSubButton 
-                         isActive={pathname === "/estadisticas/carga-diaria"} 
-                         render={<Link to="/estadisticas/carga-diaria" />}>
-                           <span>Carga diaria</span>
-                     </SidebarMenuSubButton>
+                    <SidebarMenuSubButton
+                      isActive={pathname === "/estadisticas/carga-diaria"}
+                      render={<Link to="/estadisticas/carga-diaria" />}>
+                      <CalendarPlusIcon aria-hidden="true" />
+                      <span>Carga diaria</span>
+                    </SidebarMenuSubButton>
                   </SidebarMenuSubItem>
                   <SidebarMenuSubItem>
-                     <SidebarMenuSubButton 
-                         isActive={pathname.startsWith("/estadisticas/registros") || pathname.startsWith("/estadisticas/mis-registros")} 
-                         render={<Link to="/estadisticas/registros" />}>
-                           <span>Registros</span>
-                     </SidebarMenuSubButton>
+                    <SidebarMenuSubButton
+                      isActive={pathname.startsWith("/estadisticas/registros") || pathname.startsWith("/estadisticas/mis-registros")}
+                      render={<Link to="/estadisticas/registros" />}>
+                      <CalendarCheckIcon aria-hidden="true" />
+                      <span>Registros</span>
+                    </SidebarMenuSubButton>
                   </SidebarMenuSubItem>
                   <SidebarMenuSubItem>
-                     <SidebarMenuSubButton 
-                         isActive={pathname === "/estadisticas/reportes" || pathname === "/reportes"} 
-                         render={<Link to="/estadisticas/reportes" />}>
-                           <span>Reportes</span>
-                     </SidebarMenuSubButton>
+                    <SidebarMenuSubButton
+                      isActive={pathname === "/estadisticas/reportes" || pathname === "/reportes"}
+                      render={<Link to="/estadisticas/reportes" />}>
+                      <FileChartPieIcon aria-hidden="true" />
+                      <span>Reportes</span>
+                    </SidebarMenuSubButton>
                   </SidebarMenuSubItem>
                 </SidebarMenuSub>}
               </SidebarMenuItem>
@@ -232,18 +243,18 @@ export function AppSidebar() {
                   {usersOpen && (
                     <SidebarMenuSub >
                       {canSeeUsers &&
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton
-                           isActive={pathname.startsWith("/usuarios")} render={<Link to="/usuarios" />}>
-                          <UsersIcon className="" aria-hidden="true" /><span>Usuarios</span>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>}
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton
+                            isActive={pathname.startsWith("/usuarios")} render={<Link to="/usuarios" />}>
+                            <UsersIcon className="" aria-hidden="true" /><span>Usuarios</span>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>}
                       {canSeeRoles &&
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton isActive={pathname.startsWith("/roles")} render={<Link to="/roles" />}>
-                          <ShieldCheckIcon className="" aria-hidden="true" /><span>Roles y permisos</span>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>}
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton isActive={pathname.startsWith("/roles")} render={<Link to="/roles" />}>
+                            <ShieldCheckIcon className="" aria-hidden="true" /><span>Roles y permisos</span>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>}
                     </SidebarMenuSub>
                   )}
                 </SidebarMenuItem>

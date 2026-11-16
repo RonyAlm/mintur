@@ -1,22 +1,15 @@
-import { useEffect, useState } from "react"
+import { useQuery } from "@tanstack/react-query"
 import { organizationsApi, type OrganizationMembership } from "../api/organizations.api"
 
+const EMPTY_MEMBERSHIPS: OrganizationMembership[] = []
+
 export function useMyOrganizationMemberships(userId: string | undefined) {
-  const [memberships, setMemberships] = useState<OrganizationMembership[]>([])
+  const { data } = useQuery({
+    queryKey: ["my-organization-memberships", userId],
+    queryFn: () => organizationsApi.listMine(),
+    enabled: Boolean(userId),
+    retry: false,
+  })
 
-  useEffect(() => {
-    let active = true
-    if (!userId) {
-      setMemberships([])
-      return () => { active = false }
-    }
-
-    organizationsApi.listMine()
-      .then((nextMemberships) => { if (active) setMemberships(nextMemberships) })
-      .catch(() => { if (active) setMemberships([]) })
-
-    return () => { active = false }
-  }, [userId])
-
-  return memberships
+  return data ?? EMPTY_MEMBERSHIPS
 }

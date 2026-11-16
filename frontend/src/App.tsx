@@ -94,7 +94,7 @@ function App() {
                 <Route path="alojamientos" element={<AccommodationsPage />} />
                 <Route path="alojamientos/:id" element={<AccommodationDetailPage />} />
                 <Route element={<PermissionRoute permission="accommodation-statistics:read" />}>
-                  <Route path="alojamientos/estadisticas" element={<SystemAccommodationStatisticsPage view="summary" />} />
+                  <Route path="alojamientos/estadisticas" element={<Navigate to="/alojamientos/estadisticas/reportes" replace />} />
                   <Route path="alojamientos/estadisticas/registros" element={<SystemAccommodationStatisticsPage view="records" />} />
                   <Route path="alojamientos/estadisticas/reportes" element={<SystemAccommodationStatisticsPage view="reports" />} />
                   <Route path="alojamientos/:id/estadisticas" element={<AccommodationStatisticsPage />} />

@@ -20,7 +20,7 @@ import { getPeriodRange, getWeekRange } from "../utils/statisticsPeriods"
 import AccommodationStatisticsPage from "./AccommodationStatisticsPage"
 import type { StatisticsView } from "./OrganizationStatisticsPage"
 
-type SystemStatisticsView = Extract<StatisticsView, "summary" | "records" | "reports">
+type SystemStatisticsView = Extract<StatisticsView, "records" | "reports">
 
 interface SystemAccommodationStatisticsPageProps {
   view?: SystemStatisticsView
@@ -32,7 +32,7 @@ function formatAccommodationLabel(accommodation: Accommodation) {
 }
 
 export default function SystemAccommodationStatisticsPage({
-  view = "summary",
+  view = "reports",
 }: SystemAccommodationStatisticsPageProps) {
   const [searchParams, setSearchParams] = useSearchParams()
   const [period, setPeriod] = useState<StatisticsPeriod>("week")
@@ -40,7 +40,7 @@ export default function SystemAccommodationStatisticsPage({
   const { isSystemRole, isSystemRoleLoading } = useStatisticsPermissions()
 
   const requestedId = searchParams.get("accommodationId")
-  const supportsAllScope = view === "summary" || view === "reports"
+  const supportsAllScope = view === "reports"
   const {
     data: accommodations = [],
     isLoading: accommodationsLoading,
@@ -100,7 +100,7 @@ export default function SystemAccommodationStatisticsPage({
     </Alert>
   }
 
-  const title = view === "records" ? "Registros diarios" : view === "reports" ? "Reportes" : "Resumen de estadísticas"
+  const title = view === "records" ? "Registros diarios" : "Reportes"
 
   return <main className="mx-auto w-full max-w-6xl space-y-6">
     <header className="space-y-2">
@@ -141,7 +141,7 @@ export default function SystemAccommodationStatisticsPage({
       {supportsAllScope && selectedId === "all" && <div className="flex flex-wrap items-end gap-3">
         <AccommodationStatisticsPeriodFilters
           showPeriodFilters
-          periodFilterLabel={view === "reports" ? "Filtrar reportes por período" : "Filtrar resumen por período"}
+          periodFilterLabel="Filtrar reportes por período"
           period={period}
           range={range}
           onPeriodChange={handlePeriodChange}

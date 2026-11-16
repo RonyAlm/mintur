@@ -57,7 +57,7 @@ const globalSummary = {
 }
 
 function renderPage(
-  view: "summary" | "records" | "reports" = "summary",
+  view: "records" | "reports" = "reports",
   isSystemRole = true,
   initialEntry = "/",
 ) {
@@ -91,29 +91,8 @@ describe("SystemAccommodationStatisticsPage", () => {
 
   afterEach(cleanup)
 
-  it("shows the global summary by default and requests the global endpoint", async () => {
-    renderPage()
-
-    expect(await screen.findByRole("combobox", { name: "Alojamiento" }))
-      .toHaveTextContent("Todos los alojamientos")
-    expect(await screen.findByTestId("global-summary")).toHaveTextContent("42:7")
-    await waitFor(() => expect(accommodationStatisticsApi.getAllSummary).toHaveBeenCalledWith(
-      expect.any(String), expect.any(String),
-    ))
-  })
-
-  it("shows the selected accommodation summary using the existing per-accommodation view", async () => {
-    renderPage("summary", true, "/?accommodationId=accommodation-1")
-
-    await waitFor(() => expect(screen.getByRole("combobox", { name: "Alojamiento" }))
-      .toHaveTextContent("Hotel Central — Formosa"))
-    expect(await screen.findByTestId("accommodation-statistics-page"))
-      .toHaveTextContent("accommodation-1:summary")
-    expect(accommodationStatisticsApi.getAllSummary).not.toHaveBeenCalled()
-  })
-
   it("does not expose the global view to non-system users", async () => {
-    renderPage("summary", false)
+    renderPage("reports", false)
 
     expect(await screen.findByText(/solo está disponible para usuarios de sistema/i)).toBeInTheDocument()
     expect(accommodationStatisticsApi.getAllSummary).not.toHaveBeenCalled()
