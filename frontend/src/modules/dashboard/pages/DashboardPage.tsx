@@ -32,5 +32,5 @@ export default function DashboardPage() {
 
   if (variant === "owner") return <OwnerDashboard />
   if (variant === "operator") return <OperatorDashboard />
-  return <MinistryDashboard />
+  return <MinistryDashboard isSystemRole={isSystemRole} />
 }
