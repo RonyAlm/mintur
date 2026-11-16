@@ -93,21 +93,9 @@ export function useMinistryDashboard(isSystemRole = false) {
   const unifiedTo = range.to || todayKey
 
   const recordsQuery = useQuery<AccommodationDailyStatistic[]>({
-    queryKey: [
-      "ministry-accommodation-records",
-      unifiedFrom,
-      unifiedTo,
-      activeAccommodations.map((acc) => acc.id).join(","),
-    ],
-    queryFn: async () => {
-      const results = await Promise.allSettled(
-        activeAccommodations.map((acc) =>
-          accommodationStatisticsApi.listByAccommodation(acc.id, unifiedFrom, unifiedTo),
-        ),
-      )
-      return results.flatMap((result) => (result.status === "fulfilled" ? result.value : []))
-    },
-    enabled: activeAccommodations.length > 0 && Boolean(unifiedFrom) && Boolean(unifiedTo),
+    queryKey: ["ministry-all-records", unifiedFrom, unifiedTo],
+    queryFn: () => accommodationStatisticsApi.listAll(unifiedFrom, unifiedTo),
+    enabled: Boolean(unifiedFrom) && Boolean(unifiedTo),
     retry: false,
   })
   const allRecords = recordsQuery.data ?? EMPTY_RECORDS

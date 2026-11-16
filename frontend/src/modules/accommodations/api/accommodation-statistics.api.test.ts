@@ -29,4 +29,18 @@ describe("accommodationStatisticsApi", () => {
       params: { from: "2026-10-01", to: "2026-10-10" },
     })
   })
+
+  it("requests all daily statistics for the global list endpoint", async () => {
+    const records = [
+      { id: "1", accommodationId: "a", date: "2026-10-01", totalGuests: 3, ageRanges: [], travelPurposes: [], origins: [] },
+    ]
+    vi.mocked(api.get).mockResolvedValueOnce({ data: records } as never)
+
+    await expect(accommodationStatisticsApi.listAll("2026-10-01", "2026-10-10"))
+      .resolves.toEqual(records)
+
+    expect(api.get).toHaveBeenCalledWith("/accommodation-statistics", {
+      params: { from: "2026-10-01", to: "2026-10-10" },
+    })
+  })
 })

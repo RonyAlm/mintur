@@ -43,4 +43,11 @@ export const accommodationStatisticsApi = {
     })
     return data
   },
+
+  async listAll(from: string, to: string): Promise<AccommodationDailyStatistic[]> {
+    const { data } = await api.get<AccommodationDailyStatistic[]>("/accommodation-statistics", {
+      params: { from, to },
+    })
+    return data
+  },
 }
