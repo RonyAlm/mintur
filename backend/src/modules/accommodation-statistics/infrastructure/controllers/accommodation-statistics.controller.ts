@@ -14,6 +14,7 @@ import {
   GetAccommodationStatisticsSummaryUseCase,
   GetMemberAccommodationStatisticsUseCase,
   GetAllAccommodationsStatisticsSummaryUseCase,
+  ListAllAccommodationStatisticsUseCase,
   UpdateAccommodationDailyStatisticUseCase,
 } from '../../application';
 import { Auth } from '../../../../core/decorators';
@@ -39,6 +40,7 @@ export class AccommodationStatisticsController {
     private readonly updateAccommodationDailyStatisticUseCase: UpdateAccommodationDailyStatisticUseCase,
     private readonly getAccommodationStatisticsSummaryUseCase: GetAccommodationStatisticsSummaryUseCase,
     private readonly getAllAccommodationsStatisticsSummaryUseCase: GetAllAccommodationsStatisticsSummaryUseCase,
+    private readonly listAllAccommodationStatisticsUseCase: ListAllAccommodationStatisticsUseCase,
     private readonly getMemberAccommodationStatisticsUseCase: GetMemberAccommodationStatisticsUseCase,
   ) {}
 
@@ -84,6 +86,19 @@ export class AccommodationStatisticsController {
       currentUser,
       from: new Date(query.from),
       to: new Date(query.to),
+    });
+  }
+
+  @Get()
+  @Auth('accommodation-statistics:read')
+  async listAllAccommodationStatistics(
+    @Query() query: GetAccommodationStatisticsQueryDto,
+    @CurrentUser() currentUser: AuthenticatedUser,
+  ) {
+    return this.listAllAccommodationStatisticsUseCase.execute({
+      currentUser,
+      from: query.from ? new Date(query.from) : undefined,
+      to: query.to ? new Date(query.to) : undefined,
     });
   }
 
