@@ -23,6 +23,7 @@ Test runner: `pnpm test` (vitest), `pnpm build`, `pnpm lint`
 - [x] T4 (S2, S3, S6) route=inline — Componentes de vista: MinistryDashboard, OwnerDashboard, OperatorDashboard. commit=d1c5472
 - [x] T5 (S1) route=inline — `pages/DashboardPage.tsx`, cablear ruta en App.tsx, retirar Dashboard.tsx anterior. commit=1db50ef
 - [x] T6 (S7) route=inline — Vista global Ministerio: períodos/rangos, `useMinistryDashboard` con resumen global + comparación + detalle por alojamiento, `MinistryPeriodFilters`, `NotificationsMenu`, `MinistryDashboard` (indicadores, 4 gráficos, estado de carga, últimos registros, alertas, acciones rápidas, módulos). commit=4b19fe6,0ccadd2
+- [x] T7 (S7) route=inline — Endpoint backend global `GET /accommodation-statistics` (listar todos los registros diarios, solo system admin) y uso en el frontend reemplazando el N+1. commit=58fe4a3,e844502
 
 ## Log
 
@@ -30,5 +31,7 @@ Test runner: `pnpm test` (vitest), `pnpm build`, `pnpm lint`
 - L2 (verificación): `tsc -b` OK, `eslint src/modules/dashboard src/App.tsx` OK, `pnpm build` OK, tests de `dashboard.utils` 10/10 verdes. Fallas preexistentes en `accommodations` (4 timeouts) no relacionadas con este cambio.
 - L3: "Ahora el usuario de sistema, quiero tenga los siguientes; Administrador del Ministerio — Vista global ..." (spec completa). Implementado frontend-only: el backend no expone serie diaria global ni listado de últimos registros, por lo que se combinan registros por alojamiento (`listByAccommodation` por cada alojamiento activo) con `Promise.allSettled`.
 - L4 (verificación T6): `tsc -b` OK, `eslint` OK, `pnpm build` OK, tests `dashboard.utils` 18/18 verdes.
+- L5: "si implementa ese enpoint en el backend" — Autorizado explícitamente tocar backend. Agregado `ListAllAccommodationStatisticsUseCase` + `GET /accommodation-statistics` (system admin). Frontend ahora usa `listAll` en `useMinistryDashboard` en una sola consulta, eliminando el N+1.
+- L6 (verificación T7): backend `tsc -p tsconfig.build.json` OK, jest `accommodation-statistics` 6 suites/13 tests verdes. Frontend `tsc -b`, `eslint`, tests dashboard+api 20/20 verdes.
 
 
