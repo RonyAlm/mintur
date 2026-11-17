@@ -34,7 +34,8 @@ export default function StatCard({ label, value, description, icon }: StatCardDa
         </div>
         {Icon && (
           <span
-            className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"
+            className="flex size-11 shrink-0 items-center justify-center rounded-xl
+             bg-green-100 dark:bg-green-200/10 text-green-600"
             aria-hidden="true"
           >
             <Icon className="size-5" />

@@ -1,4 +1,4 @@
-import { CheckCircle2Icon, CircleDashedIcon, CircleDotIcon } from "lucide-react"
+import { CalendarCheckIcon, CheckCircle2Icon, CircleDashedIcon, CircleDotIcon } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
@@ -22,7 +22,10 @@ export default function WeeklyLoadStatus({ accommodationId }: WeeklyLoadStatusPr
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center gap-4">
+        <div className=" bg-green-300/20 dark:bg-green-300/10 p-3 rounded-full">
+          <CalendarCheckIcon className="text-green-600 size-4" />
+        </div>
         <CardTitle>Estado de carga semanal</CardTitle>
       </CardHeader>
       <CardContent>

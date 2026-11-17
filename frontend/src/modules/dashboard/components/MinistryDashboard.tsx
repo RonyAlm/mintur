@@ -8,7 +8,13 @@ import {
   TrendingUpIcon,
   TriangleAlertIcon,
   UsersIcon,
+  ChartArea,
   type LucideIcon,
+  TrendingUpDownIcon,
+  ChartPieIcon,
+  Globe2Icon,
+  CalendarClock,
+  CalendarCheck,
 } from "lucide-react"
 import {
   Area,
@@ -190,9 +196,14 @@ export default function MinistryDashboard({ isSystemRole }: MinistryDashboardPro
 
       <section aria-label="Gráficos" className="grid gap-4 xl:grid-cols-3">
         <Card className="xl:col-span-2">
-          <CardHeader>
-            <CardTitle>Evolución de visitantes</CardTitle>
-            <CardDescription>Visitantes registrados por día en el período.</CardDescription>
+          <CardHeader className="flex flex-row items-center gap-4">
+            <div className=" bg-green-300/20 dark:bg-green-300/10 p-3 rounded-full">
+              <ChartArea className="text-green-600 size-4" />
+            </div>
+            <div>
+              <CardTitle>Evolución de visitantes</CardTitle>
+              <CardDescription>Visitantes registrados por día en el período.</CardDescription>
+            </div>
           </CardHeader>
           <CardContent>
             {dailyEvolution.length > 0 ? (
@@ -212,17 +223,22 @@ export default function MinistryDashboard({ isSystemRole }: MinistryDashboardPro
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Comparación entre períodos</CardTitle>
-            <CardDescription>Visitantes vs. período anterior.</CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Período actual</p>
-              <p className="text-3xl font-semibold tabular-nums">{comparison.current.toLocaleString("es-AR")}</p>
+          <CardHeader className="flex flex-row items-center gap-4">
+            <div className=" bg-green-300/20 dark:bg-green-300/10 p-3 rounded-full">
+              <TrendingUpDownIcon className="text-green-600 size-4" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Período anterior</p>
+              <CardTitle>Comparación entre períodos</CardTitle>
+              <CardDescription>Visitantes vs. período anterior.</CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent className="px-6 py-4 flex flex-col gap-4">
+            <div>
+              <p className="text-lg text-muted-foreground">Período actual</p>
+              <p className="text-4xl font-semibold tabular-nums">{comparison.current.toLocaleString("es-AR")}</p>
+            </div>
+            <div>
+              <p className="text-lg text-muted-foreground">Período anterior</p>
               <p className="text-xl font-medium tabular-nums text-muted-foreground">
                 {comparison.previous.toLocaleString("es-AR")}
               </p>
@@ -235,13 +251,12 @@ export default function MinistryDashboard({ isSystemRole }: MinistryDashboardPro
                 />
               )}
               <span
-                className={`text-sm font-semibold ${
-                  deltaDirection === "up"
-                    ? "text-emerald-600"
-                    : deltaDirection === "down"
-                      ? "text-red-600"
-                      : "text-muted-foreground"
-                }`}
+                className={`text-sm font-semibold ${deltaDirection === "up"
+                  ? "text-emerald-600"
+                  : deltaDirection === "down"
+                    ? "text-red-600"
+                    : "text-muted-foreground"
+                  }`}
               >
                 {comparison.deltaPercent === null
                   ? "Sin período previo"
@@ -254,11 +269,16 @@ export default function MinistryDashboard({ isSystemRole }: MinistryDashboardPro
 
       <section aria-label="Distribuciones" className="grid gap-4 xl:grid-cols-2">
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center gap-4">
+            <div className=" bg-green-300/20 dark:bg-green-300/10 p-3 rounded-full">
+               <ChartPieIcon className="text-green-600 size-4" />
+            </div>
+            <div>
             <CardTitle>Motivos del viaje</CardTitle>
             <CardDescription>Composición de los visitantes.</CardDescription>
+            </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-6 py-4 flex flex-col gap-4">
             {motives.length > 0 ? (
               <>
                 <ChartContainer config={motivesConfig} className="h-56 w-full">
@@ -290,11 +310,16 @@ export default function MinistryDashboard({ isSystemRole }: MinistryDashboardPro
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Procedencia de visitantes</CardTitle>
-            <CardDescription>Visitantes por provincia o país.</CardDescription>
+          <CardHeader className="flex flex-row items-center gap-4">
+            <div className=" bg-green-300/20 dark:bg-green-300/10 p-3 rounded-full">
+              <Globe2Icon className="text-green-600 size-4" />
+            </div>
+            <div>
+              <CardTitle>Procedencia de visitantes</CardTitle>
+              <CardDescription>Visitantes por provincia o país.</CardDescription>
+            </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-6 py-4 flex flex-col gap-4">
             {origins.length > 0 ? (
               <ChartContainer config={originsConfig} className="h-72 w-full">
                 <BarChart accessibilityLayer layout="vertical" data={origins} margin={{ left: 8, right: 16 }}>
@@ -318,11 +343,16 @@ export default function MinistryDashboard({ isSystemRole }: MinistryDashboardPro
 
       <section aria-label="Secciones inferiores" className="grid gap-4 xl:grid-cols-2">
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center gap-4">
+            <div className=" bg-green-300/20 dark:bg-green-300/10 p-3 rounded-full">
+              <CalendarClock className="size-4 text-green-600" aria-hidden="true" />
+            </div>
+            <div>
             <CardTitle>Estado de carga</CardTitle>
             <CardDescription>
               Alojamientos que registraron estadísticas y los que están pendientes.
             </CardDescription>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <Progress value={loadedPercent}>
@@ -364,9 +394,14 @@ export default function MinistryDashboard({ isSystemRole }: MinistryDashboardPro
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Últimos registros</CardTitle>
-            <CardDescription>Últimas cargas realizadas.</CardDescription>
+          <CardHeader className="flex flex-row items-center gap-4">
+            <div className=" bg-green-300/20 dark:bg-green-300/10 p-3 rounded-full">
+              <CalendarCheck className="size-4 text-green-600" aria-hidden="true" />
+            </div>
+            <div>
+              <CardTitle>Últimos registros</CardTitle>
+              <CardDescription>Últimas cargas realizadas.</CardDescription>
+            </div>
           </CardHeader>
           <CardContent>
             {latestRecords.length === 0 ? (
@@ -398,9 +433,11 @@ export default function MinistryDashboard({ isSystemRole }: MinistryDashboardPro
           <Link
             key={label}
             to={to}
-            className="flex items-center gap-3 rounded-lg border border-border/70 bg-card px-4 py-3 text-sm font-medium transition-colors hover:border-primary/50 hover:bg-accent"
+            className="flex items-center gap-3 rounded-lg border border-border/70
+             bg-card px-4 py-3 text-sm font-medium transition-colors hover:border-green-600
+             dark:hover:bg-green-600/20 hover:bg-green-50/50 hover:text-green-600 focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <Icon className="size-5 text-primary" aria-hidden="true" />
+            <Icon className="size-5" aria-hidden="true" />
             <span>{label}</span>
           </Link>
         ))}
@@ -414,10 +451,14 @@ export default function MinistryDashboard({ isSystemRole }: MinistryDashboardPro
               <Link
                 key={to}
                 to={to}
-                className="group animate-rise border border-border/70 bg-card p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-ring"
+                className="group animate-rise rounded-2xl border border-border/70 bg-card p-5 transition-all duration-200 hover:-translate-y-0.5
+                 hover:border-green-600 hover:shadow-lg hover:shadow-green-600/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 style={{ animationDelay: `${index * 70}ms` }}
               >
-                <span className="mb-4 flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                <span className="mb-4 flex size-10 items-center justify-center rounded-xl
+                 bg-green-50 text-green-600 dark:bg-green-600/10 dark:text-green-50
+                 transition-colors group-hover:bg-green-600 group-hover:text-green-50
+                 dark:group-hover:bg-green-600/10 dark:group-hover:text-green-600">
                   <Icon className="size-5" aria-hidden="true" />
                 </span>
                 <h4 className="flex items-center gap-1.5 font-semibold">

@@ -1,5 +1,5 @@
 import { Link } from "react-router"
-import { ArrowRightIcon, UsersIcon } from "lucide-react"
+import { ArrowRightIcon, CalendarClock, UsersIcon } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import type { AccommodationDailyStatistic } from "@/modules/accommodations/types/accommodation-statistics.types"
 
@@ -26,15 +26,22 @@ export default function RecentRecords({ records, recordsPath, limit = 5 }: Recen
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Últimos registros</CardTitle>
+        <div className="flex flex-row items-center gap-4">
+          <div className=" bg-green-300/20 dark:bg-green-300/10 p-3 rounded-full">
+            <CalendarClock className="size-4 text-green-600" aria-hidden="true" />
+          </div>
+          <CardTitle>Últimos registros</CardTitle>
+        </div>
         <Link
           to={recordsPath}
-          className="text-sm font-medium text-primary hover:underline"
+          title="Ver todos"
+          className="hover:text-green-600 hover:scale-105 transition-all flex items-center gap-1"
         >
-          Ver todos
+          
+          <ArrowRightIcon className="size-4" aria-hidden="true" />
         </Link>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-6">
         {recent.length === 0 ? (
           <p className="py-6 text-center text-sm text-muted-foreground">
             Sin cargas registradas en el período.
@@ -56,7 +63,7 @@ export default function RecentRecords({ records, recordsPath, limit = 5 }: Recen
         )}
         <Link
           to={recordsPath}
-          className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+          className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
         >
           Ver todos los registros
           <ArrowRightIcon className="size-4" aria-hidden="true" />

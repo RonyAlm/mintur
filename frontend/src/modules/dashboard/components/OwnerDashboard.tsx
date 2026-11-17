@@ -2,6 +2,8 @@ import { Link } from "react-router"
 import {
   CalendarCheckIcon,
   CalendarPlusIcon,
+  ChartArea,
+  ChartPieIcon,
   FileChartPieIcon,
   UsersIcon,
 } from "lucide-react"
@@ -199,98 +201,114 @@ export default function OwnerDashboard() {
             ))}
           </section>
 
-      <section aria-label="Gráficos" className="grid gap-4 xl:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Visitantes por semana</CardTitle>
-            <CardDescription>Total de huéspedes agrupado por semana.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {weeklyGuests.length > 0 ? (
-              <ChartContainer config={weeklyConfig} className="h-64 w-full">
-                <BarChart accessibilityLayer data={weeklyGuests} margin={{ left: 4, right: 12 }}>
-                  <CartesianGrid vertical={false} />
-                  <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={8} />
-                  <YAxis allowDecimals={false} tickLine={false} axisLine={false} />
-                  <ChartTooltip cursor={false} content={<ChartTooltipContent nameKey="guests" />} />
-                  <Bar dataKey="guests" fill="var(--color-guests)" radius={4} />
-                </BarChart>
-              </ChartContainer>
-            ) : (
-              <p className="py-12 text-center text-sm text-muted-foreground">
-                Sin registros para mostrar en el período.
-              </p>
-            )}
-          </CardContent>
-        </Card>
+          <section aria-label="Gráficos" className="grid gap-4 xl:grid-cols-2">
+            <Card>
+              <CardHeader className="flex flex-row items-center gap-4">
+                <div className=" bg-green-300/20 dark:bg-green-300/10 p-3 rounded-full">
+                  <UsersIcon className="text-green-600 size-4" />
+                </div>
+                <div>
+                  <CardTitle>Visitantes por semana</CardTitle>
+                  <CardDescription>Total de huéspedes agrupado por semana.</CardDescription>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {weeklyGuests.length > 0 ? (
+                  <ChartContainer config={weeklyConfig} className="h-64 w-full">
+                    <BarChart accessibilityLayer data={weeklyGuests} margin={{ left: 4, right: 12 }}>
+                      <CartesianGrid vertical={false} />
+                      <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={8} />
+                      <YAxis allowDecimals={false} tickLine={false} axisLine={false} />
+                      <ChartTooltip cursor={false} content={<ChartTooltipContent nameKey="guests" />} />
+                      <Bar dataKey="guests" fill="var(--color-guests)" radius={4} />
+                    </BarChart>
+                  </ChartContainer>
+                ) : (
+                  <p className="py-12 text-center text-sm text-muted-foreground">
+                    Sin registros para mostrar en el período.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Distribución por motivo del viaje</CardTitle>
-            <CardDescription>Composición de los huéspedes del período.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {purposeDistribution.length > 0 ? (
-              <>
-                <ChartContainer config={purposeConfig} className="h-56 w-full">
-                  <PieChart>
-                    <Pie data={purposeDistribution} dataKey="quantity" nameKey="name" innerRadius={48} outerRadius={82} paddingAngle={2}>
+            <Card>
+              <CardHeader className="flex flex-row items-center gap-4">
+                <div className=" bg-green-300/20 dark:bg-green-300/10 p-3 rounded-full">
+                  <ChartPieIcon className="text-green-600 size-4" />
+                </div>
+                <div>
+                  <CardTitle>Distribución por motivo del viaje</CardTitle>
+                  <CardDescription>Composición de los huéspedes del período.</CardDescription>
+
+                </div>
+              </CardHeader>
+              <CardContent>
+                {purposeDistribution.length > 0 ? (
+                  <>
+                    <ChartContainer config={purposeConfig} className="h-56 w-full">
+                      <PieChart>
+                        <Pie data={purposeDistribution} dataKey="quantity" nameKey="name" innerRadius={48} outerRadius={82} paddingAngle={2}>
+                          {purposeDistribution.map((item, index) => (
+                            <Cell key={item.name} fill={chartColors[index % chartColors.length]} />
+                          ))}
+                        </Pie>
+                        <ChartTooltip content={<ChartTooltipContent nameKey="name" />} />
+                      </PieChart>
+                    </ChartContainer>
+                    <ul className="px-4 grid gap-x-4 gap-y-2 sm:grid-cols-2">
                       {purposeDistribution.map((item, index) => (
-                        <Cell key={item.name} fill={chartColors[index % chartColors.length]} />
+                        <li key={item.name} className="flex items-center justify-between gap-3 text-sm">
+                          <span className="flex min-w-0 items-center gap-2">
+                            <span aria-hidden="true" className="size-2.5 shrink-0 rounded-sm" style={{ backgroundColor: chartColors[index % chartColors.length] }} />
+                            <span className="truncate">{item.name}</span>
+                          </span>
+                          <span className="font-medium tabular-nums">{item.quantity.toLocaleString("es-AR")}</span>
+                        </li>
                       ))}
-                    </Pie>
-                    <ChartTooltip content={<ChartTooltipContent nameKey="name" />} />
-                  </PieChart>
+                    </ul>
+                  </>
+                ) : (
+                  <p className="py-12 text-center text-sm text-muted-foreground">
+                    Sin datos de motivos para mostrar.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          </section>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-4">
+              <div className=" bg-green-300/20 dark:bg-green-300/10 p-3 rounded-full">
+                <ChartArea className="text-green-600 size-4" />
+              </div>
+              <div>
+                <CardTitle>Evolución diaria de huéspedes</CardTitle>
+                <CardDescription>Huéspedes registrados por día en el período seleccionado.</CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {dailyEvolution.length > 0 ? (
+                <ChartContainer config={evolutionConfig} className="h-64 w-full">
+                  <AreaChart accessibilityLayer data={dailyEvolution} margin={{ left: 4, right: 12, top: 8 }}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={8} />
+                    <YAxis allowDecimals={false} tickLine={false} axisLine={false} />
+                    <ChartTooltip cursor={false} content={<ChartTooltipContent nameKey="guests" />} />
+                    <Area type="monotone" dataKey="guests" stroke="#15ee39" strokeWidth={2} fill="#15ee39" fillOpacity={0.18} activeDot={{ r: 4 }} />
+                  </AreaChart>
                 </ChartContainer>
-                <ul className="grid gap-x-4 gap-y-2 sm:grid-cols-2">
-                  {purposeDistribution.map((item, index) => (
-                    <li key={item.name} className="flex items-center justify-between gap-3 text-sm">
-                      <span className="flex min-w-0 items-center gap-2">
-                        <span aria-hidden="true" className="size-2.5 shrink-0 rounded-sm" style={{ backgroundColor: chartColors[index % chartColors.length] }} />
-                        <span className="truncate">{item.name}</span>
-                      </span>
-                      <span className="font-medium tabular-nums">{item.quantity.toLocaleString("es-AR")}</span>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            ) : (
-              <p className="py-12 text-center text-sm text-muted-foreground">
-                Sin datos de motivos para mostrar.
-              </p>
-            )}
-          </CardContent>
-        </Card>
-      </section>
+              ) : (
+                <p className="py-12 text-center text-sm text-muted-foreground">
+                  Sin registros diarios para mostrar en este período.
+                </p>
+              )}
+            </CardContent>
+          </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Evolución diaria de huéspedes</CardTitle>
-          <CardDescription>Huéspedes registrados por día en el período seleccionado.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {dailyEvolution.length > 0 ? (
-            <ChartContainer config={evolutionConfig} className="h-64 w-full">
-              <AreaChart accessibilityLayer data={dailyEvolution} margin={{ left: 4, right: 12, top: 8 }}>
-                <CartesianGrid vertical={false} />
-                <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={8} />
-                <YAxis allowDecimals={false} tickLine={false} axisLine={false} />
-                <ChartTooltip cursor={false} content={<ChartTooltipContent nameKey="guests" />} />
-                <Area type="monotone" dataKey="guests" stroke="#15ee39" strokeWidth={2} fill="#15ee39" fillOpacity={0.18} activeDot={{ r: 4 }} />
-              </AreaChart>
-            </ChartContainer>
-          ) : (
-            <p className="py-12 text-center text-sm text-muted-foreground">
-              Sin registros diarios para mostrar en este período.
-            </p>
-          )}
-        </CardContent>
-      </Card>
-
-      <div className="grid gap-4 xl:grid-cols-[1.3fr_1fr]">
-        {accommodationId && <WeeklyLoadStatus accommodationId={accommodationId} />}
-        <RecentRecords records={records} recordsPath={recordsPath} />
-      </div>
+          <div className="grid gap-4 xl:grid-cols-[1.3fr_1fr]">
+            {accommodationId && <WeeklyLoadStatus accommodationId={accommodationId} />}
+            <RecentRecords records={records} recordsPath={recordsPath} />
+          </div>
         </>
       )}
     </div>

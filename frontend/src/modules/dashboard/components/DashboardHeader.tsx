@@ -18,7 +18,7 @@ export default function DashboardHeader({
   right,
 }: DashboardHeaderProps) {
   return (
-    <section className="relative overflow-hidden rounded-2xl bg-transparent p-6 text-green-950 dark:text-green-50 md:p-8">
+    <section className="relative overflow-hidden rounded-2xl bg-transparent p-6 text-green-950 dark:text-green-50 md:py-8 md:px-2">
       <div className="relative animate-rise">
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div className="min-w-0">
